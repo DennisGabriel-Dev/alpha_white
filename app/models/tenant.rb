@@ -5,4 +5,7 @@ class Tenant < ApplicationRecord
                                   message: "apenas letras minúsculas, números e hífens" }
 
   scope :active, -> { where(active: true) }
+
+  # Associations
+  has_many :courses, dependent: :destroy
 end
