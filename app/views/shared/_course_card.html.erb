@@ -1,0 +1,54 @@
+<%# Course Card Component
+     Card de curso individual
+     Props: course (objeto Course) %>
+
+<div class="card group">
+  <%# Thumbnail/Imagem do curso %>
+  <div class="relative mb-4 rounded-lg overflow-hidden bg-gradient-to-br from-primary to-primary-dark h-48 flex items-center justify-center">
+    <%# Placeholder - substituir por course.thumbnail quando implementado %>
+    <span class="text-6xl">📖</span>
+    
+    <%# Badge de categoria/tag (opcional) %>
+    <div class="absolute top-3 left-3">
+      <span class="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-primary">
+        <%= course.active ? "Ativo" : "Em breve" %>
+      </span>
+    </div>
+  </div>
+  
+  <%# Conteúdo do card %>
+  <div class="space-y-3">
+    <%# Título do curso %>
+    <h3 class="text-xl font-bold text-gray-800 group-hover:text-primary transition-colors">
+      <%= course.name %>
+    </h3>
+
+    <%# Descrição %>
+    <p class="text-gray-600 text-sm leading-relaxed line-clamp-2">
+      <%= course.description || "Conteúdo completo e atualizado para sua preparação no ENEM." %>
+    </p>
+
+    <%# Meta info (duração, aulas, etc) - mock por enquanto %>
+    <div class="flex items-center space-x-4 text-xs text-gray-500 pt-2">
+      <span class="flex items-center space-x-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span>8h de conteúdo</span>
+      </span>
+      <span class="flex items-center space-x-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+        </svg>
+        <span>24 aulas</span>
+      </span>
+    </div>
+
+    <%# CTA %>
+    <div class="pt-3">
+      <%= link_to course_path(course), class: "block w-full text-center py-2 px-4 bg-accent-turquoise hover:bg-accent-turquoise/90 text-white font-semibold rounded-lg transition-colors" do %>
+        Ver detalhes
+      <% end %>
+    </div>
+  </div>
+</div>
