@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_02_01_000003) do
+ActiveRecord::Schema[8.1].define(version: 2025_02_03_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -29,7 +29,9 @@ ActiveRecord::Schema[8.1].define(version: 2025_02_01_000003) do
   create_table "tenants", comment: "Table tenants (schools). Each tenant represents a whitelabel school.", force: :cascade do |t|
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
+    t.string "logo_url"
     t.string "name", null: false
+    t.string "primary_color", default: "#3C0094"
     t.string "subdomain", null: false, comment: "Unique subdomain for the tenant (ex: 'objetivo' for objetivo.seudominio.com)"
     t.datetime "updated_at", null: false
     t.index ["subdomain"], name: "index_tenants_on_subdomain", unique: true

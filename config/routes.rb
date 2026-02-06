@@ -9,8 +9,16 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # Rotas Web (HTML)
   resources :courses
 
+  # API Routes (JSON)
+  namespace :api do
+    namespace :v1 do
+      resources :courses, only: [:index, :show, :create, :update, :destroy]
+    end
+  end
+
   # Defines the root path route ("/")
-  root "courses#index"
+  root "pages#home"
 end
