@@ -1,13 +1,16 @@
 class CoursesController < ApplicationController
-  before_action :set_course, only: [:show, :edit, :update, :destroy]
+  before_action :set_course, only: [ :show, :edit, :update, :destroy ]
 
   def index
     # Apenas cursos do tenant atual serão retornados automaticamente
     @courses = Course.all
+    respond_to do |format|
+      format.html
+      format.json { render json: @courses }
+    end
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @course = Course.new
