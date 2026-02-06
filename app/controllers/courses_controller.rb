@@ -21,26 +21,55 @@ class CoursesController < ApplicationController
     @course = Course.new(course_params)
 
     if @course.save
-      redirect_to @course, notice: "Curso criado com sucesso."
+      respond_to do |format|
+        format.html { redirect_to @course, notice: "Curso #{@course.name} criado com sucesso." }
+        format.json { render json: {
+            course: @course,
+            message: "Curso #{@course.name} criado com sucesso."
+        }, status: :created }
+      end
     else
-      render :new, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: @course.errors, status: :unprocessable_entity }
+      end
     end
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     if @course.update(course_params)
-      redirect_to @course, notice: "Curso atualizado com sucesso."
+      respond_to do |format|
+        format.html { redirect_to @course, notice: "Curso #{@courser.name} atualizado com sucesso." }
+        format.json { render json: {
+            course: @course,
+            message: "Curso #{@course.name} atualizado com sucesso."
+        }, status: :ok }
+      end
     else
-      render :edit, status: :unprocessable_entity
+      respond_to do |format|
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: @course.errors, status: :unprocessable_entity }
+      end
     end
   end
 
   def destroy
-    @course.destroy
-    redirect_to courses_path, notice: "Curso removido com sucesso."
+    if @course.destroy
+      respond_to do |format|
+        format.html { redirect_to courses_path, notice: "Curso #{@course.name} deletado com sucesso." }
+        format.json { render json: {
+            course: @course,
+            message: "Curso #{@course.name} deletado com sucesso."
+        }, status: :ok }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to courses_path, alert: "Erro ao deletar curso #{@course.name}." }
+        format.json { render json: @course.errors, status: :unprocessable_entity }
+      end
+    end
   end
 
   private
