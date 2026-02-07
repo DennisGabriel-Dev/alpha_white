@@ -34,7 +34,9 @@ class User < ApplicationRecord
     :tenant_admin,
     :instructor,
     :student
-  ]
+  ], default: :student
 
   belongs_to :tenant
+
+  acts_as_tenant :tenant
 end

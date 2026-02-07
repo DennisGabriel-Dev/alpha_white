@@ -1,2 +1,37 @@
 #!/usr/bin/env ruby
-exec "./bin/rails", "server", *ARGV
+server_pid = Process.spawn("./bin/rails", "server", *ARGV)
+tailwind_pid = Process.spawn(
+  "bundle", "exec", "tailwindcss",
+  "-c", "tailwind.config.js",
+  "-i", "app/assets/stylesheets/application.css",
+  "-o", "app/assets/builds/application.css",
+  "--watch"
+)
+
+shutdown = lambda do |signal|
+  [server_pid, tailwind_pid].each do |pid|
+    begin
+      Process.kill(signal, pid)
+    rescue StandardError
+      nil
+    end
+  end
+end
+
+trap("INT") { shutdown.call("INT") }
+trap("TERM") { shutdown.call("TERM") }
+
+exited_pid = Process.wait
+shutdown.call("TERM")
+
+begin
+  Process.wait(server_pid) unless exited_pid == server_pid
+rescue StandardError
+  nil
+end
+
+begin
+  Process.wait(tailwind_pid) unless exited_pid == tailwind_pid
+rescue StandardError
+  nil
+end
