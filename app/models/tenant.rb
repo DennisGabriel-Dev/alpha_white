@@ -25,4 +25,5 @@ class Tenant < ApplicationRecord
 
   # Associations
   has_many :courses, dependent: :destroy
+  has_many :users, dependent: :destroy
 end

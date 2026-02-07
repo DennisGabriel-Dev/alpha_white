@@ -29,7 +29,14 @@
       <%# CTAs Desktop %>
       <div class="hidden md:flex items-center space-x-4">
         <% if user_signed_in? %>
-          <%= link_to "Sair", destroy_user_session_path, method: :delete, class: "text-primary font-semibold hover:text-primary-dark transition-colors" %>
+          <%= link_to "Sair", destroy_user_session_path, 
+            data: {
+              turbo_method: :delete,
+              turbo_confirm: "Tem certeza que deseja sair?",
+              turbo_confirm_message: "Tem certeza que deseja sair?"
+            },
+            class: "text-primary font-semibold hover:text-primary-dark transition-colors" 
+          %>
         <% else %>
           <%= link_to "Entrar", new_user_session_path, class: "text-primary font-semibold hover:text-primary-dark transition-colors" %>
           <%= link_to "Começar Grátis", new_user_registration_path, class: "btn-primary" %>
