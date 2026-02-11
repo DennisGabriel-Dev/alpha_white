@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
   # Configura multi-tenancy
   set_current_tenant_through_filter
   before_action :set_tenant
+  before_action :set_locale
 
   private
 
@@ -30,5 +31,9 @@ class ApplicationController < ActionController::Base
     else
       render plain: "Cursinho não encontrado: #{subdomain}", status: :not_found
     end
+  end
+
+  def set_locale
+    I18n.locale = "pt-br"
   end
 end
