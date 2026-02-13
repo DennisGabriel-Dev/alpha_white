@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_02_01_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_06_030354) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -29,12 +29,30 @@ ActiveRecord::Schema[8.1].define(version: 2025_02_01_000003) do
   create_table "tenants", comment: "Table tenants (schools). Each tenant represents a whitelabel school.", force: :cascade do |t|
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
+    t.string "logo_url"
     t.string "name", null: false
+    t.string "primary_color", default: "#3C0094"
     t.string "subdomain", null: false, comment: "Unique subdomain for the tenant (ex: 'objetivo' for objetivo.seudominio.com)"
     t.datetime "updated_at", null: false
     t.index ["subdomain"], name: "index_tenants_on_subdomain", unique: true
     t.check_constraint "subdomain::text = lower(subdomain::text)", name: "subdomain_lowercase"
   end
 
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.datetime "remember_created_at"
+    t.datetime "reset_password_sent_at"
+    t.string "reset_password_token"
+    t.integer "role", null: false
+    t.bigint "tenant_id"
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["tenant_id"], name: "index_users_on_tenant_id"
+  end
+
   add_foreign_key "courses", "tenants"
+  add_foreign_key "users", "tenants"
 end

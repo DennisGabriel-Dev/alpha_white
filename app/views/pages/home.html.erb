@@ -1,0 +1,128 @@
+<%# Home Page - Plataforma Educacional ENEM
+     Estrutura completa da landing page com todas as seções %>
+
+<%# Header/Navbar %>
+<%= render "shared/header" %>
+
+<%# Hero Section %>
+<%= render "shared/hero" %>
+
+<%# Seção de Benefícios %>
+<section class="py-20 bg-white">
+  <div class="container mx-auto px-4">
+    <%# Título da seção %>
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+        Por que estudar conosco?
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Uma plataforma completa pensada para facilitar sua jornada rumo à aprovação
+      </p>
+    </div>
+
+    <%# Grid de benefícios %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <% @benefits.each do |benefit| %>
+        <%= render "shared/benefit_card", 
+                   icon: benefit[:icon], 
+                   title: benefit[:title], 
+                   description: benefit[:description] %>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<%# Seção de Cursos em Destaque %>
+<section class="py-20 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <%# Cabeçalho da seção %>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
+      <div>
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+          Cursos mais populares
+        </h2>
+        <p class="text-lg text-gray-600">
+          Conteúdo de qualidade para sua preparação
+        </p>
+      </div>
+      <%= link_to courses_path, class: "mt-4 md:mt-0 text-primary hover:text-primary-dark font-semibold flex items-center space-x-2 group" do %>
+        <span>Ver todos os cursos</span>
+        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+        </svg>
+      <% end %>
+    </div>
+
+    <%# Grid de cursos %>
+    <% if @featured_courses.any? %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <% @featured_courses.each do |course| %>
+          <%= render "shared/course_card", course: course %>
+        <% end %>
+      </div>
+    <% else %>
+      <%# Estado vazio %>
+      <div class="text-center py-16 bg-white rounded-2xl">
+        <span class="text-6xl mb-4 inline-block">📚</span>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">
+          Cursos em breve!
+        </h3>
+        <p class="text-gray-500">
+          Estamos preparando conteúdos incríveis para você. Aguarde!
+        </p>
+      </div>
+    <% end %>
+  </div>
+</section>
+
+<%# Seção de Trilhas de Estudo %>
+<section class="py-20 bg-white">
+  <div class="container mx-auto px-4">
+    <%# Título da seção %>
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+        Siga uma trilha de estudos
+      </h2>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Jornadas guiadas com tudo que você precisa para dominar cada área do conhecimento
+      </p>
+    </div>
+
+    <%# Grid de trilhas %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <% @tracks.each do |track| %>
+        <%= render "shared/track_card",
+                   name: track[:name],
+                   description: track[:description],
+                   courses_count: track[:courses_count],
+                   hours: track[:hours],
+                   level: track[:level] %>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<%# Seção CTA Final %>
+<section class="py-20 bg-gradient-to-r from-primary via-primary-dark to-accent-turquoise text-white">
+  <div class="container mx-auto px-4">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl md:text-5xl font-bold mb-6">
+        Pronto para começar sua preparação? 🚀
+      </h2>
+      <p class="text-xl text-gray-100 mb-8">
+        Junte-se a milhares de estudantes que já estão transformando seus sonhos em realidade
+      </p>
+      
+      <%= link_to new_user_registration_path, class: "btn-primary inline-block text-lg px-12 py-4 bg-accent-orange hover:bg-orange-600 shadow-2xl" do %>
+        Criar conta grátis
+      <% end %>
+      
+      <p class="text-sm text-gray-200 mt-6">
+        ✨ Sem cartão de crédito. Cancele quando quiser.
+      </p>
+    </div>
+  </div>
+</section>
+
+<%# Footer %>
+<%= render "shared/footer" %>

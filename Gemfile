@@ -62,4 +62,9 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Annotate Rails models with schema and ActiveRecord relationships [https://github.com/drwl/annotaterb]
+  gem "annotaterb"
 end
+
+gem "devise", "~> 5.0"

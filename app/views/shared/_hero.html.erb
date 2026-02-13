@@ -1,0 +1,61 @@
+<%# Hero Section Component
+     Primeira seção da home com headline, CTAs e imagem %>
+
+<section class="bg-gradient-to-br from-primary via-primary-dark to-primary-deeper text-white py-20">
+  <div class="container mx-auto px-4">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      
+      <%# Conteúdo (Esquerda) %>
+      <div class="space-y-6">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+          Sua aprovação no <span class="text-accent-orange">ENEM</span> começa aqui
+        </h1>
+        
+        <p class="text-lg md:text-xl text-gray-200 leading-relaxed">
+          Prepare-se com conteúdo completo, trilhas personalizadas e simulados realistas. 
+          Estude no seu ritmo e alcance seus objetivos! 🚀
+        </p>
+        
+        <%# CTAs %>
+        <div class="flex flex-col sm:flex-row gap-4 pt-4">
+          <%= link_to new_user_registration_path, class: "btn-primary text-center text-lg px-8 py-4 inline-block" do %>
+            Começar minha preparação
+          <% end %>
+          
+          <%= link_to courses_path, class: "btn-secondary text-center text-lg px-8 py-4 inline-block bg-white/10 border-white text-white hover:bg-white hover:text-primary" do %>
+            Ver cursos disponíveis
+          <% end %>
+        </div>
+        
+        <%# Social Proof rápido %>
+        <div class="flex items-center space-x-6 pt-6 text-sm text-gray-300">
+          <div class="flex items-center space-x-2">
+            <span class="text-2xl">✅</span>
+            <span>+1000 alunos aprovados</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-2xl">⭐</span>
+            <span>Nota 4.9/5</span>
+          </div>
+        </div>
+      </div>
+
+      <%# Imagem/Ilustração (Direita) %>
+      <div class="flex justify-center">
+        <div class="relative">
+          <%# Placeholder para imagem - substituir por imagem real depois %>
+          <div class="w-full max-w-lg aspect-square bg-white/10 backdrop-blur-sm rounded-3xl flex items-center justify-center border-4 border-white/20">
+            <div class="text-center p-8">
+              <span class="text-8xl">🎓</span>
+              <p class="text-xl font-semibold mt-4">Seu futuro começa hoje</p>
+            </div>
+          </div>
+          
+          <%# Elementos decorativos flutuantes %>
+          <div class="absolute -top-4 -left-4 w-20 h-20 bg-accent-orange rounded-full opacity-50 blur-xl"></div>
+          <div class="absolute -bottom-4 -right-4 w-20 h-20 bg-accent-turquoise rounded-full opacity-50 blur-xl"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

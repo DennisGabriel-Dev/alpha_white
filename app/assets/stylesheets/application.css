@@ -8,3 +8,75 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+@import "tailwindcss";
+
+/* Tailwind theme customization */
+@theme {
+  --color-primary: #3C0094;
+  --color-primary-dark: #360187;
+  --color-primary-deeper: #170721;
+  --color-accent-orange: #FE7610;
+  --color-accent-turquoise: #00A3A8;
+}
+
+/* Custom base styles */
+body {
+  background-color: white;
+  color: rgb(17 24 39);
+}
+
+h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Custom component classes */
+.btn-primary {
+  background-color: var(--color-accent-orange);
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: rgb(234 88 12);
+}
+
+.btn-secondary {
+  border: 2px solid var(--color-accent-turquoise);
+  color: var(--color-accent-turquoise);
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-accent-turquoise);
+  color: white;
+}
+
+.card {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  padding: 1.5rem;
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+}

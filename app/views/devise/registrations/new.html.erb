@@ -1,0 +1,116 @@
+<%# Cadastro Page - Versão corrigida e elegante %>
+
+<div style="height: 100vh;" class="min-h-screen w-full bg-gradient-to-br from-accent-turquoise to-primary-dark flex items-center justify-center">
+
+  <div class="w-md max-w-md px-4 mt-6">
+
+    <%# Card REAL %>
+    <div class="bg-white rounded-3xl shadow-2xl p-8 space-y-6">
+
+      <%# Header %>
+      <div class="text-center space-y-3">
+        <div class="flex justify-center">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent-orange to-accent-turquoise flex items-center justify-center shadow-md">
+            <%= heroicon(:rocket_launch, variant: :solid, css_class: "w-8 h-8 text-white") %>
+          </div>
+        </div>
+
+        <h1 class="text-2xl font-extrabold text-gray-900">
+          Crie sua conta 🚀
+        </h1>
+
+        <p class="text-sm text-gray-600">
+          Junte-se ao <span class="font-semibold text-primary"><%= tenant_name %></span>  
+          e estude com foco total.
+        </p>
+      </div>
+
+      <%# Benefícios %>
+      <div class="space-y-2 bg-gray-50 rounded-xl p-4 text-sm text-gray-700">
+        <div class="flex items-center gap-2">
+          <%= heroicon(:check_circle, variant: :solid, css_class: "w-5 h-5 text-primary") %>
+          Acesso completo à plataforma
+        </div>
+        <div class="flex items-center gap-2">
+          <%= heroicon(:chart_bar, variant: :solid, css_class: "w-5 h-5 text-accent-turquoise") %>
+          Acompanhe seu progresso
+        </div>
+        <div class="flex items-center gap-2">
+          <%= heroicon(:trophy, variant: :solid, css_class: "w-5 h-5 text-accent-orange") %>
+          Simulados e desempenho real
+        </div>
+      </div>
+
+      <%# Erros %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <%# Formulário %>
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-4" }) do |f| %>
+
+        <%# Email %>
+        <div>
+          <%= f.label :email, "E-mail", class: "text-xs font-semibold text-gray-700" %>
+          <%= f.email_field :email,
+            placeholder: "email@email.com",
+            autocomplete: "email",
+            class: "mt-1 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-transparent" %>
+        </div>
+
+        <%# Senha %>
+        <div>
+          <div class="flex justify-between text-xs text-gray-700 font-semibold">
+            <%= f.label :password, "Senha" %>
+            <% if @minimum_password_length %>
+              <span class="text-gray-500">mín. <%= @minimum_password_length %></span>
+            <% end %>
+          </div>
+          <%= f.password_field :password,
+            placeholder: "Crie uma senha segura",
+            autocomplete: "new-password",
+            class: "mt-1 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-transparent" %>
+        </div>
+
+        <%# Confirmação %>
+        <div>
+          <%= f.label :password_confirmation, "Confirme a senha", class: "text-xs font-semibold text-gray-700" %>
+          <%= f.password_field :password_confirmation,
+            placeholder: "Repita sua senha",
+            autocomplete: "new-password",
+            class: "mt-1 w-full rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary focus:border-transparent" %>
+        </div>
+
+        <%# Termos %>
+        <p class="text-[11px] text-center text-gray-500">
+          Ao continuar, você concorda com nossos
+          <a href="#" class="text-primary font-semibold hover:underline">Termos</a> e
+          <a href="#" class="text-primary font-semibold hover:underline">Privacidade</a>.
+        </p>
+
+        <%# CTA %>
+        <%= f.submit "Criar conta gratuita",
+          class: "w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-3 rounded-xl shadow-lg hover:shadow-xl transition" %>
+      <% end %>
+
+      <%# Login %>
+      <p class="text-center text-sm text-gray-600">
+        Já tem conta?
+        <%= link_to "Entrar agora", new_session_path(resource_name),
+          class: "font-bold text-primary hover:underline" %>
+      </p>
+
+    </div>
+
+    <%# Social proof %>
+    <div class="mt-6 flex justify-center gap-6 text-white text-sm">
+      <div class="flex items-center gap-1">
+        <%= heroicon(:user_group, variant: :solid, css_class: "w-5 h-5") %>
+        +1.000 alunos
+      </div>
+      <div class="flex items-center gap-1">
+        <%= heroicon(:star, variant: :solid, css_class: "w-5 h-5 text-yellow-400") %>
+        4.9
+      </div>
+    </div>
+
+  </div>
+</div>

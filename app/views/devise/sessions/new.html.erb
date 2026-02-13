@@ -1,0 +1,117 @@
+<%# Login Page - Design moderno e focado em conversão %>
+
+<div class="min-h-screen bg-gradient-to-br from-primary via-primary-dark to-primary-deeper flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-sm w-full">
+    
+    <%# Card Principal %>
+    <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6">
+      
+      <%# Header - Logo + Título %>
+      <div class="text-center">
+        <%# Logo do Tenant %>
+        <div class="flex justify-center mb-6">
+          <div class="w-16 h-16 bg-gradient-to-br from-primary to-accent-turquoise rounded-2xl flex items-center justify-center shadow-lg">
+            <span class="text-4xl">📚</span>
+          </div>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+          Bem-vindo de volta!
+        </h1>
+        <p class="text-gray-600">
+          Entre na sua conta do <%= tenant_name %>
+        </p>
+      </div>
+
+      <%# Mensagens de Erro/Alerta %>
+      <% if flash[:alert] %>
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+          <div class="flex items-start">
+            <%= heroicon(:exclamation_circle, variant: :solid, css_class: "w-5 h-5 mr-3 text-red-600 flex-shrink-0 mt-0.5") %>
+            <p class="text-red-800 text-sm flex-1"><%= flash[:alert] %></p>
+          </div>
+        </div>
+      <% end %>
+
+      <% if flash[:notice] %>
+        <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg">
+          <div class="flex items-start">
+            <%= heroicon(:check_circle, variant: :solid, css_class: "w-5 h-5 mr-3 text-green-600 flex-shrink-0 mt-0.5") %>
+            <p class="text-green-800 text-sm flex-1"><%= flash[:notice] %></p>
+          </div>
+        </div>
+      <% end %>
+
+      <%# Formulário de Login %>
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "space-y-4" }) do |f| %>
+        
+        <%# Campo Email %>
+        <div>
+          <%= f.label :email, "E-mail", class: "block text-xs font-semibold text-gray-700 mb-1.5" %>
+          <%= f.email_field :email, 
+              autofocus: true, 
+              autocomplete: "email",
+              placeholder: "seu@email.com",
+              class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-gray-900 placeholder-gray-400" %>
+        </div>
+
+        <%# Campo Senha %>
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <%= f.label :password, "Senha", class: "block text-xs font-semibold text-gray-700" %>
+            <%= link_to "Esqueceu?", new_password_path(resource_name), class: "text-xs text-primary hover:text-primary-dark font-medium" %>
+          </div>
+          <%= f.password_field :password, 
+              autocomplete: "current-password",
+              placeholder: "Digite sua senha",
+              class: "w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-gray-900 placeholder-gray-400" %>
+        </div>
+
+        <%# Lembrar-me %>
+        <% if devise_mapping.rememberable? %>
+          <div class="flex items-center">
+            <%= f.check_box :remember_me, class: "w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" %>
+            <%= f.label :remember_me, "Lembrar de mim", class: "ml-2 text-sm text-gray-700" %>
+          </div>
+        <% end %>
+
+        <%# Botão de Login %>
+        <div>
+          <%= f.submit "Entrar", class: "w-full bg-gradient-to-r from-accent-orange to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105" %>
+        </div>
+      <% end %>
+
+      <%# Divisor %>
+      <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-300"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-4 bg-white text-gray-500">ou</span>
+        </div>
+      </div>
+
+      <%# Link para Cadastro %>
+      <div class="text-center">
+        <p class="text-gray-600 text-sm">
+          Ainda não tem uma conta?
+          <%= link_to "Criar conta grátis", new_registration_path(resource_name), class: "font-bold text-primary hover:text-primary-dark transition-colors" %>
+        </p>
+      </div>
+
+      <%# Links Adicionais %>
+      <div class="text-center space-y-2 pt-4 border-t border-gray-200">
+        <%= link_to "Não recebeu instruções de confirmação?", new_confirmation_path(resource_name), class: "block text-xs text-gray-500 hover:text-gray-700" if devise_mapping.confirmable? %>
+        <%= link_to "Não recebeu instruções de desbloqueio?", new_unlock_path(resource_name), class: "block text-xs text-gray-500 hover:text-gray-700" if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) %>
+      </div>
+    </div>
+
+    <%# Voltar para Home %>
+    <div class="text-center mt-8">
+      <%= link_to root_path, class: "inline-flex items-center text-white hover:text-gray-200 transition-colors" do %>
+        <%= heroicon(:arrow_left, css_class: "w-5 h-5 mr-2") %>
+        Voltar para home
+      <% end %>
+    </div>
+  </div>
+</div>

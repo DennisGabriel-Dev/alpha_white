@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
+  protect_from_forgery with: :null_session
 
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
@@ -8,6 +9,7 @@ class ApplicationController < ActionController::Base
   # Configura multi-tenancy
   set_current_tenant_through_filter
   before_action :set_tenant
+  before_action :set_locale
 
   private
 
@@ -29,5 +31,9 @@ class ApplicationController < ActionController::Base
     else
       render plain: "Cursinho não encontrado: #{subdomain}", status: :not_found
     end
+  end
+
+  def set_locale
+    I18n.locale = "pt-br"
   end
 end
