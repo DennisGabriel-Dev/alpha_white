@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_06_030354) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_11_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -24,6 +24,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_06_030354) do
     t.index ["tenant_id", "id"], name: "index_courses_on_tenant_id_and_id"
     t.index ["tenant_id", "name"], name: "index_courses_on_tenant_id_and_name"
     t.index ["tenant_id"], name: "index_courses_on_tenant_id"
+  end
+
+  create_table "sessions", comment: "Sessions of a course. Each session belongs to a course and tenant.", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.bigint "tenant_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id", "position"], name: "index_sessions_on_course_id_and_position"
+    t.index ["course_id"], name: "index_sessions_on_course_id"
+    t.index ["tenant_id", "id"], name: "index_sessions_on_tenant_id_and_id"
+    t.index ["tenant_id"], name: "index_sessions_on_tenant_id"
   end
 
   create_table "tenants", comment: "Table tenants (schools). Each tenant represents a whitelabel school.", force: :cascade do |t|
@@ -54,5 +67,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_06_030354) do
   end
 
   add_foreign_key "courses", "tenants"
+  add_foreign_key "sessions", "courses"
+  add_foreign_key "sessions", "tenants"
   add_foreign_key "users", "tenants"
 end

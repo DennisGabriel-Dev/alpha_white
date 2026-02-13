@@ -1,4 +1,5 @@
 module ApplicationHelper
+  include IconHelper
   # Retorna o tenant atual
   def current_tenant
     ActsAsTenant.current_tenant
@@ -22,5 +23,12 @@ module ApplicationHelper
   # Helper para verificar se há tenant ativo
   def tenant_present?
     current_tenant.present?
+  end
+
+  # Verifica se o usuário atual é Admin ou Instrutor (pode criar/editar sessões, aulas etc.)
+  def admin_or_instructor?
+    return false unless user_signed_in?
+
+    current_user.super_admin? || current_user.tenant_admin? || current_user.instructor?
   end
 end

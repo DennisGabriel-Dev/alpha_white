@@ -25,6 +25,8 @@ class Course < ApplicationRecord
 
   belongs_to :tenant
 
+  has_many :sessions, dependent: :destroy
+
   validates :name, presence: true
   validates :description, length: { maximum: 1000 }
 

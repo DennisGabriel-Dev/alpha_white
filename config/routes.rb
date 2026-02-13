@@ -11,12 +11,16 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Rotas Web (HTML)
-  resources :courses
+  resources :courses do
+    resources :sessions, only: [:new, :create, :edit, :update, :destroy]
+  end
 
   # API Routes (JSON)
   namespace :api do
     namespace :v1 do
-      resources :courses, only: [:index, :show, :create, :update, :destroy]
+      resources :courses, only: [:index, :show, :create, :update, :destroy] do
+        resources :sessions, only: [:index, :show, :create, :update, :destroy]
+      end
     end
   end
 
