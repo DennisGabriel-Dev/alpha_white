@@ -59,13 +59,13 @@
     <div class="space-y-4">
       <% @course.sessions.each_with_index do |session, index| %>
         <div class="card flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-4 flex-1">
             <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold">
               <%= index + 1 %>
             </div>
             <div>
               <h3 class="font-semibold text-gray-800">
-                <%= session.name %>
+                <%= link_to session.name, course_session_path(@course, session), class: "hover:text-primary transition-colors" %>
               </h3>
               <!-- <p class="text-sm text-gray-500">
                 Posição: <%#= session.position %>

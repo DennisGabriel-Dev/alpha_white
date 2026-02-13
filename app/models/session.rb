@@ -27,6 +27,7 @@ class Session < ApplicationRecord
 
   belongs_to :course
   belongs_to :tenant
+  has_many :lessons, dependent: :destroy
 
   before_validation :set_tenant_from_course, on: :create
 

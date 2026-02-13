@@ -12,13 +12,17 @@ class Api::V1::SessionsController < Api::V1::BaseController
     @sessions = @course.sessions
     render json: {
       sessions: @sessions,
-      total: @sessions.count
+      total: @sessions.count,
+      _links: hateoas_course_links(@course)
     }
   end
 
   # GET /api/v1/courses/:course_id/sessions/:id
   def show
-    render json: { session: @session }
+    render json: {
+      session: @session,
+      _links: hateoas_session_links(@course, @session)
+    }
   end
 
   # POST /api/v1/courses/:course_id/sessions

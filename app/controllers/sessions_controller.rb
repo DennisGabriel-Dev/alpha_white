@@ -7,8 +7,11 @@ class SessionsController < ApplicationController
 
   before_action :authenticate_user!
   before_action :set_course
-  before_action :set_session, only: [:edit, :update, :destroy]
+  before_action :set_session, only: [:show, :edit, :update, :destroy]
   before_action :authorize_admin_or_instructor!, only: [:new, :create, :edit, :update, :destroy]
+
+  def show
+  end
 
   def new
     @session = @course.sessions.build
