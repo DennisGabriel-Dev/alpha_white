@@ -17,6 +17,8 @@ Rails.application.routes.draw do
         resources :feedbacks, only: [:create]
         resource :lesson_completion, only: [:create, :update]
         resource :quiz, only: [:new, :create, :edit, :update, :destroy] do
+          get :take
+          post :submit
           resources :questions, only: [:index, :new, :create, :edit, :update, :destroy]
         end
       end

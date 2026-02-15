@@ -61,10 +61,18 @@
         <% if quiz_completion&.quiz_completed? %>
           <p class="text-sm text-green-600"><%= heroicon(:check_circle, css_class: "w-4 h-4 inline") %> Prova concluída</p>
         <% else %>
-          <p class="text-gray-600 mb-2">Complete a prova para marcar esta aula como concluída.</p>
-          <%= form_with url: course_session_lesson_lesson_completion_path(@course, @session, @lesson), method: :patch, local: true do %>
-            <input type="hidden" name="lesson_completion[quiz_completed]" value="true">
-            <button type="submit" class="text-sm text-primary font-medium hover:underline">Marcar prova como concluída</button>
+          <% if student? %>
+            <p class="text-gray-600 mb-2">Responda as questões abaixo e depois marque a prova como concluída.</p>
+            <%= link_to take_course_session_lesson_quiz_path(@course, @session, @lesson), class: "btn-primary inline-flex items-center text-sm py-2 px-4" do %>
+              Fazer prova
+              <%= heroicon(:chart_bar, css_class: "w-4 h-4 ml-2") %>
+            <% end %>
+            <div class="mt-4 pt-4 border-t border-gray-200">
+              <%= form_with url: course_session_lesson_lesson_completion_path(@course, @session, @lesson), method: :patch, local: true do %>
+                <input type="hidden" name="lesson_completion[quiz_completed]" value="true">
+                <button type="submit" class="text-sm text-primary font-medium hover:underline">Marcar prova como concluída</button>
+              <% end %>
+            </div>
           <% end %>
         <% end %>
       </div>

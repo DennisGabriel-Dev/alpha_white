@@ -8,8 +8,8 @@ class QuestionsController < ApplicationController
   before_action :set_session
   before_action :set_lesson
   before_action :set_quiz
-  before_action :set_question, only: [:edit, :update, :destroy]
-  before_action :authorize_admin_or_instructor!, only: [:new, :create, :edit, :update, :destroy]
+  before_action :set_question, only: [ :edit, :update, :destroy ]
+  before_action :authorize_admin_or_instructor!, only: [ :new, :create, :edit, :update, :destroy ]
 
   def index
     @questions = @quiz.questions.includes(:question_options)
@@ -77,12 +77,12 @@ class QuestionsController < ApplicationController
   def question_params
     p = params.require(:question).permit(
       :enunciation, :position,
-      question_options_attributes: [:id, :text, :correct, :position, :_destroy]
+      question_options_attributes: [ :id, :text, :correct, :position, :_destroy ]
     )
     correct_index = params[:correct_option_index]&.to_i
     if correct_index && p[:question_options_attributes]
-      p[:question_options_attributes].each_with_index do |(k, v), i|
-        v[:correct] = (i == correct_index)
+      p[:question_options_attributes].to_h.each do |k, v|
+        v[:correct] = (k.to_s.to_i == correct_index)
       end
     end
     p
