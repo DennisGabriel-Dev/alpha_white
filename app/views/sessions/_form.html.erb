@@ -1,0 +1,36 @@
+<%# Formulário de sessão (new e edit) %>
+
+<%= form_with model: [ @course, session ], local: true, class: "space-y-4" do |f| %>
+  <% if session.errors.any? %>
+    <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+      <h4 class="font-semibold text-red-800 mb-2">Verifique os erros:</h4>
+      <ul class="list-disc list-inside text-red-700 text-sm">
+        <% session.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "Nome da sessão", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+    <%= f.text_field :name, 
+        class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent",
+        placeholder: "Ex: Módulo 1 - Introdução",
+        autofocus: true %>
+  </div>
+
+  <div>
+    <%= f.label :position, "Posição (ordem)", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+    <%= f.number_field :position, 
+        class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent",
+        min: 0,
+        placeholder: "0" %>
+    <p class="mt-1 text-xs text-gray-500">Número menor = aparece primeiro</p>
+  </div>
+
+  <div class="flex items-center gap-3 pt-4">
+    <%= f.submit class: "btn-primary cursor-pointer" %>
+    <%= link_to "Cancelar", @course, class: "text-gray-600 hover:text-gray-800 font-medium" %>
+  </div>
+<% end %>

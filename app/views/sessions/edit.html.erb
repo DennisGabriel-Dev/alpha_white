@@ -1,0 +1,19 @@
+<%# Editar sessão %>
+
+<%= render "shared/header" %>
+
+<div class="container mx-auto px-4 py-8 max-w-xl">
+  <nav class="mb-6">
+    <%= link_to @course, class: "inline-flex items-center text-gray-600 hover:text-primary transition-colors" do %>
+      <%= heroicon(:arrow_left, css_class: "w-5 h-5 mr-2") %>
+      Voltar para <%= @course.name %>
+    <% end %>
+  </nav>
+
+  <div class="card">
+    <h1 class="text-xl font-bold text-gray-800 mb-6">Editar sessão</h1>
+    <%= render "form", course: @course, session: @session %>
+  </div>
+</div>
+
+<%= render "shared/footer" %>

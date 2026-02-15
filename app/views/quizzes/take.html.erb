@@ -1,0 +1,51 @@
+<%# Tela da prova para o estudante responder %>
+
+<%= render "shared/header" %>
+
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+  <nav class="mb-6">
+    <%= link_to course_session_lesson_path(@course, @session, @lesson), class: "inline-flex items-center text-gray-600 hover:text-primary transition-colors" do %>
+      <%= heroicon(:arrow_left, css_class: "w-5 h-5 mr-2") %>
+      Voltar para <%= @lesson.name %>
+    <% end %>
+  </nav>
+
+  <div class="card mb-8">
+    <h1 class="text-2xl font-bold text-gray-800 mb-2"><%= @quiz.title %></h1>
+    <p class="text-gray-600">Aula: <%= @lesson.name %></p>
+    <p class="text-sm text-gray-500 mt-2">Selecione uma alternativa para cada questão.</p>
+  </div>
+
+  <%= form_with url: submit_course_session_lesson_quiz_path(@course, @session, @lesson), method: :post, local: true, class: "space-y-8" do |f| %>
+    <% @quiz.questions.includes(:question_options).each_with_index do |question, index| %>
+      <div class="card">
+        <h3 class="font-semibold text-gray-800 mb-4">
+          <%= index + 1 %>. <%= question.enunciation %>
+        </h3>
+        <div class="space-y-3">
+          <% question.question_options.each do |option| %>
+            <% my_answer = question.student_answers.find_by(user: current_user) %>
+            <% checked = my_answer&.question_option_id == option.id %>
+            <label class="flex items-start gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 hover:border-primary/30 transition-colors <%= 'border-primary bg-primary/5' if checked %>">
+              <input type="radio"
+                     name="answers[<%= question.id %>]"
+                     value="<%= option.id %>"
+                     class="mt-1 w-4 h-4 text-primary border-gray-300 focus:ring-primary"
+                     <%= 'checked' if checked %>>
+              <span class="text-gray-700"><%= option.text %></span>
+            </label>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="flex items-center gap-3">
+      <button type="submit" class="btn-primary cursor-pointer">
+        Enviar respostas
+      </button>
+      <%= link_to "Cancelar", course_session_lesson_path(@course, @session, @lesson), class: "text-gray-600 hover:text-gray-800 font-medium" %>
+    </div>
+  <% end %>
+</div>
+
+<%= render "shared/footer" %>
