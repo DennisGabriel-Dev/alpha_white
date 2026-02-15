@@ -1,0 +1,137 @@
+<%# Formulário de questão com alternativas dinâmicas %>
+
+<%= form_with model: [ @course, @session, @lesson, @quiz, question ], local: true, class: "space-y-6" do |f| %>
+  <% if question.errors.any? %>
+    <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+      <h4 class="font-semibold text-red-800 mb-2">Verifique os erros:</h4>
+      <ul class="list-disc list-inside text-red-700 text-sm">
+        <% question.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :enunciation, "Enunciado da questão", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+    <%= f.text_area :enunciation,
+        class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent",
+        rows: 3,
+        placeholder: "Digite o enunciado da questão...",
+        autofocus: true %>
+  </div>
+
+  <div>
+    <%= f.label :position, "Posição (ordem)", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+    <%= f.number_field :position,
+        class: "w-24 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent",
+        min: 0,
+        placeholder: "0" %>
+  </div>
+
+  <div>
+    <div class="flex items-center justify-between mb-3">
+      <label class="block text-sm font-semibold text-gray-700">Alternativas</label>
+      <p class="text-xs text-gray-500">Marque apenas uma como correta</p>
+    </div>
+
+    <div id="question-options-container" class="space-y-3">
+      <%= f.fields_for :question_options do |opt_form| %>
+        <div class="question-option-row flex gap-2 items-start p-3 border border-gray-200 rounded-lg bg-gray-50" data-index="<%= opt_form.index %>">
+          <div class="flex-1 flex gap-2 items-center">
+            <%= radio_button_tag "correct_option_index", opt_form.index, opt_form.object.correct?, class: "correct-option-radio w-4 h-4 text-green-600 border-gray-300 focus:ring-primary" %>
+            <%= opt_form.hidden_field :correct, value: opt_form.object.correct?, class: "correct-hidden" %>
+            <label for="correct_option_index_<%= opt_form.index %>" class="text-sm text-gray-600 whitespace-nowrap cursor-pointer">Correta?</label>
+            <%= opt_form.text_field :text,
+                class: "flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent",
+                placeholder: "Texto da alternativa" %>
+            <%= opt_form.hidden_field :position, value: opt_form.index %>
+          </div>
+          <% if opt_form.object.persisted? %>
+            <div class="flex items-center">
+              <%= opt_form.check_box :_destroy, class: "sr-only destroy-option" %>
+              <button type="button" class="remove-option-btn text-red-600 hover:text-red-800 p-1" title="Remover">
+                <%= heroicon(:trash, css_class: "w-4 h-4") %>
+              </button>
+            </div>
+          <% else %>
+            <button type="button" class="remove-new-option-btn text-red-600 hover:text-red-800 p-1" title="Remover">
+              <%= heroicon(:trash, css_class: "w-4 h-4") %>
+            </button>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <button type="button" id="add-option-btn" class="mt-3 px-4 py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary/5 transition-colors inline-flex items-center">
+      <%= heroicon(:plus, css_class: "w-4 h-4 mr-2") %>
+      Adicionar alternativa
+    </button>
+  </div>
+
+  <div class="flex items-center gap-3 pt-4">
+    <%= f.submit class: "btn-primary cursor-pointer" %>
+    <%= link_to "Cancelar", course_session_lesson_quiz_questions_path(@course, @session, @lesson), class: "text-gray-600 hover:text-gray-800 font-medium" %>
+  </div>
+<% end %>
+
+<template id="option-template">
+  <div class="question-option-row flex gap-2 items-start p-3 border border-gray-200 rounded-lg bg-gray-50" data-index="INDEX">
+    <div class="flex-1 flex gap-2 items-center">
+      <input type="radio" name="correct_option_index" value="INDEX" id="correct_option_index_INDEX" class="correct-option-radio w-4 h-4 text-green-600 border-gray-300 focus:ring-primary">
+      <input type="hidden" name="question[question_options_attributes][INDEX][correct]" value="false" class="correct-hidden">
+      <label class="text-sm text-gray-600 whitespace-nowrap" for="correct_option_index_INDEX">Correta?</label>
+      <input type="text" name="question[question_options_attributes][INDEX][text]" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Texto da alternativa">
+      <input type="hidden" name="question[question_options_attributes][INDEX][position]" value="INDEX">
+    </div>
+    <button type="button" class="remove-new-option-btn text-red-600 hover:text-red-800 p-1" title="Remover">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+    </button>
+  </div>
+</template>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const addBtn = document.getElementById('add-option-btn');
+    const container = document.getElementById('question-options-container');
+    const template = document.getElementById('option-template');
+    let index = container.querySelectorAll('.question-option-row').length;
+
+    function updateCorrectHidden() {
+      const selected = document.querySelector('input[name="correct_option_index"]:checked');
+      container.querySelectorAll('.question-option-row').forEach((row, i) => {
+        const hidden = row.querySelector('.correct-hidden');
+        if (hidden) hidden.value = (selected && parseInt(selected.value) === i) ? 'true' : 'false';
+      });
+    }
+
+    document.querySelectorAll('.correct-option-radio').forEach(function(radio) {
+      radio.addEventListener('change', updateCorrectHidden);
+    });
+
+    addBtn?.addEventListener('click', function() {
+      const html = template.innerHTML.replace(/INDEX/g, index);
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      const newRow = div.firstElementChild;
+      container.appendChild(newRow);
+      newRow.querySelector('.correct-option-radio')?.addEventListener('change', updateCorrectHidden);
+      newRow.querySelector('.remove-new-option-btn')?.addEventListener('click', function() { newRow.remove(); });
+      index++;
+    });
+
+    container?.addEventListener('click', function(e) {
+      const removeBtn = e.target.closest('.remove-option-btn');
+      const removeNewBtn = e.target.closest('.remove-new-option-btn');
+      const row = e.target.closest('.question-option-row');
+      if (removeBtn && row) {
+        const destroyInput = row.querySelector('.destroy-option');
+        if (destroyInput) { destroyInput.checked = true; row.style.display = 'none'; }
+      } else if (removeNewBtn && row) {
+        row.remove();
+      }
+    });
+
+    document.querySelector('form')?.addEventListener('submit', updateCorrectHidden);
+  });
+</script>

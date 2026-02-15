@@ -1,0 +1,51 @@
+<%# Formulário de aula (new e edit) %>
+
+<%= form_with model: [ @course, @session, lesson ], local: true, class: "space-y-4" do |f| %>
+  <% if lesson.errors.any? %>
+    <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+      <h4 class="font-semibold text-red-800 mb-2">Verifique os erros:</h4>
+      <ul class="list-disc list-inside text-red-700 text-sm">
+        <% lesson.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "Nome da aula", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+    <%= f.text_field :name,
+        class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent",
+        placeholder: "Ex: Introdução ao tema",
+        autofocus: true %>
+  </div>
+
+  <div>
+    <%= f.label :description, "Descrição", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+    <%= f.text_area :description,
+        class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent",
+        rows: 3,
+        placeholder: "Descrição da aula (opcional)" %>
+  </div>
+
+  <div>
+    <%= f.label :video_url, "URL do vídeo", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+    <%= f.url_field :video_url,
+        class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent",
+        placeholder: "https://..." %>
+  </div>
+
+  <div>
+    <%= f.label :position, "Posição (ordem)", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+    <%= f.number_field :position,
+        class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent",
+        min: 0,
+        placeholder: "0" %>
+    <p class="mt-1 text-xs text-gray-500">Número menor = aparece primeiro</p>
+  </div>
+
+  <div class="flex items-center gap-3 pt-4">
+    <%= f.submit class: "btn-primary cursor-pointer" %>
+    <%= link_to "Cancelar", course_session_path(@course, @session), class: "text-gray-600 hover:text-gray-800 font-medium" %>
+  </div>
+<% end %>
