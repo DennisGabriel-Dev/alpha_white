@@ -6,10 +6,13 @@ class LessonsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_course
   before_action :set_session
-  before_action :set_lesson, only: [:show, :edit, :update, :destroy]
-  before_action :authorize_admin_or_instructor!, only: [:new, :create, :edit, :update, :destroy]
+  before_action :set_lesson, only: [ :show, :edit, :update, :destroy ]
+  before_action :authorize_admin_or_instructor!, only: [ :new, :create, :edit, :update, :destroy ]
 
   def show
+    @feedbacks = @lesson.feedbacks
+    @my_feedback = @feedbacks.find_by(user: current_user)
+    @feedbacks = @feedbacks.where.not(id: @my_feedback&.id)
   end
 
   def new

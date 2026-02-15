@@ -1,0 +1,10 @@
+<div class="flex items-center gap-2 mb-2">
+  <% 5.times do |i| %>
+    <span class="<%= i < feedback.rating ? 'text-yellow-500' : 'text-gray-300' %>">
+      <%= heroicon(:star, variant: :solid, css_class: "w-5 h-5") %>
+    </span>
+  <% end %>
+</div>
+<% if feedback.description.present? %>
+  <p class="text-gray-700"><%= feedback.description %></p>
+<% end %>
