@@ -21,6 +21,7 @@ Rails.application.routes.draw do
           post :submit
           resources :questions, only: [:index, :new, :create, :edit, :update, :destroy]
         end
+        delete :destroy_video, on: :member
       end
     end
   end

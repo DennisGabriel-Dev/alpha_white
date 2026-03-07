@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
   set_current_tenant_through_filter
   before_action :set_tenant
   before_action :set_locale
+  before_action :set_active_storage_url_options
 
   private
 
@@ -35,5 +36,13 @@ class ApplicationController < ActionController::Base
 
   def set_locale
     I18n.locale = "pt-br"
+  end
+
+  def set_active_storage_url_options
+    ActiveStorage::Current.url_options = {
+      protocol: request.protocol,
+      host: request.host,
+      port: request.optional_port
+    }
   end
 end
