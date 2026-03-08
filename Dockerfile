@@ -32,11 +32,14 @@ COPY vendor ./vendor/
 
 RUN gem install bundler
 
-# Prefer local cache (bundle package) to avoid network timeouts; fallback to bundle install
-RUN bundle install --local || bundle install
+# Allow lockfile update when Gemfile has new gems
+RUN bundle config set --local deployment false && \
+    (bundle install --local || bundle install) && \
+    cp Gemfile.lock /tmp/Gemfile.lock.built
 
-# Copy application code
+# Copy application code (Gemfile.lock do host é sobrescrito pelo do build abaixo)
 COPY . .
+RUN cp /tmp/Gemfile.lock.built Gemfile.lock
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/app/bin/docker-entrypoint"]

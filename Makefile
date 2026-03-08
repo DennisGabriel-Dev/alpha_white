@@ -1,7 +1,7 @@
 # Alpha White - Comandos Docker (uso em desenvolvimento/apresentação)
 # Pré-requisito: Docker e Docker Compose instalados
 
-.PHONY: help start start_background stop setup db_prepare db_seed db_create console logs
+.PHONY: help start start_background stop setup db_prepare db_seed db_create console logs update_lock
 
 help:
 	@echo "Alpha White - Comandos disponíveis:"
@@ -14,6 +14,7 @@ help:
 	@echo "  make db_create      - Apenas db:create"
 	@echo "  make console        - Abre Rails console no container"
 	@echo "  make logs           - Mostra logs do app"
+	@echo "  make update_lock    - Copia Gemfile.lock do container para o host (após add gem)"
 
 setup: start_background
 	@echo "Aguardando containers (primeira vez pode demorar no build)..."
@@ -45,3 +46,8 @@ console:
 
 logs:
 	docker compose logs -f app
+
+# Copia Gemfile.lock atualizado do container para o host (útil se você roda só no Docker e adicionou uma gem)
+update_lock:
+	docker compose run --rm app cat Gemfile.lock > Gemfile.lock
+	@echo "Gemfile.lock atualizado. Pode commitar se quiser versionar."
