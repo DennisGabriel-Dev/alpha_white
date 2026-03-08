@@ -5,8 +5,25 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5432:5432"
+    container_name: alpha_white_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    image: alpha_white_app
+    command: ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
+    working_dir: /app
+    environment:
+      - RAILS_ENV=development
+      - DATABASE_URL=postgresql://postgres@db:5432/alpha_white_development
+    ports:
+      - "3000:3000"
+    container_name: alpha_white_app
+    depends_on:
+      - db
+    env_file:
+      - .env
 
 volumes:
   postgres_data:
