@@ -30,9 +30,11 @@ Rails.application.routes.draw do
     end
   end
 
-  # API Routes (JSON)
+  # API Routes (JSON) — autenticação via JWT (Authorization: Bearer <token>)
   namespace :api do
     namespace :v1 do
+      post "auth/login", to: "auth/sessions#create"
+
       resources :courses, only: [:index, :show, :create, :update, :destroy] do
         resources :sessions, only: [:index, :show, :create, :update, :destroy] do
           resources :lessons, only: [:index, :show, :create, :update, :destroy] do

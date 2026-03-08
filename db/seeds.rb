@@ -54,15 +54,60 @@ tenants.each do |tenant|
   end
 end
 
+# Senha padrão para todos os usuários de seed (desenvolvimento)
+SEED_PASSWORD = "senha123"
+
+# Usuários por tenant: admin, instrutor e estudantes (email único por tenant no formato tenant_email)
+users_by_tenant = {
+  "objetivo" => [
+    { email: "admin@objetivo.demo", role: :tenant_admin },
+    { email: "instrutor@objetivo.demo", role: :instructor },
+    { email: "aluno1@objetivo.demo", role: :student },
+    { email: "aluno2@objetivo.demo", role: :student }
+  ],
+  "poliedro" => [
+    { email: "admin@poliedro.demo", role: :tenant_admin },
+    { email: "instrutor@poliedro.demo", role: :instructor },
+    { email: "aluno1@poliedro.demo", role: :student },
+    { email: "aluno2@poliedro.demo", role: :student }
+  ],
+  "anglo" => [
+    { email: "admin@anglo.demo", role: :tenant_admin },
+    { email: "instrutor@anglo.demo", role: :instructor },
+    { email: "aluno1@anglo.demo", role: :student },
+    { email: "aluno2@anglo.demo", role: :student }
+  ]
+}
+
+# Super admin (vinculado ao primeiro tenant)
+super_tenant = tenants.first
+super_user = User.find_or_initialize_by(email: "super@alpha.demo")
+super_user.assign_attributes(password: SEED_PASSWORD, role: :super_admin, tenant: super_tenant)
+super_user.save!
+puts "  ✅ Super admin: super@alpha.demo"
+
+tenants.each do |tenant|
+  list = users_by_tenant[tenant.subdomain] || []
+  list.each do |data|
+    user = User.find_or_initialize_by(email: data[:email])
+    user.assign_attributes(password: SEED_PASSWORD, role: data[:role], tenant: tenant)
+    user.save!
+    puts "  ✅ Usuário #{tenant.subdomain}: #{data[:email]} (#{data[:role]})"
+  end
+end
+
 puts ""
 puts "✨ Seeds concluídos!"
 puts ""
 puts "📊 Resumo:"
 puts "  - #{Tenant.count} tenants (cursinhos)"
 puts "  - #{Course.count} cursos no total"
+puts "  - #{User.count} usuários"
+puts ""
+puts "🔐 Senha padrão dos usuários de seed: #{SEED_PASSWORD}"
 puts ""
 puts "🌐 Acesse os tenants:"
 tenants.each do |tenant|
   courses_count = ActsAsTenant.with_tenant(tenant) { Course.count }
-  puts "  - #{tenant.name}: http://#{tenant.subdomain}.localhost:3000 (#{courses_count} cursos)"
+  puts "  - #{tenant.name}: http://#{tenant.subdomain}.lvh.me:3000 (#{courses_count} cursos)"
 end

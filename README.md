@@ -74,6 +74,34 @@ A aplicação usa a gem [acts_as_tenant](https://github.com/ErwinM/acts_as_tenan
 
 ---
 
+### Usuários para Acessar
+```
+# Senha padrão para todos os usuários de seed (desenvolvimento) é "senha123"
+
+# Usuários por tenant: admin, instrutor e estudantes (email único por tenant no formato tenant_email)
+{
+  "objetivo" => [
+    { email: "admin@objetivo.demo", role: :tenant_admin },
+    { email: "instrutor@objetivo.demo", role: :instructor },
+    { email: "aluno1@objetivo.demo", role: :student },
+    { email: "aluno2@objetivo.demo", role: :student }
+  ],
+  "poliedro" => [
+    { email: "admin@poliedro.demo", role: :tenant_admin },
+    { email: "instrutor@poliedro.demo", role: :instructor },
+    { email: "aluno1@poliedro.demo", role: :student },
+    { email: "aluno2@poliedro.demo", role: :student }
+  ],
+  "anglo" => [
+    { email: "admin@anglo.demo", role: :tenant_admin },
+    { email: "instrutor@anglo.demo", role: :instructor },
+    { email: "aluno1@anglo.demo", role: :student },
+    { email: "aluno2@anglo.demo", role: :student }
+  ]
+}
+```
+
+
 ## 📚 Estrutura de Tenants
 
 ### Modelo Tenant
