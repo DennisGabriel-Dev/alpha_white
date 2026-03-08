@@ -134,6 +134,13 @@ end
 
 ---
 
+## 📡 Documentação da API
+
+Para integração com clientes:
+- **Swagger UI**: após subir o servidor, acesse `/api-docs` (ex.: `http://objetivo.lvh.me:3000/api-docs`).
+
+---
+
 ## 📦 Stack
 
 - **Rails** 8.1.2
