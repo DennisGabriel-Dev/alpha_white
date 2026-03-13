@@ -1,0 +1,908 @@
+openapi: 3.0.3
+info:
+  title: Alpha White API
+  description: |
+    API REST para a plataforma whitelabel de cursinhos preparatórios.
+    **Multi-tenant**: use o subdomínio do cursinho em todas as requisições (ex.: `objetivo.seudominio.com`).
+    Em desenvolvimento: `objetivo.lvh.me:3000`.
+  version: 1.0.0
+
+security:
+  - BearerAuth: []
+
+servers:
+  - url: http://{subdomain}.lvh.me:3000
+    description: Desenvolvimento local
+    variables:
+      subdomain:
+        default: objetivo
+
+tags:
+  - name: Auth
+    description: Login API (JWT)
+  - name: Courses
+    description: Cursos do tenant
+  - name: Sessions
+    description: Sessões de um curso
+  - name: Lessons
+    description: Aulas de uma sessão
+  - name: Feedbacks
+    description: Feedback do estudante na aula
+  - name: Lesson Completions
+    description: Conclusão de aula (progresso)
+  - name: Quizzes
+    description: Provas da aula
+  - name: Questions
+    description: Questões da prova
+  - name: Question Options
+    description: Alternativas da questão
+  - name: Student Answers
+    description: Respostas do estudante
+
+paths:
+  /api/v1/auth/login:
+    post:
+      tags: [Auth]
+      summary: Login (obter JWT)
+      description: Envia e-mail e senha. Retorna token JWT e dados do usuário. Use o header Authorization Bearer nas demais requisições.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [auth]
+              properties:
+                auth:
+                  type: object
+                  required: [email, password]
+                  properties:
+                    email: { type: string, format: email }
+                    password: { type: string, format: password }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string, description: "JWT para Authorization Bearer" }
+                  user:
+                    type: object
+                    properties:
+                      id: { type: integer }
+                      email: { type: string }
+                      role: { type: string }
+                      tenant_id: { type: integer }
+        '401':
+          description: E-mail ou senha inválidos
+        '404':
+          description: Subdomínio não encontrado
+
+  /api/v1/courses:
+    get:
+      tags: [Courses]
+      summary: Lista cursos
+      description: Retorna cursos do tenant. Não exige autenticação.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  courses: { type: array, items: { $ref: '#/components/schemas/Course' } }
+                  total: { type: integer }
+    post:
+      tags: [Courses]
+      summary: Cria curso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [course]
+              properties:
+                course:
+                  type: object
+                  properties:
+                    name: { type: string }
+                    description: { type: string }
+                    active: { type: boolean }
+      responses:
+        '201': { description: Criado }
+        '422': { description: Erro de validação }
+
+  /api/v1/courses/{id}:
+    get:
+      tags: [Courses]
+      summary: Detalhe do curso
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+        '404': { description: Não encontrado }
+    patch:
+      tags: [Courses]
+      summary: Atualiza curso
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                course:
+                  type: object
+                  properties:
+                    name: { type: string }
+                    description: { type: string }
+                    active: { type: boolean }
+      responses:
+        '200': { description: OK }
+        '422': { description: Erro de validação }
+    delete:
+      tags: [Courses]
+      summary: Remove curso
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+
+  /api/v1/courses/{course_id}/sessions:
+    get:
+      tags: [Sessions]
+      summary: Lista sessões do curso
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sessions: { type: array, items: { $ref: '#/components/schemas/Session' } }
+                  total: { type: integer }
+                  _links: { $ref: '#/components/schemas/Links' }
+    post:
+      tags: [Sessions]
+      summary: Cria sessão (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                session:
+                  type: object
+                  properties:
+                    name: { type: string }
+                    position: { type: integer }
+      responses:
+        '201': { description: Criado }
+        '422': { description: Erro de validação }
+
+  /api/v1/courses/{course_id}/sessions/{id}:
+    get:
+      tags: [Sessions]
+      summary: Detalhe da sessão
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+        '404': { description: Não encontrado }
+    patch:
+      tags: [Sessions]
+      summary: Atualiza sessão (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                session:
+                  type: object
+                  properties:
+                    name: { type: string }
+                    position: { type: integer }
+      responses:
+        '200': { description: OK }
+        '422': { description: Erro de validação }
+    delete:
+      tags: [Sessions]
+      summary: Remove sessão (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+
+  /api/v1/courses/{course_id}/sessions/{session_id}/lessons:
+    get:
+      tags: [Lessons]
+      summary: Lista aulas da sessão
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [Lessons]
+      summary: Cria aula (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lesson:
+                  type: object
+                  properties:
+                    name: { type: string }
+                    description: { type: string }
+                    video_url: { type: string }
+                    position: { type: integer }
+      responses:
+        '201': { description: Criado }
+        '422': { description: Erro de validação }
+
+  /api/v1/courses/{course_id}/sessions/{session_id}/lessons/{id}:
+    get:
+      tags: [Lessons]
+      summary: Detalhe da aula
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+        '404': { description: Não encontrado }
+    patch:
+      tags: [Lessons]
+      summary: Atualiza aula (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lesson:
+                  type: object
+                  properties:
+                    name: { type: string }
+                    description: { type: string }
+                    video_url: { type: string }
+                    position: { type: integer }
+      responses:
+        '200': { description: OK }
+        '422': { description: Erro de validação }
+    delete:
+      tags: [Lessons]
+      summary: Remove aula (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+
+  /api/v1/courses/{course_id}/sessions/{session_id}/lessons/{lesson_id}/feedbacks:
+    get:
+      tags: [Feedbacks]
+      summary: Lista feedbacks da aula
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [Feedbacks]
+      summary: Envia feedback
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [feedback]
+              properties:
+                feedback:
+                  type: object
+                  required: [rating]
+                  properties:
+                    rating: { type: integer, minimum: 1, maximum: 5 }
+                    description: { type: string }
+      responses:
+        '201': { description: Criado }
+        '422': { description: Erro de validação }
+
+  /api/v1/courses/{course_id}/sessions/{session_id}/lessons/{lesson_id}/lesson_completion:
+    get:
+      tags: [Lesson Completions]
+      summary: Estado de conclusão da aula
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [Lesson Completions]
+      summary: Cria ou atualiza conclusão
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lesson_completion:
+                  type: object
+                  properties:
+                    quiz_completed: { type: boolean }
+                    video_watched: { type: boolean }
+      responses:
+        '201': { description: Criado }
+        '200': { description: OK }
+        '422': { description: Erro de validação }
+    patch:
+      tags: [Lesson Completions]
+      summary: Atualiza conclusão
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lesson_completion:
+                  type: object
+                  properties:
+                    quiz_completed: { type: boolean }
+                    video_watched: { type: boolean }
+      responses:
+        '200': { description: OK }
+        '422': { description: Erro de validação }
+
+  /api/v1/courses/{course_id}/sessions/{session_id}/lessons/{lesson_id}/quizzes:
+    get:
+      tags: [Quizzes]
+      summary: Lista provas da aula
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [Quizzes]
+      summary: Cria prova (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quiz:
+                  type: object
+                  properties:
+                    title: { type: string }
+      responses:
+        '201': { description: Criado }
+        '422': { description: Erro de validação }
+
+  /api/v1/courses/{course_id}/sessions/{session_id}/lessons/{lesson_id}/quizzes/{id}:
+    get:
+      tags: [Quizzes]
+      summary: Detalhe da prova
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+        '404': { description: Não encontrado }
+    patch:
+      tags: [Quizzes]
+      summary: Atualiza prova (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quiz:
+                  type: object
+                  properties:
+                    title: { type: string }
+      responses:
+        '200': { description: OK }
+        '422': { description: Erro de validação }
+    delete:
+      tags: [Quizzes]
+      summary: Remove prova (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+
+  /api/v1/courses/{course_id}/sessions/{session_id}/lessons/{lesson_id}/quizzes/{quiz_id}/questions:
+    get:
+      tags: [Questions]
+      summary: Lista questões da prova (com alternativas)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: quiz_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [Questions]
+      summary: Cria questão (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: quiz_id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: object
+                  properties:
+                    enunciation: { type: string }
+                    position: { type: integer }
+                    question_options_attributes:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          text: { type: string }
+                          correct: { type: boolean }
+                          position: { type: integer }
+      responses:
+        '201': { description: Criado }
+        '422': { description: Erro de validação }
+
+  /api/v1/courses/{course_id}/sessions/{session_id}/lessons/{lesson_id}/quizzes/{quiz_id}/questions/{id}:
+    get:
+      tags: [Questions]
+      summary: Detalhe da questão
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: quiz_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+        '404': { description: Não encontrado }
+    patch:
+      tags: [Questions]
+      summary: Atualiza questão (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: quiz_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: object
+                  properties:
+                    enunciation: { type: string }
+                    position: { type: integer }
+                    question_options_attributes:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id: { type: integer }
+                          text: { type: string }
+                          correct: { type: boolean }
+                          position: { type: integer }
+                          _destroy: { type: boolean }
+      responses:
+        '200': { description: OK }
+        '422': { description: Erro de validação }
+    delete:
+      tags: [Questions]
+      summary: Remove questão (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: quiz_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+
+  /api/v1/courses/{course_id}/sessions/{session_id}/lessons/{lesson_id}/quizzes/{quiz_id}/questions/{question_id}/question_options:
+    get:
+      tags: [Question Options]
+      summary: Lista alternativas da questão
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: quiz_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: question_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [Question Options]
+      summary: Cria alternativa (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: quiz_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: question_id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question_option:
+                  type: object
+                  properties:
+                    text: { type: string }
+                    correct: { type: boolean }
+                    position: { type: integer }
+      responses:
+        '201': { description: Criado }
+        '422': { description: Erro de validação }
+
+  /api/v1/courses/{course_id}/sessions/{session_id}/lessons/{lesson_id}/quizzes/{quiz_id}/questions/{question_id}/question_options/{id}:
+    get:
+      tags: [Question Options]
+      summary: Detalhe da alternativa
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: quiz_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: question_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+        '404': { description: Não encontrado }
+    patch:
+      tags: [Question Options]
+      summary: Atualiza alternativa (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: quiz_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: question_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question_option:
+                  type: object
+                  properties:
+                    text: { type: string }
+                    correct: { type: boolean }
+                    position: { type: integer }
+      responses:
+        '200': { description: OK }
+        '422': { description: Erro de validação }
+    delete:
+      tags: [Question Options]
+      summary: Remove alternativa (Admin/Instrutor)
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: quiz_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: question_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+
+  /api/v1/courses/{course_id}/sessions/{session_id}/lessons/{lesson_id}/quizzes/{quiz_id}/questions/{question_id}/student_answers:
+    get:
+      tags: [Student Answers]
+      summary: Minhas respostas para a questão
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: quiz_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: question_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [Student Answers]
+      summary: Envia ou atualiza resposta
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: quiz_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: question_id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                student_answer:
+                  type: object
+                  properties:
+                    answer: { type: string }
+                    selected_option: { type: string }
+                    question_option_id: { type: integer }
+      responses:
+        '201': { description: Criado }
+        '200': { description: OK }
+        '422': { description: Erro de validação }
+  /api/v1/courses/{course_id}/sessions/{session_id}/lessons/{lesson_id}/quizzes/{quiz_id}/questions/{question_id}/student_answers/{id}:
+    patch:
+      tags: [Student Answers]
+      summary: Atualiza resposta
+      parameters:
+        - $ref: '#/components/parameters/course_id'
+        - $ref: '#/components/parameters/session_id'
+        - $ref: '#/components/parameters/lesson_id'
+        - name: quiz_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: question_id
+          in: path
+          required: true
+          schema: { type: integer }
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                student_answer:
+                  type: object
+                  properties:
+                    answer: { type: string }
+                    selected_option: { type: string }
+                    question_option_id: { type: integer }
+      responses:
+        '200': { description: OK }
+        '422': { description: Erro de validação }
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Token retornado por POST /api/v1/auth/login"
+
+  parameters:
+    course_id:
+      name: course_id
+      in: path
+      required: true
+      schema: { type: integer }
+    session_id:
+      name: session_id
+      in: path
+      required: true
+      schema: { type: integer }
+    lesson_id:
+      name: lesson_id
+      in: path
+      required: true
+      schema: { type: integer }
+
+  schemas:
+    Course:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        active: { type: boolean }
+        tenant_id: { type: integer }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Session:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        position: { type: integer }
+        course_id: { type: integer }
+        tenant_id: { type: integer }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Lesson:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        video_url: { type: string }
+        position: { type: integer }
+        session_id: { type: integer }
+        tenant_id: { type: integer }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Links:
+      type: object
+      additionalProperties:
+        type: string
+      description: Links HATEOAS (self, sessions, create_session, etc.)

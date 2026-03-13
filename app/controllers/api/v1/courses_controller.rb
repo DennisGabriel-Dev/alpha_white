@@ -1,5 +1,5 @@
 # API V1 - Courses Controller (apenas JSON)
-class Api::V1::CoursesController < ApplicationController
+class Api::V1::CoursesController < Api::V1::BaseController
   before_action :set_course, only: [ :show, :update, :destroy ]
 
   # GET /api/v1/courses

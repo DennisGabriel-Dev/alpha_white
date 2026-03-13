@@ -52,7 +52,7 @@ class Api::V1::LessonCompletionsController < Api::V1::BaseController
   def completion_completed?(completion)
     completion.persisted? && (
       (completion.lesson.quiz.blank? || completion.quiz_completed?) &&
-      (completion.lesson.video_url.blank? || completion.video_watched?)
+      ((!completion.lesson.video.attached? && completion.lesson.video_url.blank?) || completion.video_watched?)
     )
   end
 end

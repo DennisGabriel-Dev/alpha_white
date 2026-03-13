@@ -38,6 +38,6 @@ class LessonCompletion < ApplicationRecord
   end
 
   def watched_video?
-    video_watched || lesson.video_url.blank?
+    video_watched || (!lesson.video.attached? && lesson.video_url.blank?)
   end
 end

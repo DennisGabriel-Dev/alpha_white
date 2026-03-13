@@ -29,10 +29,36 @@
   </div>
 
   <div>
-    <%= f.label :video_url, "URL do vídeo", class: "block text-sm font-semibold text-gray-700 mb-1" %>
-    <%= f.url_field :video_url,
-        class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent",
-        placeholder: "https://..." %>
+    <% if lesson.video.attached? %>
+      <%= video_tag url_for(lesson.video),
+            controls: true,
+            preload: "metadata",
+            class: "w-full h-48 object-cover rounded-lg mb-2 bg-black" %>
+      <%= button_to "Remover vídeo",
+            destroy_video_course_session_lesson_path(@course, @session, lesson),
+            method: :delete,
+            data: { turbo_confirm: "Tem certeza que deseja remover este vídeo?" },
+            class: "text-red-600 hover:text-red-800 font-medium" %>
+      <% if lesson.video_url.present? %>
+        <p class="mt-2 text-xs text-gray-500">
+          Observação: esta aula também tem uma `video_url` preenchida, mas enquanto houver upload, o upload tem prioridade.
+          Se quiser usar a URL, remova o upload acima.
+        </p>
+      <% end %>
+    <% else %>
+      <div class="mb-4">
+        <%= f.label :video_url, "URL do vídeo (opcional)", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+        <%= f.url_field :video_url,
+            class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent",
+            placeholder: "https://..." %>
+        <p class="mt-1 text-xs text-gray-500">Se você subir um arquivo de vídeo, ele terá prioridade na exibição.</p>
+      </div>
+      <%= f.label :video, "Vídeo", class: "block text-sm font-semibold text-gray-700 mb-1" %>
+      <%= f.file_field :video,
+          class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent",
+          accept: "video/*" %>
+    <% end %>
+    
   </div>
 
   <div>

@@ -6,6 +6,10 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
+  # API documentation (Swagger UI + OpenAPI spec)
+  get "api-docs" => "api_docs#index", as: :api_docs
+  get "api-docs/spec" => "api_docs#spec", as: :api_docs_spec
+
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
@@ -21,13 +25,16 @@ Rails.application.routes.draw do
           post :submit
           resources :questions, only: [:index, :new, :create, :edit, :update, :destroy]
         end
+        delete :destroy_video, on: :member
       end
     end
   end
 
-  # API Routes (JSON)
+  # API Routes (JSON) — autenticação via JWT (Authorization: Bearer <token>)
   namespace :api do
     namespace :v1 do
+      post "auth/login", to: "auth/sessions#create"
+
       resources :courses, only: [:index, :show, :create, :update, :destroy] do
         resources :sessions, only: [:index, :show, :create, :update, :destroy] do
           resources :lessons, only: [:index, :show, :create, :update, :destroy] do

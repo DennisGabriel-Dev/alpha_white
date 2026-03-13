@@ -32,6 +32,7 @@ class Lesson < ApplicationRecord
   belongs_to :session
   belongs_to :tenant
   has_one :quiz, dependent: :destroy, inverse_of: :lesson
+  has_one_attached :video
   has_many :feedbacks, dependent: :destroy
   has_many :lesson_completions, dependent: :destroy
 

@@ -6,8 +6,8 @@ class LessonsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_course
   before_action :set_session
-  before_action :set_lesson, only: [ :show, :edit, :update, :destroy ]
-  before_action :authorize_admin_or_instructor!, only: [ :new, :create, :edit, :update, :destroy ]
+  before_action :set_lesson, only: [ :show, :edit, :update, :destroy, :destroy_video ]
+  before_action :authorize_admin_or_instructor!, only: [ :new, :create, :edit, :update, :destroy, :destroy_video ]
 
   def show
     @feedbacks = @lesson.feedbacks
@@ -44,6 +44,11 @@ class LessonsController < ApplicationController
     redirect_to course_session_path(@course, @session), notice: "Aula removida com sucesso."
   end
 
+  def destroy_video
+    @lesson.video.purge
+    redirect_to edit_course_session_lesson_path(@course, @session, @lesson), notice: "Vídeo removido com sucesso."
+  end
+
   private
 
   def set_course
@@ -59,6 +64,6 @@ class LessonsController < ApplicationController
   end
 
   def lesson_params
-    params.require(:lesson).permit(:name, :description, :video_url, :position)
+    params.require(:lesson).permit(:name, :description, :video_url, :position, :video)
   end
 end
