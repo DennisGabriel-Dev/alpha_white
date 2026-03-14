@@ -41,6 +41,12 @@ RUN bundle config set --local deployment false && \
 COPY . .
 RUN cp /tmp/Gemfile.lock.built Gemfile.lock
 
+# Compilar CSS (Tailwind) no build para a imagem já ter application.css; no run o bin/dev pode rodar --watch para live reload
+RUN mkdir -p app/assets/builds && \
+    bundle exec tailwindcss -c tailwind.config.js \
+      -i app/assets/stylesheets/application.css \
+      -o app/assets/builds/application.css
+
 # Entrypoint prepares the database.
 ENTRYPOINT ["/app/bin/docker-entrypoint"]
 
