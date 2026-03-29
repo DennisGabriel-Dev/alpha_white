@@ -25,7 +25,7 @@ class TenantSettingsController < ApplicationController
   end
 
   def require_super_admin!
-    unless super_admin?
+    unless tenant_admin?
       redirect_to root_path, alert: "Acesso restrito."
     end
   end

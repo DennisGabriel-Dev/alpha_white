@@ -21,6 +21,12 @@ module PermissionHelper
     current_user.super_admin?
   end
 
+  def tenant_admin?
+    return false unless user_signed_in?
+
+    current_user.super_admin? || current_user.tenant_admin?
+  end
+
   def instructor?
     return false unless user_signed_in?
 
