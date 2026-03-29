@@ -1,0 +1,72 @@
+<%# Editar curso – adapta ao tema ativo %>
+
+<% if themed_layout? %>
+  <%# Temas com layout próprio (aurora, merma…) %>
+  <% content_for :breadcrumb do %>
+    <nav class="flex items-center gap-1.5 text-sm text-gray-400">
+      <%= link_to "Cursos", courses_path, class: "hover:text-gray-700 transition-colors" %>
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <%= link_to @course.name, course_path(@course), class: "hover:text-gray-700 transition-colors truncate max-w-[12rem]" %>
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+      <span class="font-semibold text-gray-800">Editar</span>
+    </nav>
+  <% end %>
+
+  <% content_for :header_actions do %>
+    <%= link_to "Ver curso", course_path(@course),
+          class: "inline-flex items-center gap-1.5 text-xs font-medium border border-gray-200 px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors" do %>
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+      </svg>
+      Ver curso
+    <% end %>
+  <% end %>
+
+  <div class="max-w-xl mx-auto p-6">
+    <div class="bg-white rounded-2xl border border-gray-100 p-6">
+      <h1 class="text-base font-bold text-gray-900 mb-1">Editar curso</h1>
+      <p class="text-xs text-gray-400 mb-5"><%= @course.name %></p>
+      <%= render "form", course: @course %>
+    </div>
+
+    <%# Zona de perigo %>
+    <div class="mt-4 bg-white rounded-2xl border border-red-100 p-5">
+      <p class="text-sm font-semibold text-red-700 mb-1">Zona de perigo</p>
+      <p class="text-xs text-gray-400 mb-3">Esta ação é irreversível. Todas as sessões e aulas serão removidas.</p>
+      <%= button_to "Excluir curso", course_path(@course), method: :delete,
+            data: { turbo_confirm: "Tem certeza? Esta ação não pode ser desfeita." },
+            class: "text-xs font-semibold text-red-600 border border-red-200 px-4 py-2 rounded-xl hover:bg-red-50 transition-colors" %>
+    </div>
+  </div>
+
+<% else %>
+  <%# Tema padrão %>
+  <%= render "shared/header" %>
+
+  <div class="container mx-auto px-4 py-8 max-w-xl">
+    <nav class="mb-6">
+      <%= link_to course_path(@course), class: "inline-flex items-center text-gray-600 hover:text-primary transition-colors" do %>
+        <%= heroicon(:arrow_left, css_class: "w-5 h-5 mr-2") %>
+        Voltar para <%= @course.name %>
+      <% end %>
+    </nav>
+    <div class="card mb-6">
+      <h1 class="text-xl font-bold text-gray-800 mb-6">Editar curso</h1>
+      <%= render "form", course: @course %>
+    </div>
+    <div class="card border border-red-100">
+      <p class="text-sm font-semibold text-red-700 mb-1">Zona de perigo</p>
+      <p class="text-xs text-gray-400 mb-3">Esta ação é irreversível.</p>
+      <%= button_to "Excluir curso", course_path(@course), method: :delete,
+            data: { turbo_confirm: "Tem certeza? Esta ação não pode ser desfeita." },
+            class: "text-sm font-semibold text-red-600 hover:underline" %>
+    </div>
+  </div>
+
+  <%= render "shared/footer" %>
+<% end %>

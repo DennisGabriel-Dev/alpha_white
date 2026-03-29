@@ -16,7 +16,7 @@
 #  index_tenants_on_subdomain  (subdomain) UNIQUE
 #
 class Tenant < ApplicationRecord
-  THEMES = %w[default aurora].freeze
+  THEMES = %w[default aurora merma].freeze
 
   validates :name, presence: true
   validates :subdomain, presence: true, uniqueness: true,

@@ -1,0 +1,122 @@
+<%# Courses index – Merma %>
+<% content_for :header_title do %>
+  <nav class="flex items-center gap-2 text-sm text-gray-400">
+    <span class="font-semibold text-gray-800">Cursos</span>
+    <span class="text-gray-300">·</span>
+    <span class="text-xs"><%= @courses.count %> <%= "curso".pluralize(@courses.count) %></span>
+  </nav>
+<% end %>
+
+<% content_for :header_actions do %>
+  <% if admin_or_instructor? %>
+    <%= link_to new_course_path,
+          class: "merma-btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold" do %>
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Novo curso
+    <% end %>
+  <% end %>
+<% end %>
+
+<div class="p-6 overflow-y-auto h-full">
+
+  <%# Barra de busca %>
+  <div class="flex items-center gap-3 mb-5">
+    <div class="relative flex-1 max-w-sm">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input type="text" id="merma-course-search" placeholder="Buscar cursos..."
+             class="w-full pl-9 pr-4 py-2 text-sm bg-white border border-gray-200 rounded-xl
+                    focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/20">
+    </div>
+  </div>
+
+  <% if @courses.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3" id="merma-courses-grid">
+      <% @courses.each_with_index do |course, i| %>
+        <% color = merma_course_color(i) %>
+        <div class="merma-course-grid-item" data-name="<%= course.name.downcase %>">
+          <%= link_to course_path(course),
+                class: "group flex flex-col bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow" do %>
+
+            <%# Header colorido %>
+            <div class="h-28 flex items-end p-4"
+                 style="background: linear-gradient(135deg, <%= color[:bg] %>, white);">
+              <div class="flex items-center gap-3">
+                <span class="w-11 h-11 rounded-xl flex items-center justify-center text-base font-bold"
+                      style="background: <%= color[:text] %>20; color: <%= color[:text] %>;">
+                  <%= course.name.first.upcase %>
+                </span>
+                <div>
+                  <p class="text-xs font-medium text-gray-400">
+                    <%= pluralize(course.sessions.count, "módulo", "módulos") %>
+                  </p>
+                  <p class="text-sm font-semibold text-gray-900 group-hover:text-[var(--color-primary)] transition-colors">
+                    <%= course.name %>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <%# Corpo %>
+            <div class="p-4 flex flex-col gap-3 flex-1">
+              <% if course.description.present? %>
+                <p class="text-xs text-gray-400 leading-relaxed line-clamp-2"><%= course.description %></p>
+              <% end %>
+
+              <div class="flex items-center justify-between mt-auto">
+                <span class="text-xs text-gray-400">
+                  <%= pluralize(course.sessions.sum { |s| s.lessons.count }, "aula", "aulas") %>
+                </span>
+                <span class="text-xs font-medium px-2.5 py-1 rounded-full
+                             <%= course.active ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-500' %>">
+                  <%= course.active ? "Ativo" : "Em breve" %>
+                </span>
+              </div>
+            </div>
+
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    <p id="merma-no-results" class="hidden text-center text-sm text-gray-400 py-12">
+      Nenhum curso encontrado.
+    </p>
+  <% else %>
+    <div class="flex flex-col items-center justify-center py-20 rounded-2xl border-2 border-dashed border-gray-200">
+      <svg class="w-8 h-8 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+      </svg>
+      <p class="text-sm text-gray-500 font-medium">Nenhum curso cadastrado</p>
+      <% if admin_or_instructor? %>
+        <%= link_to new_course_path, class: "mt-4 merma-btn-primary px-4 py-2 rounded-xl text-xs font-semibold" do %>
+          Criar primeiro curso
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+</div>
+
+<script>
+  document.addEventListener('turbo:load', function () {
+    const input = document.getElementById('merma-course-search');
+    if (!input) return;
+    input.addEventListener('input', function () {
+      const q = this.value.toLowerCase();
+      let visible = 0;
+      document.querySelectorAll('.merma-course-grid-item').forEach(function (el) {
+        const show = el.dataset.name.includes(q);
+        el.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      const noRes = document.getElementById('merma-no-results');
+      if (noRes) noRes.classList.toggle('hidden', visible > 0);
+    });
+  });
+</script>

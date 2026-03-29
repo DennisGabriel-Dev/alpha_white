@@ -1,0 +1,37 @@
+<%# Ring de progresso SVG reutilizável
+    Locals:
+      pct          – inteiro 0–100
+      size         – px total (default 48)
+      stroke_width – espessura da linha (default 4)
+      show_text    – boolean: exibir % dentro (default true)
+      css_class    – classes extras
+%>
+<% size         ||= 48 %>
+<% stroke_width ||= 4 %>
+<% css_class    ||= "" %>
+<% show_text    = local_assigns.key?(:show_text) ? show_text : true %>
+<% r     = (size / 2.0) - stroke_width %>
+<% circ  = (2 * Math::PI * r).round(2) %>
+<% filled = [pct.to_f, 100].min %>
+<% dash  = (filled * circ / 100).round(2) %>
+<% cx    = size / 2 %>
+
+<svg width="<%= size %>" height="<%= size %>" viewBox="0 0 <%= size %> <%= size %>"
+     class="<%= css_class %>" style="flex-shrink:0">
+  <circle cx="<%= cx %>" cy="<%= cx %>" r="<%= r %>"
+          fill="none" stroke="#e5e7eb" stroke-width="<%= stroke_width %>"/>
+  <circle cx="<%= cx %>" cy="<%= cx %>" r="<%= r %>"
+          fill="none" stroke="var(--color-primary)" stroke-width="<%= stroke_width %>"
+          stroke-dasharray="<%= dash %>, <%= circ %>"
+          stroke-linecap="round"
+          transform="rotate(-90 <%= cx %> <%= cx %>)"/>
+  <% if show_text %>
+    <text x="<%= cx %>" y="<%= cx %>"
+          dominant-baseline="middle" text-anchor="middle"
+          font-size="<%= [(size / 4.5).round, 8].max %>"
+          font-weight="700" fill="var(--color-primary)"
+          class="merma-ring-text">
+      <%= pct %>%
+    </text>
+  <% end %>
+</svg>

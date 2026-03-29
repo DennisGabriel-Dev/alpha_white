@@ -1,0 +1,78 @@
+<%# Lesson show – Merma
+    Sidebar:     course nav tree (com aula atual destacada)
+    Main:        player + tabs (Summary, Descrição, Quiz, Feedback)
+    Right panel: Study Progress + Course Content %>
+
+<%# ── Sidebar: nav do curso com aula atual ── %>
+<% content_for :sidebar_content do %>
+  <%= render "shared/merma/course_nav",
+        course: @course,
+        sessions: @sessions,
+        all_lessons: @all_lessons,
+        completions: @completions,
+        current_lesson: @lesson %>
+<% end %>
+
+<%# ── Right panel: progresso ── %>
+<% content_for :right_panel do %>
+  <%= render "shared/merma/study_progress",
+        course: @course,
+        sessions: @sessions,
+        all_lessons: @all_lessons,
+        completions: @completions,
+        current_lesson: @lesson %>
+<% end %>
+
+<%# ── Breadcrumb ── %>
+<% content_for :breadcrumb do %>
+  <nav class="flex items-center gap-1.5 text-sm text-gray-400 overflow-hidden">
+    <%= link_to "Cursos", courses_path, class: "hover:text-gray-700 transition-colors flex-shrink-0" %>
+    <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+    </svg>
+    <%= link_to @course.name, course_path(@course),
+          class: "hover:text-gray-700 transition-colors truncate max-w-[8rem] flex-shrink-0" %>
+    <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+    </svg>
+    <span class="text-gray-800 font-medium truncate">
+      <%= @lesson.name %>
+    </span>
+  </nav>
+<% end %>
+
+<%# ── Ações no header ── %>
+<% content_for :header_actions do %>
+  <% comp = @lesson.lesson_completions.find_by(user: current_user) %>
+  <% if comp&.completed? %>
+    <span class="inline-flex items-center gap-1.5 text-xs font-medium text-green-600 bg-green-50 px-3 py-1.5 rounded-lg">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+      </svg>
+      Aula concluída
+    </span>
+  <% end %>
+  <% if admin_or_instructor? %>
+    <%= link_to edit_course_session_lesson_path(@course, @session, @lesson),
+          class: "inline-flex items-center gap-1.5 text-xs font-medium border border-gray-200 px-3 py-1.5 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors" do %>
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+      </svg>
+      Editar
+    <% end %>
+  <% end %>
+<% end %>
+
+<%# ── Conteúdo principal ── %>
+<% content_for :main_class, "overflow-hidden flex flex-col" %>
+
+<div class="flex flex-col flex-1 overflow-hidden">
+
+  <%# Player de vídeo %>
+  <%= render "lessons/themes/merma/video_player" %>
+
+  <%# Tabs de conteúdo %>
+  <%= render "lessons/themes/merma/content_tabs" %>
+
+</div>
