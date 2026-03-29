@@ -10,9 +10,15 @@ class LessonsController < ApplicationController
   before_action :authorize_admin_or_instructor!, only: [ :new, :create, :edit, :update, :destroy, :destroy_video ]
 
   def show
-    @feedbacks = @lesson.feedbacks
+    @feedbacks = @lesson.feedbacks.includes(:user)
     @my_feedback = @feedbacks.find_by(user: current_user)
     @feedbacks = @feedbacks.where.not(id: @my_feedback&.id)
+
+    @sessions   = @course.sessions.order(:position).includes(:lessons)
+    @all_lessons = @sessions.flat_map(&:lessons)
+    @completions = LessonCompletion
+      .where(user: current_user, lesson: @all_lessons)
+      .index_by(&:lesson_id)
   end
 
   def new

@@ -1,0 +1,83 @@
+<%# Sub-partial: tabs de conteúdo (Descrição | Quiz | Feedback) %>
+
+<div class="px-6 pt-4 pb-6" x-data="{ tab: 'description' }" id="lesson-tabs">
+
+  <%# Tab bar %>
+  <div class="flex items-center gap-1 border-b border-gray-100 mb-6" id="tab-bar">
+    <% tabs = [] %>
+    <% tabs << { id: "description", label: "Descrição" } if @lesson.description.present? %>
+    <% tabs << { id: "quiz", label: "Prova" } if @lesson.quiz.present? || admin_or_instructor? %>
+    <% tabs << { id: "feedback", label: "Feedback" } %>
+    <% tabs = [{ id: "description", label: "Visão geral" }] if tabs.empty? %>
+
+    <% tabs.each_with_index do |tab, i| %>
+      <button type="button"
+              class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors
+                     <%= i == 0 ? 'border-[var(--color-primary)] text-[var(--color-primary)]'
+                                : 'border-transparent text-gray-400 hover:text-gray-600' %>"
+              data-tab="<%= tab[:id] %>">
+        <%= tab[:label] %>
+      </button>
+    <% end %>
+  </div>
+
+  <%# Aba: Descrição %>
+  <div id="tab-description" class="tab-panel <%= @lesson.description.present? ? '' : 'hidden' %>">
+    <% if @lesson.description.present? %>
+      <p class="text-gray-600 leading-relaxed text-sm whitespace-pre-wrap"><%= @lesson.description %></p>
+    <% else %>
+      <p class="text-gray-400 text-sm">Esta aula não possui descrição.</p>
+    <% end %>
+    <% if admin_or_instructor? %>
+      <div class="mt-6 pt-4 border-t border-gray-100">
+        <%= link_to edit_course_session_lesson_path(@course, @session, @lesson),
+              class: "inline-flex items-center gap-1.5 text-xs font-medium text-gray-400 hover:text-[var(--color-primary)] transition-colors" do %>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+          Editar aula
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Aba: Quiz %>
+  <div id="tab-quiz" class="tab-panel hidden">
+    <%= render "lessons/themes/aurora/quiz_section" %>
+  </div>
+
+  <%# Aba: Feedback %>
+  <div id="tab-feedback" class="tab-panel hidden">
+    <%= render "lessons/themes/aurora/feedback_section" %>
+  </div>
+
+</div>
+
+<script>
+  document.addEventListener('turbo:load', function () {
+    const bar = document.getElementById('tab-bar');
+    if (!bar) return;
+
+    function activate(id) {
+      bar.querySelectorAll('.tab-btn').forEach(function (btn) {
+        const active = btn.dataset.tab === id;
+        btn.classList.toggle('border-[var(--color-primary)]', active);
+        btn.classList.toggle('text-[var(--color-primary)]', active);
+        btn.classList.toggle('border-transparent', !active);
+        btn.classList.toggle('text-gray-400', !active);
+      });
+      document.querySelectorAll('.tab-panel').forEach(function (panel) {
+        panel.classList.toggle('hidden', panel.id !== 'tab-' + id);
+      });
+    }
+
+    bar.querySelectorAll('.tab-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () { activate(btn.dataset.tab); });
+    });
+
+    <%# Abre a aba de quiz automaticamente se vier de redirect %>
+    <% if params[:tab] == "quiz" %>
+      activate('quiz');
+    <% end %>
+  });
+</script>

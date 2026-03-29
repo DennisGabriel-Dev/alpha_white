@@ -1,0 +1,99 @@
+<%# Home Aurora – visão dashboard para o estudante %>
+<% content_for :header_title, "Visão geral" %>
+<% content_for :header_subtitle, tenant_name %>
+
+<div class="p-6 overflow-y-auto flex-1">
+
+  <%# ── Saudação ── %>
+  <div class="mb-8">
+    <% greeting = Time.current.hour < 12 ? "Bom dia" : Time.current.hour < 18 ? "Boa tarde" : "Boa noite" %>
+    <h1 class="text-2xl font-bold text-gray-900">
+      <%= greeting %><%= user_signed_in? ? ", #{current_user.email.split('@').first.capitalize}!" : "!" %>
+    </h1>
+    <p class="text-gray-400 mt-1 text-sm">
+      <%= user_signed_in? ? "Continue de onde parou." : "Faça login para acompanhar seu progresso." %>
+    </p>
+  </div>
+
+  <% if user_signed_in? %>
+    <%# ── Stats ── %>
+    <% total_lessons = Course.joins(sessions: :lessons).count %>
+    <% completed_count = LessonCompletion.where(user: current_user).count %>
+    <% enrolled_courses = Course.joins(sessions: :lessons)
+                                .joins("INNER JOIN lesson_completions ON lesson_completions.lesson_id = lessons.id")
+                                .where("lesson_completions.user_id = ?", current_user.id)
+                                .distinct.count %>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <%= render "pages/themes/aurora/stat_card",
+            label: "Cursos",
+            value: Course.active.count,
+            icon: "book",
+            color: "primary" %>
+      <%= render "pages/themes/aurora/stat_card",
+            label: "Aulas concluídas",
+            value: completed_count,
+            icon: "check",
+            color: "green" %>
+      <%= render "pages/themes/aurora/stat_card",
+            label: "Em progresso",
+            value: enrolled_courses,
+            icon: "play",
+            color: "amber" %>
+      <%= render "pages/themes/aurora/stat_card",
+            label: "Total de aulas",
+            value: total_lessons,
+            icon: "film",
+            color: "slate" %>
+    </div>
+  <% end %>
+
+  <%# ── Cursos em destaque ── %>
+  <div class="mb-8">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-base font-semibold text-gray-900">
+        <%= user_signed_in? ? "Cursos disponíveis" : "Explore os cursos" %>
+      </h2>
+      <%= link_to courses_path,
+            class: "text-xs font-medium text-[var(--color-primary)] hover:underline flex items-center gap-1" do %>
+        Ver todos
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      <% end %>
+    </div>
+
+    <% if @featured_courses.any? %>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <% @featured_courses.each do |course| %>
+          <%= render "pages/themes/aurora/course_card", course: course %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="flex flex-col items-center justify-center py-16 rounded-2xl border-2 border-dashed border-gray-200">
+        <svg class="w-10 h-10 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        <p class="text-sm font-medium text-gray-500">Nenhum curso disponível ainda</p>
+        <p class="text-xs text-gray-400 mt-1">Os cursos aparecerão aqui quando forem cadastrados.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <%# ── CTA login (visitantes) ── %>
+  <% unless user_signed_in? %>
+    <div class="rounded-2xl p-8 text-white text-center"
+         style="background: linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 60%, black));">
+      <h3 class="text-xl font-bold mb-2">Comece sua jornada hoje</h3>
+      <p class="text-white/80 text-sm mb-5">Crie sua conta gratuita e tenha acesso a todos os cursos.</p>
+      <div class="flex justify-center gap-3">
+        <%= link_to "Criar conta", new_user_registration_path,
+              class: "px-5 py-2.5 bg-white font-semibold text-sm rounded-xl transition-opacity hover:opacity-90",
+              style: "color: var(--color-primary);" %>
+        <%= link_to "Entrar", new_user_session_path,
+              class: "px-5 py-2.5 bg-white/20 text-white font-semibold text-sm rounded-xl hover:bg-white/30 transition-colors" %>
+      </div>
+    </div>
+  <% end %>
+
+</div>

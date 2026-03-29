@@ -19,4 +19,9 @@ module ApplicationHelper
   def tenant_logo_url
     current_tenant&.logo_url || nil
   end
+
+  # Verdadeiro quando o tenant usa um layout próprio (não o application padrão)
+  def themed_layout?
+    current_tenant&.theme.present? && current_tenant.theme != "default"
+  end
 end
