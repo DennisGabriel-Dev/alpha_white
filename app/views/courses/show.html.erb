@@ -1,5 +1,5 @@
 <% if current_tenant&.theme.present? %>
-  <%= render "show_#{current_tenant.theme}" %>
+  <%= render "courses/themes/show_#{current_tenant.theme}" %>
 <% else %>
-  <%= render "show_default" %>
+  <%= render "courses/themes/show_default" %>
 <% end %>

@@ -46,8 +46,14 @@
 
     <%# CTA %>
     <div class="pt-3">
-      <%= link_to course_path(course), class: "block w-full text-center py-2 px-4 bg-accent-turquoise hover:bg-accent-turquoise/90 text-white font-semibold rounded-lg transition-colors" do %>
-        Ver detalhes
+      <% if user_signed_in? %>
+        <%= link_to course_path(course), class: "block w-full text-center py-2 px-4 bg-accent-turquoise hover:bg-accent-turquoise/90 text-white font-semibold rounded-lg transition-colors" do %>
+          Ver detalhes
+        <% end %>
+      <% else %>
+        <%= link_to new_user_registration_path, class: "block w-full text-center py-2 px-4 bg-accent-turquoise hover:bg-accent-turquoise/90 text-white font-semibold rounded-lg transition-colors" do %>
+          Inscreva-se
+        <% end %>
       <% end %>
     </div>
   </div>

@@ -21,7 +21,7 @@ class TenantSettingsController < ApplicationController
   private
 
   def theme_params
-    params.require(:tenant).permit(:theme)
+    params.require(:tenant).permit(:theme, :primary_color)
   end
 
   def require_super_admin!

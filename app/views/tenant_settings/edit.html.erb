@@ -3,7 +3,7 @@
 
     <div class="mb-8">
       <h1 class="text-2xl font-bold text-gray-900">Aparência do tenant</h1>
-      <p class="text-gray-500 mt-1">Escolha o tema visual para <strong><%= tenant_name %></strong>.</p>
+      <p class="text-gray-500 mt-1">Personalize o visual de <strong><%= tenant_name %></strong>.</p>
     </div>
 
     <% if notice.present? %>
@@ -85,12 +85,93 @@
 
       </div>
 
+      <%# Seção de cores %>
+      <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <h2 class="text-sm font-semibold text-gray-900 mb-1">Cor principal</h2>
+        <p class="text-xs text-gray-400 mb-5">Usada em botões, sidebar, links e destaques do tema.</p>
+
+        <%# Paleta de cores predefinidas %>
+        <div class="flex flex-wrap gap-3 mb-5" id="color-presets">
+          <% [
+            { hex: "#3C0094", label: "Roxo" },
+            { hex: "#1D4ED8", label: "Azul" },
+            { hex: "#0F766E", label: "Verde-azulado" },
+            { hex: "#15803D", label: "Verde" },
+            { hex: "#B45309", label: "Âmbar" },
+            { hex: "#DC2626", label: "Vermelho" },
+            { hex: "#7C3AED", label: "Violeta" },
+            { hex: "#0369A1", label: "Azul-céu" },
+            { hex: "#1E293B", label: "Ardósia" },
+          ].each do |color| %>
+            <button type="button"
+                    class="color-preset w-8 h-8 rounded-full border-2 border-transparent hover:scale-110 transition-transform focus:outline-none"
+                    style="background-color: <%= color[:hex] %>;"
+                    data-color="<%= color[:hex] %>"
+                    title="<%= color[:label] %>">
+            </button>
+          <% end %>
+        </div>
+
+        <%# Color picker + hex manual %>
+        <div class="flex items-center gap-3">
+          <%= f.color_field :primary_color,
+                id: "primary_color_picker",
+                class: "w-10 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5 bg-white",
+                value: @tenant.primary_color || "#3C0094" %>
+          <%= f.text_field :primary_color,
+                id: "primary_color_hex",
+                class: "w-32 px-3 py-2 text-sm border border-gray-200 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-indigo-300",
+                value: @tenant.primary_color || "#3C0094",
+                pattern: "^#[0-9A-Fa-f]{6}$",
+                placeholder: "#3C0094" %>
+          <div class="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 text-xs text-gray-500">
+            <div id="color-preview" class="w-4 h-4 rounded-full" style="background-color: <%= @tenant.primary_color || '#3C0094' %>;"></div>
+            Prévia
+          </div>
+        </div>
+      </div>
+
       <div class="flex justify-end">
-        <%= f.submit "Salvar tema",
+        <%= f.submit "Salvar alterações",
+              id: "submit-btn",
               class: "inline-flex items-center px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors",
               style: "background-color: #{tenant_primary_color};" %>
       </div>
     <% end %>
+
+    <script>
+      document.addEventListener('turbo:load', function () {
+        const picker  = document.getElementById('primary_color_picker');
+        const hex     = document.getElementById('primary_color_hex');
+        const preview = document.getElementById('color-preview');
+        const submit  = document.getElementById('submit-btn');
+
+        function applyColor(value) {
+          if (!/^#[0-9A-Fa-f]{6}$/.test(value)) return;
+          picker.value  = value;
+          hex.value     = value;
+          preview.style.backgroundColor = value;
+          submit.style.backgroundColor  = value;
+          document.querySelectorAll('.color-preset').forEach(function(btn) {
+            const active = btn.dataset.color.toLowerCase() === value.toLowerCase();
+            btn.style.borderColor = active ? value : 'transparent';
+            btn.style.transform   = active ? 'scale(1.15)' : '';
+          });
+        }
+
+        picker.addEventListener('input', function () { applyColor(picker.value); });
+
+        hex.addEventListener('input', function () { applyColor(hex.value); });
+
+        document.querySelectorAll('.color-preset').forEach(function(btn) {
+          btn.addEventListener('click', function () { applyColor(btn.dataset.color); });
+          if (btn.dataset.color.toLowerCase() === (hex.value || '').toLowerCase()) {
+            btn.style.borderColor = btn.dataset.color;
+            btn.style.transform   = 'scale(1.15)';
+          }
+        });
+      });
+    </script>
 
   </div>
 </div>
