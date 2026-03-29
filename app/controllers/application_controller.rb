@@ -38,6 +38,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def require_admin_or_instructor!
+    return if admin_or_instructor?
+
+    redirect_to root_path, alert: "Acesso negado. Apenas administradores ou instrutores podem realizar esta ação."
+  end
+
   def resolve_layout
     theme = current_tenant&.theme
     theme.present? && theme != "default" ? theme : "application"

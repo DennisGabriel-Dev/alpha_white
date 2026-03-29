@@ -1,4 +1,6 @@
 class CoursesController < ApplicationController
+  before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy]
+  before_action :require_admin_or_instructor!, only: [:new, :create, :edit, :update, :destroy]
   before_action :set_course, only: [:show, :edit, :update, :destroy]
 
   def index
