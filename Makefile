@@ -47,6 +47,9 @@ console:
 logs:
 	docker compose logs -f app
 
+migrate:
+	docker compose exec app bin/rails db:migrate
+
 # Copia Gemfile.lock atualizado do container para o host (útil se você roda só no Docker e adicionou uma gem)
 update_lock:
 	docker compose run --rm app cat Gemfile.lock > Gemfile.lock
