@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 class LessonsController < ApplicationController
-  include ApiAuthorizable
-
   before_action :authenticate_user!
+  before_action :require_admin_or_instructor!, only: [ :new, :create, :edit, :update, :destroy, :destroy_video ]
   before_action :set_course
   before_action :set_session
   before_action :set_lesson, only: [ :show, :edit, :update, :destroy, :destroy_video ]
-  before_action :authorize_admin_or_instructor!, only: [ :new, :create, :edit, :update, :destroy, :destroy_video ]
 
   def show
     @feedbacks = @lesson.feedbacks.includes(:user)

@@ -3,12 +3,10 @@
 # Controller web para sessões de um curso (HTML)
 # Apenas Admin ou Instrutor podem create/update/destroy
 class SessionsController < ApplicationController
-  include ApiAuthorizable
-
   before_action :authenticate_user!
+  before_action :require_admin_or_instructor!, only: [:new, :create, :edit, :update, :destroy]
   before_action :set_course
   before_action :set_session, only: [:show, :edit, :update, :destroy]
-  before_action :authorize_admin_or_instructor!, only: [:new, :create, :edit, :update, :destroy]
 
   def show
   end
