@@ -1,11 +1,5 @@
-<%= render "shared/header" %>
-
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-2xl font-bold text-gray-800 mb-6">Cursos</h1>
-
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <%= render @courses %>
-  </div>
-</div>
-
-<%= render "shared/footer" %>
+<% if current_tenant&.theme.present? %>
+  <%= render "courses/themes/index_#{current_tenant.theme}" %>
+<% else %>
+  <%= render "courses/themes/index_default" %>
+<% end %>

@@ -174,3 +174,7 @@ Para integração com clientes:
 - **Rails** 8.1.2
 - **PostgreSQL** 17 (container)
 - **Ruby** 3.3 (na imagem Docker)
+
+## Problemas que tive
+Erro no resolve do namespace db:
+comando para resolver: docker network connect --alias db alpha_white_default alpha_white_db

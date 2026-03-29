@@ -20,32 +20,8 @@ module ApplicationHelper
     current_tenant&.logo_url || nil
   end
 
-  # Helper para verificar se há tenant ativo
-  def tenant_present?
-    current_tenant.present?
-  end
-
-  def admin_or_instructor?
-    return false unless user_signed_in?
-
-    current_user.super_admin? || current_user.tenant_admin? || current_user.instructor?
-  end
-
-  def student?
-    return false unless user_signed_in?
-
-    current_user.student?
-  end
-
-  def super_admin?
-    return false unless user_signed_in?
-
-    current_user.super_admin?
-  end
-
-  def instructor?
-    return false unless user_signed_in?
-
-    current_user.instructor?
+  # Verdadeiro quando o tenant usa um layout próprio (não o application padrão)
+  def themed_layout?
+    current_tenant&.theme.present? && current_tenant.theme != "default"
   end
 end

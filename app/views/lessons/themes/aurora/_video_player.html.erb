@@ -1,0 +1,72 @@
+<%# Sub-partial: player de vídeo da aula (Aurora) %>
+
+<div class="border-b border-gray-100">
+
+  <% completion = @lesson.lesson_completions.find_by(user: current_user) %>
+
+  <% if @lesson.video.attached? || @lesson.video_url.present? %>
+
+    <%# Player real %>
+    <div class="bg-black w-full" style="aspect-ratio: 16/9;">
+      <% if @lesson.video.attached? %>
+        <%= video_tag url_for(@lesson.video),
+              controls: true, preload: "metadata",
+              class: "w-full h-full object-contain" %>
+      <% else %>
+        <iframe src="<%= @lesson.video_url %>" class="w-full h-full" allowfullscreen></iframe>
+      <% end %>
+    </div>
+
+    <%# Barra abaixo do player %>
+    <div class="px-6 py-3 flex items-center justify-between gap-4 bg-white">
+      <div class="min-w-0">
+        <h1 class="text-base font-semibold text-gray-900 truncate"><%= @lesson.name %></h1>
+        <p class="text-xs text-gray-400 mt-0.5"><%= @course.name %> · <%= @session.name %></p>
+      </div>
+
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <% if completion&.video_watched? %>
+          <span class="inline-flex items-center gap-1.5 text-xs font-medium text-green-600 bg-green-50 px-3 py-1.5 rounded-lg">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+            Assistido
+          </span>
+        <% else %>
+          <%= form_with url: course_session_lesson_lesson_completion_path(@course, @session, @lesson),
+                method: :patch, local: true do %>
+            <input type="hidden" name="lesson_completion[video_watched]" value="true">
+            <button type="submit"
+                    class="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors
+                           border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)]/5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+              </svg>
+              Marcar como assistido
+            </button>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+  <% else %>
+
+    <%# Sem vídeo: placeholder com cor do tenant %>
+    <div class="w-full flex items-center justify-center"
+         style="aspect-ratio: 16/9; background: linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 60%, black));">
+      <div class="text-center text-white/60">
+        <svg class="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+        </svg>
+        <p class="text-sm font-medium">Nenhum vídeo nesta aula</p>
+      </div>
+    </div>
+
+    <div class="px-6 py-3 bg-white border-b border-gray-100">
+      <h1 class="text-base font-semibold text-gray-900"><%= @lesson.name %></h1>
+      <p class="text-xs text-gray-400 mt-0.5"><%= @course.name %> · <%= @session.name %></p>
+    </div>
+
+  <% end %>
+
+</div>
