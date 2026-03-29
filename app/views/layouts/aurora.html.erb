@@ -183,7 +183,7 @@
         <% end %>
 
         <%# Page content %>
-        <main class="flex-1 overflow-y-auto">
+        <main class="flex-1 <%= content_for?(:main_class) ? yield(:main_class) : 'overflow-y-auto' %>">
           <%= yield %>
         </main>
 
