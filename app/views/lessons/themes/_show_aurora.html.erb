@@ -1,0 +1,27 @@
+<%# Aula – layout Aurora (split: conteúdo + playlist) %>
+<% content_for :header_title, @lesson.name %>
+<% content_for :header_subtitle, "#{@course.name} · #{@session.name}" %>
+<% content_for :main_class, "overflow-hidden flex flex-col" %>
+
+<div class="flex flex-1 overflow-hidden">
+
+  <%# ── Coluna principal ── %>
+  <div class="flex-1 overflow-y-auto min-w-0">
+
+    <%# Player %>
+    <%= render "lessons/themes/aurora/video_player" %>
+
+    <%# Tabs: Descrição | Quiz | Feedback %>
+    <%= render "lessons/themes/aurora/content_tabs" %>
+
+  </div>
+
+  <%# ── Playlist lateral ── %>
+  <%= render "shared/aurora/lesson_playlist",
+        course: @course,
+        sessions: @sessions,
+        all_lessons: @all_lessons,
+        completions: @completions,
+        current_lesson: @lesson %>
+
+</div>

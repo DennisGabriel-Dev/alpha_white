@@ -1,0 +1,73 @@
+<% content_for :header_title, "Cursos" %>
+<% content_for :header_subtitle, "#{@courses.count} #{"curso".pluralize(@courses.count)} disponíveis" %>
+
+<div class="p-6 overflow-y-auto flex-1">
+
+  <%# Barra de busca + ações %>
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+    <div class="relative max-w-sm w-full">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <input type="text" id="course-search" placeholder="Buscar cursos..."
+             class="w-full pl-10 pr-4 py-2 text-sm bg-white border border-gray-200 rounded-xl
+                    focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30">
+    </div>
+    <% if admin_or_instructor? %>
+      <%= link_to new_course_path,
+            class: "aurora-btn-primary inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold flex-shrink-0" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Novo curso
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Grid de cursos %>
+  <% if @courses.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" id="courses-grid">
+      <% @courses.each do |course| %>
+        <div class="course-card-item" data-name="<%= course.name.downcase %>">
+          <%= render "pages/themes/aurora/course_card", course: course %>
+        </div>
+      <% end %>
+    </div>
+
+    <p id="no-results" class="hidden text-center text-sm text-gray-400 py-12">
+      Nenhum curso encontrado para essa busca.
+    </p>
+  <% else %>
+    <div class="flex flex-col items-center justify-center py-20 rounded-2xl border-2 border-dashed border-gray-200">
+      <svg class="w-10 h-10 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+      </svg>
+      <p class="text-sm font-medium text-gray-500">Nenhum curso cadastrado</p>
+      <% if admin_or_instructor? %>
+        <%= link_to new_course_path,
+              class: "mt-4 aurora-btn-primary px-4 py-2 rounded-xl text-sm font-semibold" do %>
+          Criar primeiro curso
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+</div>
+
+<script>
+  document.addEventListener('turbo:load', function () {
+    const input = document.getElementById('course-search');
+    if (!input) return;
+    input.addEventListener('input', function () {
+      const q = this.value.toLowerCase();
+      let visible = 0;
+      document.querySelectorAll('.course-card-item').forEach(function (item) {
+        const show = item.dataset.name.includes(q);
+        item.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      const noResults = document.getElementById('no-results');
+      if (noResults) noResults.classList.toggle('hidden', visible > 0);
+    });
+  });
+</script>

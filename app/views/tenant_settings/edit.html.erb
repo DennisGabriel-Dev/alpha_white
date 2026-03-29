@@ -1,0 +1,187 @@
+<div class="min-h-screen bg-gray-50 py-10 px-4">
+  <div class="max-w-3xl mx-auto">
+
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900">Aparência do tenant</h1>
+      <p class="text-gray-500 mt-1">Personalize o visual de <strong><%= tenant_name %></strong>.</p>
+    </div>
+
+    <% if notice.present? %>
+      <div class="mb-6 rounded-lg bg-green-50 border border-green-200 px-4 py-3 text-green-800 text-sm">
+        <%= notice %>
+      </div>
+    <% end %>
+
+    <% if alert.present? %>
+      <div class="mb-6 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-red-800 text-sm">
+        <%= alert %>
+      </div>
+    <% end %>
+
+    <%= form_with model: @tenant, url: tenant_setting_path, method: :patch do |f| %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+
+        <%# Tema: Default %>
+        <label class="relative cursor-pointer">
+          <%= f.radio_button :theme, "default", class: "sr-only peer", id: "theme_default" %>
+          <div class="border-2 rounded-xl p-5 transition-all peer-checked:border-indigo-600 peer-checked:bg-indigo-50 border-gray-200 bg-white hover:border-indigo-300">
+            <div class="w-full h-28 rounded-lg bg-gray-100 mb-4 flex items-center justify-center overflow-hidden">
+              <div class="w-full h-full flex flex-col">
+                <div class="h-6 bg-gray-200 w-full"></div>
+                <div class="flex-1 flex items-center justify-center p-4">
+                  <div class="space-y-2 w-full">
+                    <div class="h-2 bg-gray-300 rounded w-3/4"></div>
+                    <div class="h-2 bg-gray-300 rounded w-1/2"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-semibold text-gray-800">Padrão</p>
+                <p class="text-xs text-gray-400 mt-0.5">Layout simples e direto</p>
+              </div>
+              <div class="w-4 h-4 rounded-full border-2 border-gray-300 peer-checked:border-indigo-600 flex items-center justify-center">
+                <div class="w-2 h-2 rounded-full bg-indigo-600 hidden peer-checked:block"></div>
+              </div>
+            </div>
+          </div>
+        </label>
+
+        <%# Tema: Aurora %>
+        <label class="relative cursor-pointer">
+          <%= f.radio_button :theme, "aurora", class: "sr-only peer", id: "theme_aurora" %>
+          <div class="border-2 rounded-xl p-5 transition-all peer-checked:border-indigo-600 peer-checked:bg-indigo-50 border-gray-200 bg-white hover:border-indigo-300">
+            <div class="w-full h-28 rounded-lg bg-gray-100 mb-4 flex items-center justify-center overflow-hidden">
+              <div class="w-full h-full flex">
+                <div class="w-10 bg-indigo-700 h-full flex flex-col gap-1 p-1 pt-2">
+                  <div class="h-1.5 bg-indigo-400 rounded w-full"></div>
+                  <div class="h-1.5 bg-indigo-400 rounded w-full"></div>
+                  <div class="h-1.5 bg-indigo-400 rounded w-full"></div>
+                </div>
+                <div class="flex-1 flex flex-col">
+                  <div class="h-5 bg-white border-b border-gray-200 flex items-center px-2 gap-2">
+                    <div class="h-1.5 bg-gray-200 rounded w-10"></div>
+                    <div class="h-1.5 bg-gray-200 rounded w-10"></div>
+                  </div>
+                  <div class="flex-1 bg-gray-50 p-2 space-y-1.5">
+                    <div class="h-2 bg-gray-300 rounded w-3/4"></div>
+                    <div class="h-2 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-semibold text-gray-800">Aurora</p>
+                <p class="text-xs text-gray-400 mt-0.5">Sidebar + header estilo dashboard</p>
+              </div>
+              <div class="w-4 h-4 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                <div class="w-2 h-2 rounded-full bg-indigo-600 hidden"></div>
+              </div>
+            </div>
+          </div>
+        </label>
+
+      </div>
+
+      <%# Seção de cores %>
+      <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <h2 class="text-sm font-semibold text-gray-900 mb-1">Cor principal</h2>
+        <p class="text-xs text-gray-400 mb-5">Usada em botões, sidebar, links e destaques do tema.</p>
+
+        <%# Paleta de cores predefinidas %>
+        <div class="flex flex-wrap gap-3 mb-5" id="color-presets">
+          <% [
+            { hex: "#3C0094", label: "Roxo" },
+            { hex: "#1D4ED8", label: "Azul" },
+            { hex: "#0F766E", label: "Verde-azulado" },
+            { hex: "#15803D", label: "Verde" },
+            { hex: "#B45309", label: "Âmbar" },
+            { hex: "#DC2626", label: "Vermelho" },
+            { hex: "#7C3AED", label: "Violeta" },
+            { hex: "#0369A1", label: "Azul-céu" },
+            { hex: "#1E293B", label: "Ardósia" },
+          ].each do |color| %>
+            <button type="button"
+                    class="color-preset w-8 h-8 rounded-full border-2 border-transparent hover:scale-110 transition-transform focus:outline-none"
+                    style="background-color: <%= color[:hex] %>;"
+                    data-color="<%= color[:hex] %>"
+                    title="<%= color[:label] %>">
+            </button>
+          <% end %>
+        </div>
+
+        <%# Color picker + hex manual %>
+        <div class="flex items-center gap-3">
+          <%= f.color_field :primary_color,
+                id: "primary_color_picker",
+                class: "w-10 h-10 rounded-lg border border-gray-200 cursor-pointer p-0.5 bg-white",
+                value: @tenant.primary_color || "#3C0094" %>
+          <%= f.text_field :primary_color,
+                id: "primary_color_hex",
+                class: "w-32 px-3 py-2 text-sm border border-gray-200 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-indigo-300",
+                value: @tenant.primary_color || "#3C0094",
+                pattern: "^#[0-9A-Fa-f]{6}$",
+                placeholder: "#3C0094" %>
+          <div class="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 text-xs text-gray-500">
+            <div id="color-preview" class="w-4 h-4 rounded-full" style="background-color: <%= @tenant.primary_color || '#3C0094' %>;"></div>
+            Prévia
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <%= f.submit "Salvar alterações",
+              id: "submit-btn",
+              class: "inline-flex items-center px-6 py-2.5 rounded-lg text-white font-medium text-sm transition-colors",
+              style: "background-color: #{tenant_primary_color};" %>
+      </div>
+    <% end %>
+
+    <script>
+      document.addEventListener('turbo:load', function () {
+        const picker  = document.getElementById('primary_color_picker');
+        const hex     = document.getElementById('primary_color_hex');
+        const preview = document.getElementById('color-preview');
+        const submit  = document.getElementById('submit-btn');
+
+        function applyColor(value) {
+          if (!/^#[0-9A-Fa-f]{6}$/.test(value)) return;
+          picker.value  = value;
+          hex.value     = value;
+          preview.style.backgroundColor = value;
+          submit.style.backgroundColor  = value;
+          document.querySelectorAll('.color-preset').forEach(function(btn) {
+            const active = btn.dataset.color.toLowerCase() === value.toLowerCase();
+            btn.style.borderColor = active ? value : 'transparent';
+            btn.style.transform   = active ? 'scale(1.15)' : '';
+          });
+        }
+
+        picker.addEventListener('input', function () { applyColor(picker.value); });
+
+        hex.addEventListener('input', function () { applyColor(hex.value); });
+
+        document.querySelectorAll('.color-preset').forEach(function(btn) {
+          btn.addEventListener('click', function () { applyColor(btn.dataset.color); });
+          if (btn.dataset.color.toLowerCase() === (hex.value || '').toLowerCase()) {
+            btn.style.borderColor = btn.dataset.color;
+            btn.style.transform   = 'scale(1.15)';
+          }
+        });
+      });
+    </script>
+
+  </div>
+</div>
+
+<style>
+  label:has(input[type="radio"]:checked) > div {
+    border-color: #4f46e5;
+    background-color: #eef2ff;
+  }
+  label:has(input[type="radio"]:checked) > div .radio-dot {
+    display: block;
+  }
+</style>

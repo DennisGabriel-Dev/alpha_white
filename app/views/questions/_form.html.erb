@@ -91,7 +91,7 @@
 </template>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('turbo:load', function() {
     const addBtn = document.getElementById('add-option-btn');
     const container = document.getElementById('question-options-container');
     const template = document.getElementById('option-template');
@@ -132,6 +132,6 @@
       }
     });
 
-    document.querySelector('form')?.addEventListener('submit', updateCorrectHidden);
+    container?.closest('form')?.addEventListener('submit', updateCorrectHidden);
   });
 </script>

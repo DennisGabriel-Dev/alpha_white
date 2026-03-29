@@ -16,10 +16,13 @@
 #  index_tenants_on_subdomain  (subdomain) UNIQUE
 #
 class Tenant < ApplicationRecord
+  THEMES = %w[default aurora].freeze
+
   validates :name, presence: true
   validates :subdomain, presence: true, uniqueness: true,
                         format: { with: /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/,
                                   message: "apenas letras minúsculas, números e hífens" }
+  validates :theme, inclusion: { in: THEMES }
 
   scope :active, -> { where(active: true) }
 

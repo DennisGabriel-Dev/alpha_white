@@ -7,6 +7,17 @@ class CoursesController < ApplicationController
   end
 
   def show
+    @sessions = @course.sessions.order(:position).includes(:lessons)
+    @all_lessons = @sessions.flat_map(&:lessons)
+
+    if user_signed_in?
+      completions = LessonCompletion.where(user: current_user, lesson: @all_lessons)
+      @completions = completions.index_by(&:lesson_id)
+    else
+      @completions = {}
+    end
+
+    @first_lesson = @all_lessons.first
   end
 
   def new

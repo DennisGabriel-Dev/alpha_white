@@ -29,7 +29,8 @@
       <%# CTAs Desktop %>
       <div class="hidden md:flex items-center space-x-4">
         <% if user_signed_in? %>
-          <%= link_to "Sair", destroy_user_session_path, 
+          <%= render "shared/icons/settings_icon" %>
+          <%= link_to "Sair", destroy_user_session_path,
             data: {
               turbo_method: :delete,
               turbo_confirm: "Tem certeza que deseja sair?",
@@ -60,6 +61,7 @@
         <%= link_to "Sobre", "#sobre", class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
         <div class="pt-4 border-t border-gray-200 flex flex-col space-y-3">
           <% if user_signed_in? %>
+            <%= render "shared/icons/settings_icon" %>
             <%= link_to "Sair", destroy_user_session_path, method: :delete, class: "text-center py-2 text-primary font-semibold hover:text-primary-dark transition-colors" %>
           <% else %>
             <%= link_to "Entrar", new_user_session_path, class: "text-center py-2 text-primary font-semibold hover:text-primary-dark transition-colors" %>
