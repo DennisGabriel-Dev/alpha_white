@@ -15,7 +15,10 @@ class QuizzesController < ApplicationController
 
   def submit
     @quiz = @lesson.quiz
-    redirect_to course_session_lesson_path(@course, @session, @lesson), alert: "Prova não encontrada" and return unless @quiz
+    unless @quiz
+      redirect_to course_session_lesson_path(@course, @session, @lesson), alert: "Prova não encontrada"
+      return
+    end
 
     answered = 0
     params[:answers]&.each do |question_id, question_option_id|
@@ -31,8 +34,23 @@ class QuizzesController < ApplicationController
       end
     end
 
-    redirect_to course_session_lesson_path(@course, @session, @lesson),
-                notice: "Respostas enviadas! (#{answered} questões respondidas)"
+    completion = @lesson.lesson_completions.find_or_initialize_by(user: current_user)
+    question_ids = @quiz.questions.ids
+    if question_ids.any?
+      answered_for_quiz = StudentAnswer.where(user: current_user, question_id: question_ids).distinct.count(:question_id)
+      completion.quiz_completed = true if answered_for_quiz >= question_ids.size
+    end
+    completion.save!
+
+    lesson_path = course_session_lesson_path(@course, @session, @lesson, tab: "quiz")
+
+    notice = if completion.quiz_completed?
+              "Prova concluída! Suas respostas foram registradas."
+            else
+              "Respostas enviadas (#{answered} nesta submissão). Responda todas as questões para concluir a prova."
+            end
+
+    redirect_to lesson_path, notice: notice
   end
 
   def new

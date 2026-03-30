@@ -45,6 +45,9 @@ gem "image_processing", "~> 1.2"
 # Multi-tenancy support [https://github.com/ErwinM/acts_as_tenant]
 gem "acts_as_tenant"
 
+# Dados realistas em db/seeds.rb (require manual no seed)
+gem "faker", "~> 3.0", require: false
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -57,6 +60,14 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # Testing
+  gem 'rspec-rails', '~> 8.0', '>= 8.0.1'
+  gem "factory_bot_rails"
+end
+
+group :test do
+  gem 'shoulda-matchers', '~> 7.0', '>= 7.0.1'
 end
 
 group :development do
