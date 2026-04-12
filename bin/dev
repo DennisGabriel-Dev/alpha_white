@@ -3,7 +3,7 @@ server_pid = Process.spawn("./bin/rails", "server", *ARGV)
 tailwind_pid = Process.spawn(
   "bundle", "exec", "tailwindcss",
   "-c", "tailwind.config.js",
-  "-i", "app/assets/stylesheets/application.css",
+  "-i", "app/assets/tailwind/application.css",
   "-o", "app/assets/builds/application.css",
   "--watch"
 )
