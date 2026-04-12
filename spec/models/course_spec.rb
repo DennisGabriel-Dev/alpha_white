@@ -17,6 +17,11 @@ RSpec.describe Course, type: :model do
       course = build(:course, tenant: tenant, description: "x" * 1000)
       expect(course).to be_valid
     end
+
+    it "aceita descrição com menos de 1000 caracteres" do
+      course = build(:course, tenant: tenant, description: "x" * 100)
+      expect(course).to be_valid
+    end
   end
 
   describe "associações" do
@@ -29,8 +34,9 @@ RSpec.describe Course, type: :model do
     let!(:inativo) { create(:course, :inactive, tenant: tenant) }
 
     it ".active retorna apenas cursos ativos" do
-      expect(Course.active).to include(ativo)
-      expect(Course.active).not_to include(inativo)
+      course_ativo = Course.active
+      expect(course_ativo).to include(ativo)
+      expect(course_ativo).not_to include(inativo)
     end
   end
 
@@ -41,7 +47,11 @@ RSpec.describe Course, type: :model do
       create(:course, tenant: tenant)
 
       ActsAsTenant.with_tenant(outro_tenant) do
-        create(:course, tenant: outro_tenant)
+        times_create = 3
+        times_create.times do
+          create(:course, tenant: outro_tenant)
+        end
+        expect(Course.count).to eq(times_create)
       end
 
       expect(Course.count).to eq(1)
