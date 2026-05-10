@@ -30,6 +30,7 @@ class Question < ApplicationRecord
 
   belongs_to :quiz
   belongs_to :tenant
+  belongs_to :enem_question, optional: true
   has_many :question_options, dependent: :destroy
   has_many :student_answers, dependent: :destroy
 
@@ -41,6 +42,10 @@ class Question < ApplicationRecord
   accepts_nested_attributes_for :question_options, allow_destroy: true, reject_if: proc { |attrs| attrs["text"].blank? }
 
   default_scope { order(position: :asc, id: :asc) }
+
+  def from_enem?
+    enem_question_id.present?
+  end
 
   private
 
