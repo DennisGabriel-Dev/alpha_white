@@ -14,11 +14,39 @@ RSpec.describe "EnemImportJobs", type: :request do
     )
   end
 
+  describe "GET /enem_import_jobs" do
+    context "sem autenticação" do
+      it "redireciona para login" do
+        get enem_import_jobs_path, headers: headers
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context "como estudante" do
+      before { sign_in student }
+
+      it "redireciona para root" do
+        get enem_import_jobs_path, headers: headers
+        expect(response).to redirect_to(root_path)
+      end
+    end
+
+    context "como admin" do
+      before { sign_in admin }
+
+      it "retorna 200 em HTML" do
+        get enem_import_jobs_path, headers: headers
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Meus imports ENEM")
+      end
+    end
+  end
+
   describe "POST /enem_import_jobs" do
     let(:valid_params) do
       {
-        exam_pdf: upload("2023_PV_impresso_D1_CD1.pdf"),
-        answer_key_pdf: upload("2023_GB_impresso_D1_CD1.pdf")
+        exam_pdf: upload("enem/2023/2023_PV_impresso_D1_CD1.pdf"),
+        answer_key_pdf: upload("enem/2023/2023_GB_impresso_D1_CD1.pdf")
       }
     end
 
@@ -48,11 +76,16 @@ RSpec.describe "EnemImportJobs", type: :request do
 
       it "cria job e enfileira worker" do
         expect {
-          post enem_import_jobs_path, params: valid_params, headers: headers
+          post enem_import_jobs_path, params: valid_params, headers: headers.merge("ACCEPT" => "application/json")
         }.to change(EnemImportJob, :count).by(1)
 
         expect(response).to have_http_status(:created)
         expect(EnemImportWorker).to have_received(:perform_async)
+      end
+
+      it "redireciona no fluxo HTML" do
+        post enem_import_jobs_path, params: valid_params, headers: headers
+        expect(response).to redirect_to(enem_import_jobs_path)
       end
     end
 
@@ -63,7 +96,7 @@ RSpec.describe "EnemImportJobs", type: :request do
       end
 
       it "também cria job" do
-        post enem_import_jobs_path, params: valid_params, headers: headers
+        post enem_import_jobs_path, params: valid_params, headers: headers.merge("ACCEPT" => "application/json")
         expect(response).to have_http_status(:created)
       end
     end

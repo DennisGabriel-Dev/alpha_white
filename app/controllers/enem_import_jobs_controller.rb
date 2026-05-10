@@ -5,8 +5,12 @@ class EnemImportJobsController < ApplicationController
   INEP_FILENAME_PATTERN = /\A\d{4}_(PV|GB)_[^_]+_D[12]_CD\d+\.pdf\z/i
 
   def index
-    jobs = current_tenant.enem_import_jobs.order(created_at: :desc).limit(50)
-    render json: jobs.as_json(only: %i[id status error_message enem_exam_id created_at updated_at])
+    @jobs = current_tenant.enem_import_jobs.includes(:enem_exam, :user).order(created_at: :desc).limit(50)
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @jobs.as_json(only: %i[id status error_message enem_exam_id created_at updated_at]) }
+    end
   end
 
   def create
@@ -14,7 +18,9 @@ class EnemImportJobsController < ApplicationController
     answer_key_pdf = params[:answer_key_pdf]
 
     validation_error = validate_pdf_pair(exam_pdf:, answer_key_pdf:)
-    return render json: { error: validation_error }, status: :unprocessable_content if validation_error
+    if validation_error
+      return respond_with_error(validation_error, status: :unprocessable_content)
+    end
 
     import_job = current_tenant.enem_import_jobs.new(user: current_user)
     import_job.exam_pdf.attach(exam_pdf)
@@ -22,9 +28,12 @@ class EnemImportJobsController < ApplicationController
 
     if import_job.save
       EnemImportWorker.perform_async(import_job.id)
-      render json: { id: import_job.id, status: import_job.status }, status: :created
+      respond_to do |format|
+        format.html { redirect_to enem_import_jobs_path, notice: "Import criado com sucesso. Processamento iniciado." }
+        format.json { render json: { id: import_job.id, status: import_job.status }, status: :created }
+      end
     else
-      render json: { errors: import_job.errors.full_messages }, status: :unprocessable_content
+      respond_with_error(import_job.errors.full_messages.join(", "), status: :unprocessable_content)
     end
   end
 
@@ -55,5 +64,12 @@ class EnemImportJobsController < ApplicationController
 
   def booklet_color(filename)
     filename[/_CD\d+\.pdf\z/i]&.delete_suffix(".pdf")&.upcase
+  end
+
+  def respond_with_error(message, status:)
+    respond_to do |format|
+      format.html { redirect_to enem_import_jobs_path, alert: message }
+      format.json { render json: { error: message }, status: status }
+    end
   end
 end

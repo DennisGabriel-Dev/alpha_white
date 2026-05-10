@@ -28,6 +28,8 @@ services:
       - .env
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - active_storage_data:/app/storage
 
   redis:
     image: redis:7-alpine
@@ -50,6 +52,9 @@ services:
       - .env
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - active_storage_data:/app/storage
 
 volumes:
   postgres_data:
+  active_storage_data:

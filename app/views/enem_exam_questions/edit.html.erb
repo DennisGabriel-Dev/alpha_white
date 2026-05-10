@@ -1,0 +1,45 @@
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+  <div class="mb-6">
+    <%= link_to "← Voltar para prova", enem_exam_path(@enem_exam), class: "text-sm text-gray-600 hover:text-gray-800" %>
+  </div>
+
+  <div class="bg-white border border-gray-200 rounded-lg p-4">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">Editar questão ENEM</h1>
+
+    <%= form_with model: @enem_question, url: enem_exam_enem_question_path(@enem_exam, @enem_question), method: :patch, local: true, class: "space-y-4" do |f| %>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <%= f.label :number_in_exam, "Número", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.number_field :number_in_exam, class: "w-full border border-gray-300 rounded-md p-2" %>
+        </div>
+        <div>
+          <%= f.label :area, "Área", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.select :area, EnemQuestion::AREA_VALUES, {}, class: "w-full border border-gray-300 rounded-md p-2" %>
+        </div>
+        <div>
+          <%= f.label :correct_letter, "Gabarito", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.select :correct_letter, EnemQuestion::LETTER_VALUES, {}, class: "w-full border border-gray-300 rounded-md p-2" %>
+        </div>
+      </div>
+
+      <div>
+        <%= f.label :skill, "Habilidade", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_field :skill, class: "w-full border border-gray-300 rounded-md p-2" %>
+      </div>
+
+      <div>
+        <%= f.label :statement, "Enunciado", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_area :statement, rows: 12, class: "w-full border border-gray-300 rounded-md p-2" %>
+      </div>
+
+      <div>
+        <%= f.label :alternatives_json, "Alternativas (JSON array)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_area :alternatives_json, value: JSON.pretty_generate(@enem_question.alternatives || []), rows: 10, class: "w-full border border-gray-300 rounded-md p-2 font-mono text-sm" %>
+      </div>
+
+      <div>
+        <%= f.submit "Salvar questão", class: "px-4 py-2 rounded bg-primary text-white hover:opacity-90" %>
+      </div>
+    <% end %>
+  </div>
+</div>
