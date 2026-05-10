@@ -37,6 +37,7 @@ class User < ApplicationRecord
   ], default: :student
 
   belongs_to :tenant
+  has_many :enem_import_jobs, dependent: :destroy
 
   acts_as_tenant :tenant
 end
