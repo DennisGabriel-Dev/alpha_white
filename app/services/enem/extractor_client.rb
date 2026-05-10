@@ -57,8 +57,12 @@ module Enem
     def with_attachment_tempfile(attachment)
       raise Error, "Missing attachment" unless attachment.attached?
 
-      extension = File.extname(attachment.filename.to_s)
-      tempfile = Tempfile.new(["enem-import", extension])
+      original_name = attachment.filename.to_s
+      extension = File.extname(original_name)
+      stem = File.basename(original_name, extension).gsub(/[^a-zA-Z0-9_-]/, "_")
+      stem = "enem-import" if stem.blank?
+
+      tempfile = Tempfile.new([stem, extension])
       tempfile.binmode
       tempfile.write(attachment.download)
       tempfile.rewind

@@ -17,6 +17,7 @@ services:
     environment:
       - RAILS_ENV=development
       - DATABASE_URL=postgresql://postgres@db:5432/alpha_white_development
+      - ENEM_EXTRACTOR_URL=http://host.docker.internal:8000
     ports:
       - "3000:3000"
     container_name: alpha_white_app
@@ -25,6 +26,8 @@ services:
       - redis
     env_file:
       - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   redis:
     image: redis:7-alpine
@@ -38,12 +41,15 @@ services:
       - RAILS_ENV=development
       - DATABASE_URL=postgresql://postgres@db:5432/alpha_white_development
       - REDIS_URL=redis://redis:6379/0
+      - ENEM_EXTRACTOR_URL=http://host.docker.internal:8000
     container_name: alpha_white_sidekiq
     depends_on:
       - db
       - redis
     env_file:
       - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   postgres_data:
