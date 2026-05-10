@@ -22,6 +22,26 @@ services:
     container_name: alpha_white_app
     depends_on:
       - db
+      - redis
+    env_file:
+      - .env
+
+  redis:
+    image: redis:7-alpine
+    container_name: alpha_white_redis
+
+  sidekiq:
+    image: alpha_white_app
+    command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
+    working_dir: /app
+    environment:
+      - RAILS_ENV=development
+      - DATABASE_URL=postgresql://postgres@db:5432/alpha_white_development
+      - REDIS_URL=redis://redis:6379/0
+    container_name: alpha_white_sidekiq
+    depends_on:
+      - db
+      - redis
     env_file:
       - .env
 

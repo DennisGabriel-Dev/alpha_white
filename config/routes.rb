@@ -16,6 +16,7 @@ Rails.application.routes.draw do
 
   # Configurações do tenant (somente super_admin)
   resource :tenant_setting, only: [:edit, :update]
+  resources :enem_import_jobs, only: [:index, :create]
 
   # Rotas Web (HTML)
   resources :courses do
