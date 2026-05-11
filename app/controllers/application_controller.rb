@@ -10,6 +10,8 @@ class ApplicationController < ActionController::Base
 
   layout :resolve_layout
 
+  helper_method :auth_minimal_chrome?
+
   # Configura multi-tenancy
   set_current_tenant_through_filter
   before_action :set_tenant
@@ -47,6 +49,22 @@ class ApplicationController < ActionController::Base
   def resolve_layout
     theme = current_tenant&.theme
     theme.present? && theme != "default" ? theme : "application"
+  end
+
+  # Telas “só formulário” (login, cadastro, recuperação etc.): sem menu lateral no Merma/Aurora.
+  def auth_minimal_chrome?
+    return false unless devise_controller?
+
+    case controller_name
+    when "sessions"
+      true
+    when "registrations"
+      %w[new create].include?(action_name)
+    when "passwords", "confirmations", "unlocks"
+      true
+    else
+      false
+    end
   end
 
   def set_locale
