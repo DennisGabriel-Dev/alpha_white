@@ -45,6 +45,9 @@ gem "image_processing", "~> 1.2"
 # Multi-tenancy support [https://github.com/ErwinM/acts_as_tenant]
 gem "acts_as_tenant"
 
+# Busca e filtros na biblioteca ENEM (importação para provas)
+gem "ransack", "~> 4.2"
+
 # Dados realistas em db/seeds.rb (require manual no seed)
 gem "faker", "~> 3.0", require: false
 
