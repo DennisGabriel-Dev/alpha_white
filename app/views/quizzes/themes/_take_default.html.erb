@@ -1,44 +1,107 @@
 <%= render "shared/header" %>
 
+<% review_mode = @quiz_review.present? %>
+<% questions = @quiz.questions.includes(:question_options, student_answers: :question_option) %>
+<% uid = current_user.id %>
+
 <div class="container mx-auto px-4 py-8 max-w-3xl">
   <nav class="mb-6">
-    <%= link_to course_session_lesson_path(@course, @session, @lesson),
-          class: "inline-flex items-center text-gray-600 hover:text-primary transition-colors" do %>
+    <%= link_to(review_mode ? course_session_lesson_path(@course, @session, @lesson, tab: "quiz") : course_session_lesson_path(@course, @session, @lesson),
+          class: "inline-flex items-center text-gray-600 hover:text-primary transition-colors") do %>
       <%= heroicon(:arrow_left, css_class: "w-5 h-5 mr-2") %>
       Voltar para <%= @lesson.name %>
     <% end %>
   </nav>
 
   <div class="card mb-8">
-    <h1 class="text-2xl font-bold text-gray-800 mb-2"><%= @quiz.title %></h1>
+    <h1 class="text-2xl font-bold text-gray-800 mb-2"><%= @quiz.title %><%= " · Conferência" if review_mode %></h1>
     <p class="text-gray-600">Aula: <%= @lesson.name %></p>
-    <p class="text-sm text-gray-500 mt-2">Selecione uma alternativa para cada questão.</p>
+    <% if review_mode && @review_total.to_i.positive? %>
+      <p class="text-sm text-gray-700 mt-3">
+        Resultado: <strong><%= @review_correct %>/<%= @review_total %></strong>
+        (<%= number_to_percentage((@review_correct.to_f / @review_total) * 100, precision: 0) %>).
+        Gabarito em verde; sua resposta errada em vermelho.
+      </p>
+    <% else %>
+      <p class="text-sm text-gray-500 mt-2">Selecione uma alternativa para cada questão.</p>
+    <% end %>
   </div>
 
-  <%= form_with url: submit_course_session_lesson_quiz_path(@course, @session, @lesson),
-        method: :post, local: true, class: "space-y-8" do %>
-    <% @quiz.questions.includes(:question_options).each_with_index do |question, index| %>
-      <div class="card">
-        <h3 class="font-semibold text-gray-800 mb-4"><%= index + 1 %>. <%= question.enunciation %></h3>
-        <div class="space-y-3">
-          <% question.question_options.each do |option| %>
-            <% my_answer = question.student_answers.find_by(user: current_user) %>
-            <% checked = my_answer&.question_option_id == option.id %>
-            <label class="flex items-start gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors <%= 'border-primary bg-primary/5' if checked %>">
-              <input type="radio" name="answers[<%= question.id %>]" value="<%= option.id %>"
-                     class="mt-1 w-4 h-4 text-primary border-gray-300"
-                     <%= 'checked' if checked %>>
-              <span class="text-gray-700"><%= option.text %></span>
-            </label>
-          <% end %>
+  <% if review_mode %>
+    <div class="space-y-8">
+      <% questions.each_with_index do |question, index| %>
+        <% my_answer = question.student_answers.find { |a| a.user_id == uid } %>
+        <% picked = my_answer&.question_option %>
+        <% status =
+             if picked.nil?
+               :blank
+             elsif picked.correct?
+               :ok
+             else
+               :wrong
+             end %>
+        <div class="card">
+          <div class="flex flex-wrap items-center gap-2 mb-3">
+            <h3 class="font-semibold text-gray-800"><%= index + 1 %>. <%= question.enunciation %></h3>
+            <% if status == :ok %>
+              <span class="text-xs font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded">Acertou</span>
+            <% elsif status == :wrong %>
+              <span class="text-xs font-semibold text-red-700 bg-red-50 px-2 py-0.5 rounded">Errou</span>
+            <% else %>
+              <span class="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 rounded">Sem resposta</span>
+            <% end %>
+          </div>
+          <div class="space-y-3">
+            <% question.question_options.each do |option| %>
+              <% correct = option.correct? %>
+              <% chosen = picked&.id == option.id %>
+              <% row_class =
+                   if correct
+                     "border-green-300 bg-green-50"
+                   elsif chosen && !correct
+                     "border-red-300 bg-red-50"
+                   else
+                     "border-gray-100 bg-gray-50"
+                   end %>
+              <div class="flex items-start gap-3 p-4 border rounded-lg <%= row_class %>">
+                <span class="text-gray-800 flex-1"><%= option.text %></span>
+                <% if correct %>
+                  <span class="text-xs font-semibold text-green-700 flex-shrink-0">Gabarito</span>
+                <% elsif chosen %>
+                  <span class="text-xs font-semibold text-red-700 flex-shrink-0">Sua resposta</span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
         </div>
+      <% end %>
+    </div>
+  <% else %>
+    <%= form_with url: submit_course_session_lesson_quiz_path(@course, @session, @lesson),
+          method: :post, local: true, class: "space-y-8" do %>
+      <% questions.each_with_index do |question, index| %>
+        <% my_answer = question.student_answers.find { |a| a.user_id == uid } %>
+        <div class="card">
+          <h3 class="font-semibold text-gray-800 mb-4"><%= index + 1 %>. <%= question.enunciation %></h3>
+          <div class="space-y-3">
+            <% question.question_options.each do |option| %>
+              <% checked = my_answer&.question_option_id == option.id %>
+              <label class="flex items-start gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors <%= 'border-primary bg-primary/5' if checked %>">
+                <input type="radio" name="answers[<%= question.id %>]" value="<%= option.id %>"
+                       class="mt-1 w-4 h-4 text-primary border-gray-300"
+                       <%= 'checked' if checked %>>
+                <span class="text-gray-700"><%= option.text %></span>
+              </label>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn-primary cursor-pointer">Enviar respostas</button>
+        <%= link_to "Cancelar", course_session_lesson_path(@course, @session, @lesson), class: "text-gray-600 hover:text-gray-800 font-medium" %>
       </div>
     <% end %>
-
-    <div class="flex items-center gap-3">
-      <button type="submit" class="btn-primary cursor-pointer">Enviar respostas</button>
-      <%= link_to "Cancelar", course_session_lesson_path(@course, @session, @lesson), class: "text-gray-600 hover:text-gray-800 font-medium" %>
-    </div>
   <% end %>
 </div>
 

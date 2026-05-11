@@ -7,6 +7,40 @@
     <%= link_to "Meus imports", enem_import_jobs_path, class: "px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50" %>
   </div>
 
+  <%= form_with url: enem_exams_path, method: :get, local: true, class: "bg-white border border-gray-200 rounded-lg p-4 mb-6 flex flex-wrap items-end gap-4" do %>
+    <div>
+      <label for="filter_year" class="block text-xs font-medium text-gray-600 mb-1">Ano</label>
+      <select name="year" id="filter_year" class="border border-gray-300 rounded-md p-2 text-sm min-w-[7rem]">
+        <option value="">Todos</option>
+        <% @filter_years.each do |y| %>
+          <option value="<%= y %>" <%= "selected" if params[:year].to_s == y.to_s %>><%= y %></option>
+        <% end %>
+      </select>
+    </div>
+    <div>
+      <label for="filter_day" class="block text-xs font-medium text-gray-600 mb-1">Dia</label>
+      <select name="day" id="filter_day" class="border border-gray-300 rounded-md p-2 text-sm min-w-[6rem]">
+        <option value="">Todos</option>
+        <% EnemExam::DAY_VALUES.each do |d| %>
+          <option value="<%= d %>" <%= "selected" if params[:day] == d %>><%= d %></option>
+        <% end %>
+      </select>
+    </div>
+    <div>
+      <label for="filter_color" class="block text-xs font-medium text-gray-600 mb-1">Caderno</label>
+      <select name="booklet_color" id="filter_color" class="border border-gray-300 rounded-md p-2 text-sm min-w-[7rem]">
+        <option value="">Todos</option>
+        <% @filter_colors.each do |c| %>
+          <option value="<%= c %>" <%= "selected" if params[:booklet_color].to_s.casecmp?(c.to_s) %>><%= c %></option>
+        <% end %>
+      </select>
+    </div>
+    <div class="flex gap-2">
+      <%= submit_tag "Filtrar", class: "px-4 py-2 rounded bg-primary text-white hover:opacity-90 text-sm" %>
+      <%= link_to "Limpar", enem_exams_path, class: "px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm inline-flex items-center" %>
+    </div>
+  <% end %>
+
   <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
     <table class="min-w-full text-sm">
       <thead class="bg-gray-50">

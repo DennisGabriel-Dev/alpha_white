@@ -1,6 +1,8 @@
-<%# Quiz/Prova – layout Aurora %>
-<% questions = @quiz.questions.includes(:question_options) %>
-<% content_for :header_title, @quiz.title %>
+<%# Quiz/Prova – layout Aurora (responder ou conferir) %>
+<% review_mode = @quiz_review.present? %>
+<% questions = @quiz.questions.includes(:question_options, student_answers: :question_option) %>
+<% uid = current_user.id %>
+<% content_for :header_title, @quiz.title + (review_mode ? " · Conferência" : "") %>
 <% content_for :header_subtitle, "#{@lesson.name} · #{pluralize(questions.count, 'questão', 'questões')}" %>
 
 <div class="flex-1 overflow-y-auto p-6">
@@ -32,72 +34,154 @@
     <div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">
       <div id="quiz-progress-bar"
            class="h-full rounded-full transition-all duration-300"
-           style="width: 0%; background: var(--color-primary);"></div>
+           style="width: <%= review_mode && @review_total.to_i.positive? ? ((@review_correct.to_f / @review_total) * 100).round(0) : 0 %>%; background: var(--color-primary);"></div>
     </div>
-    <p class="text-xs text-gray-400 mt-1.5" id="quiz-progress-label">0 de <%= questions.count %> respondidas</p>
+    <p class="text-xs text-gray-400 mt-1.5" id="quiz-progress-label">
+      <% if review_mode && @review_total.to_i.positive? %>
+        <%= @review_correct %>/<%= @review_total %> acertos (<%= number_to_percentage((@review_correct.to_f / @review_total) * 100, precision: 0) %>)
+      <% else %>
+        0 de <%= questions.count %> respondidas
+      <% end %>
+    </p>
+    <% if review_mode && @review_total.to_i.positive? %>
+      <p class="text-xs text-gray-600 mt-2">
+        Gabarito em <span class="text-green-700 font-medium">verde</span>;
+        sua alternativa errada em <span class="text-red-700 font-medium">vermelho</span>.
+      </p>
+    <% end %>
   </div>
 
-  <%# Formulário de respostas %>
-  <%= form_with url: submit_course_session_lesson_quiz_path(@course, @session, @lesson),
-        method: :post, local: true, id: "quiz-form" do %>
-
+  <% if review_mode %>
     <div class="space-y-4">
       <% questions.each_with_index do |question, index| %>
-        <% my_answer = question.student_answers.find_by(user: current_user) %>
+        <% my_answer = question.student_answers.find { |a| a.user_id == uid } %>
+        <% picked = my_answer&.question_option %>
+        <% status =
+             if picked.nil?
+               :blank
+             elsif picked.correct?
+               :ok
+             else
+               :wrong
+             end %>
         <div class="bg-white rounded-2xl border border-gray-100 p-5 quiz-question"
              id="question-<%= question.id %>">
-          <div class="flex items-start gap-3 mb-4">
+          <div class="flex flex-wrap items-start gap-3 mb-4">
             <span class="flex-shrink-0 w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center
                          text-[var(--color-primary)] bg-[var(--color-primary)]/10">
               <%= index + 1 %>
             </span>
-            <p class="text-sm font-medium text-gray-800 leading-relaxed pt-0.5"><%= question.enunciation %></p>
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap gap-2 mb-1">
+                <% if status == :ok %>
+                  <span class="text-xs font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-lg">Acertou</span>
+                <% elsif status == :wrong %>
+                  <span class="text-xs font-semibold text-red-700 bg-red-50 px-2 py-0.5 rounded-lg">Errou</span>
+                <% else %>
+                  <span class="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-lg">Sem resposta</span>
+                <% end %>
+              </div>
+              <p class="text-sm font-medium text-gray-800 leading-relaxed pt-0.5"><%= question.enunciation %></p>
+            </div>
           </div>
 
           <div class="space-y-2 ml-10">
             <% question.question_options.each do |option| %>
-              <% checked = my_answer&.question_option_id == option.id %>
-              <label class="quiz-option flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all
-                            <%= checked ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5'
-                                        : 'border-gray-200 hover:border-[var(--color-primary)]/40 hover:bg-gray-50' %>"
-                     data-question="<%= question.id %>">
-                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors
-                             <%= checked ? 'border-[var(--color-primary)]' : 'border-gray-300' %>">
-                  <span class="w-2 h-2 rounded-full bg-[var(--color-primary)] transition-opacity
-                               <%= checked ? 'opacity-100' : 'opacity-0' %> option-dot"></span>
-                </span>
-                <input type="radio" name="answers[<%= question.id %>]" value="<%= option.id %>"
-                       class="sr-only quiz-radio" <%= 'checked' if checked %>>
-                <span class="text-sm text-gray-700"><%= option.text %></span>
-              </label>
+              <% correct = option.correct? %>
+              <% chosen = picked&.id == option.id %>
+              <% row_class =
+                   if correct
+                     "border-green-300 bg-green-50"
+                   elsif chosen && !correct
+                     "border-red-300 bg-red-50"
+                   else
+                     "border-gray-100 bg-gray-50/80"
+                   end %>
+              <div class="flex items-center gap-3 p-3.5 rounded-xl border <%= row_class %>">
+                <span class="text-sm text-gray-700 flex-1"><%= option.text %></span>
+                <% if correct %>
+                  <span class="text-[10px] font-semibold uppercase text-green-700">Gabarito</span>
+                <% elsif chosen %>
+                  <span class="text-[10px] font-semibold uppercase text-red-700">Sua resposta</span>
+                <% end %>
+              </div>
             <% end %>
           </div>
         </div>
       <% end %>
     </div>
 
-    <%# Ações %>
     <div class="flex items-center justify-between mt-6 pt-6 border-t border-gray-100">
-      <%= link_to course_session_lesson_path(@course, @session, @lesson),
-            class: "inline-flex items-center gap-1.5 text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors" do %>
+      <%= link_to course_session_lesson_path(@course, @session, @lesson, tab: "quiz"),
+            class: "aurora-btn-primary inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold" do %>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
-        Voltar para a aula
+        Voltar à aula
       <% end %>
-
-      <button type="submit"
-              class="aurora-btn-primary inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-        </svg>
-        Enviar respostas
-      </button>
     </div>
+  <% else %>
+    <%= form_with url: submit_course_session_lesson_quiz_path(@course, @session, @lesson),
+          method: :post, local: true, id: "quiz-form" do %>
+
+      <div class="space-y-4">
+        <% questions.each_with_index do |question, index| %>
+          <% my_answer = question.student_answers.find { |a| a.user_id == uid } %>
+          <div class="bg-white rounded-2xl border border-gray-100 p-5 quiz-question"
+               id="question-<%= question.id %>">
+            <div class="flex items-start gap-3 mb-4">
+              <span class="flex-shrink-0 w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center
+                           text-[var(--color-primary)] bg-[var(--color-primary)]/10">
+                <%= index + 1 %>
+              </span>
+              <p class="text-sm font-medium text-gray-800 leading-relaxed pt-0.5"><%= question.enunciation %></p>
+            </div>
+
+            <div class="space-y-2 ml-10">
+              <% question.question_options.each do |option| %>
+                <% checked = my_answer&.question_option_id == option.id %>
+                <label class="quiz-option flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all
+                              <%= checked ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5'
+                                          : 'border-gray-200 hover:border-[var(--color-primary)]/40 hover:bg-gray-50' %>"
+                       data-question="<%= question.id %>">
+                  <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors
+                               <%= checked ? 'border-[var(--color-primary)]' : 'border-gray-300' %>">
+                    <span class="w-2 h-2 rounded-full bg-[var(--color-primary)] transition-opacity
+                                 <%= checked ? 'opacity-100' : 'opacity-0' %> option-dot"></span>
+                  </span>
+                  <input type="radio" name="answers[<%= question.id %>]" value="<%= option.id %>"
+                         class="sr-only quiz-radio" <%= 'checked' if checked %>>
+                  <span class="text-sm text-gray-700"><%= option.text %></span>
+                </label>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="flex items-center justify-between mt-6 pt-6 border-t border-gray-100">
+        <%= link_to course_session_lesson_path(@course, @session, @lesson),
+              class: "inline-flex items-center gap-1.5 text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Voltar para a aula
+        <% end %>
+
+        <button type="submit"
+                class="aurora-btn-primary inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Enviar respostas
+        </button>
+      </div>
+    <% end %>
   <% end %>
 
 </div>
 
+<% unless review_mode %>
 <script>
   document.addEventListener('turbo:load', function () {
     const total = <%= questions.count %>;
@@ -117,7 +201,10 @@
     }
 
     form.querySelectorAll('.quiz-option').forEach(function (label) {
-      label.addEventListener('click', function () {
+      label.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
         const questionId = label.dataset.question;
         const radio = label.querySelector('.quiz-radio');
         if (!radio) return;
@@ -147,3 +234,4 @@
     updateProgress();
   });
 </script>
+<% end %>

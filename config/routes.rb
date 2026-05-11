@@ -29,8 +29,10 @@ Rails.application.routes.draw do
         resource :lesson_completion, only: [:create, :update]
         resource :quiz, only: [:new, :create, :edit, :update, :destroy] do
           get :take
+          get :review
           post :submit
           resources :questions, only: [:index, :new, :create, :edit, :update, :destroy]
+          resource :enem_import, only: [:new, :create], controller: "quiz_enem_imports"
         end
         delete :destroy_video, on: :member
       end
