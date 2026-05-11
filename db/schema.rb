@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_21_032604) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_10_133000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -52,6 +52,46 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_032604) do
     t.index ["tenant_id", "id"], name: "index_courses_on_tenant_id_and_id"
     t.index ["tenant_id", "name"], name: "index_courses_on_tenant_id_and_name"
     t.index ["tenant_id"], name: "index_courses_on_tenant_id"
+  end
+
+  create_table "enem_exams", comment: "Canonical ENEM exam edition (global, no tenant).", force: :cascade do |t|
+    t.string "booklet_color", null: false
+    t.datetime "created_at", null: false
+    t.string "day", null: false, comment: "D1 or D2"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "updated_at", null: false
+    t.integer "year", null: false
+    t.index ["year", "day", "booklet_color"], name: "index_enem_exams_on_year_day_booklet", unique: true
+  end
+
+  create_table "enem_import_jobs", comment: "Tenant-scoped import jobs for ENEM PDF pairs.", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "enem_exam_id"
+    t.text "error_message"
+    t.integer "status", default: 0, null: false
+    t.bigint "tenant_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["enem_exam_id"], name: "index_enem_import_jobs_on_enem_exam_id"
+    t.index ["tenant_id", "id"], name: "index_enem_import_jobs_on_tenant_id_and_id"
+    t.index ["tenant_id", "status", "created_at"], name: "index_enem_import_jobs_on_tenant_id_and_status_and_created_at"
+    t.index ["tenant_id"], name: "index_enem_import_jobs_on_tenant_id"
+    t.index ["user_id"], name: "index_enem_import_jobs_on_user_id"
+  end
+
+  create_table "enem_questions", comment: "Official ENEM question (global library).", force: :cascade do |t|
+    t.jsonb "alternatives", default: [], null: false
+    t.string "area", null: false, comment: "LC, CH, CN, MT"
+    t.string "correct_letter", null: false
+    t.datetime "created_at", null: false
+    t.bigint "enem_exam_id", null: false
+    t.integer "number_in_exam", null: false
+    t.string "skill"
+    t.text "statement", null: false
+    t.datetime "updated_at", null: false
+    t.index ["area"], name: "index_enem_questions_on_area"
+    t.index ["enem_exam_id", "number_in_exam"], name: "index_enem_questions_on_exam_and_number", unique: true
+    t.index ["enem_exam_id"], name: "index_enem_questions_on_enem_exam_id"
   end
 
   create_table "feedbacks", comment: "Student feedback on a lesson (rating + description).", force: :cascade do |t|
@@ -107,13 +147,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_032604) do
   create_table "questions", comment: "Questions of a quiz. Each question is the enunciation of the quiz.", force: :cascade do |t|
     t.string "correct_answer"
     t.datetime "created_at", null: false
+    t.bigint "enem_question_id"
     t.text "enunciation", null: false
     t.integer "position", default: 0, null: false
     t.bigint "quiz_id", null: false
     t.bigint "tenant_id", null: false
     t.datetime "updated_at", null: false
+    t.index ["enem_question_id"], name: "index_questions_on_enem_question_id"
     t.index ["quiz_id", "position"], name: "index_questions_on_quiz_id_and_position"
     t.index ["quiz_id"], name: "index_questions_on_quiz_id"
+    t.index ["tenant_id", "enem_question_id"], name: "index_questions_on_tenant_id_and_enem_question_id"
     t.index ["tenant_id", "id"], name: "index_questions_on_tenant_id_and_id"
     t.index ["tenant_id"], name: "index_questions_on_tenant_id"
   end
@@ -163,6 +206,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_032604) do
     t.string "name", null: false
     t.string "primary_color", default: "#3C0094"
     t.string "subdomain", null: false, comment: "Unique subdomain for the tenant (ex: 'objetivo' for objetivo.seudominio.com)"
+    t.string "theme", default: "default", null: false
     t.datetime "updated_at", null: false
     t.index ["subdomain"], name: "index_tenants_on_subdomain", unique: true
     t.check_constraint "subdomain::text = lower(subdomain::text)", name: "subdomain_lowercase"
@@ -186,6 +230,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_032604) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "courses", "tenants"
+  add_foreign_key "enem_import_jobs", "enem_exams"
+  add_foreign_key "enem_import_jobs", "tenants"
+  add_foreign_key "enem_import_jobs", "users"
+  add_foreign_key "enem_questions", "enem_exams"
   add_foreign_key "feedbacks", "lessons"
   add_foreign_key "feedbacks", "users"
   add_foreign_key "lesson_completions", "lessons"
@@ -193,6 +241,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_21_032604) do
   add_foreign_key "lessons", "sessions"
   add_foreign_key "lessons", "tenants"
   add_foreign_key "question_options", "questions"
+  add_foreign_key "questions", "enem_questions"
   add_foreign_key "questions", "quizzes"
   add_foreign_key "questions", "tenants"
   add_foreign_key "quizzes", "lessons"

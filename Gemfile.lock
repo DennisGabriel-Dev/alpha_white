@@ -291,10 +291,18 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.3.1)
+    ransack (4.4.1)
+      activerecord (>= 7.2)
+      activesupport (>= 7.2)
+      i18n
     rdoc (7.1.0)
       erb
       psych (>= 4.0.0)
       tsort
+    redis (5.4.1)
+      redis-client (>= 0.22.0)
+    redis-client (0.29.0)
+      connection_pool
     regexp_parser (2.11.3)
     reline (0.6.3)
       io-console (~> 0.5)
@@ -353,6 +361,12 @@ GEM
     securerandom (0.4.1)
     shoulda-matchers (7.0.1)
       activesupport (>= 7.1)
+    sidekiq (8.1.4)
+      connection_pool (>= 3.0.0)
+      json (>= 2.16.0)
+      logger (>= 1.7.0)
+      rack (>= 3.2.0)
+      redis-client (>= 0.26.0)
     solid_cable (3.0.12)
       actioncable (>= 7.2)
       activejob (>= 7.2)
@@ -441,7 +455,7 @@ DEPENDENCIES
   debug
   devise (~> 5.0)
   factory_bot_rails
-  faker
+  faker (~> 3.0)
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
@@ -451,9 +465,12 @@ DEPENDENCIES
   propshaft
   puma (>= 5.0)
   rails (~> 8.1.2)
+  ransack (~> 4.2)
+  redis
   rspec-rails (~> 8.0, >= 8.0.1)
   rubocop-rails-omakase
   shoulda-matchers (~> 7.0, >= 7.0.1)
+  sidekiq
   solid_cable
   solid_cache
   solid_queue

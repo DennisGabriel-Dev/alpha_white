@@ -4,6 +4,14 @@ class EnemQuestion < ApplicationRecord
 
   belongs_to :enem_exam
 
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[area number_in_exam statement skill correct_letter created_at updated_at]
+  end
+
+  def self.ransackable_associations(_auth_object = nil)
+    %w[enem_exam]
+  end
+
   validates :number_in_exam, presence: true,
                              numericality: { only_integer: true, greater_than: 0 }
   validates :area, presence: true, inclusion: { in: AREA_VALUES }

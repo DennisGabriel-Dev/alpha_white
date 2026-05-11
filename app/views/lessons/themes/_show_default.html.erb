@@ -65,10 +65,30 @@
         <% if quiz_comp&.quiz_completed? %>
           <p class="text-sm text-green-600"><%= heroicon(:check_circle, css_class: "w-4 h-4 inline") %> Prova concluída</p>
         <% elsif student? %>
+          <% if @lesson.video_prerequisite_met_for?(current_user) %>
+            <%= link_to take_course_session_lesson_quiz_path(@course, @session, @lesson),
+                  class: "btn-primary inline-flex items-center text-sm py-2 px-4" do %>
+              Fazer prova <%= heroicon(:chart_bar, css_class: "w-4 h-4 ml-2") %>
+            <% end %>
+          <% else %>
+            <p class="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              Assista à aula ou marque o vídeo como assistido antes de fazer a prova.
+            </p>
+          <% end %>
+        <% elsif admin_or_instructor? %>
           <%= link_to take_course_session_lesson_quiz_path(@course, @session, @lesson),
                 class: "btn-primary inline-flex items-center text-sm py-2 px-4" do %>
-            Fazer prova <%= heroicon(:chart_bar, css_class: "w-4 h-4 ml-2") %>
+            Fazer prova (pré-visualizar) <%= heroicon(:chart_bar, css_class: "w-4 h-4 ml-2") %>
           <% end %>
+        <% end %>
+        <% if @lesson.quiz.user_has_student_answers?(current_user) %>
+          <div class="mt-3">
+            <%= link_to review_course_session_lesson_quiz_path(@course, @session, @lesson),
+                  class: "inline-flex items-center text-sm py-2 px-4 rounded-lg border-2 border-primary text-primary font-medium hover:bg-primary/5" do %>
+              <%= heroicon(:chart_bar, css_class: "w-4 h-4 mr-2") %>
+              Conferir respostas
+            <% end %>
+          </div>
         <% end %>
       </div>
     <% end %>

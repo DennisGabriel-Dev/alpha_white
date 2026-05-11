@@ -1,0 +1,161 @@
+<%= render "shared/header" %>
+
+<div class="container mx-auto px-4 py-8 max-w-6xl">
+  <nav class="mb-6 flex flex-wrap items-center gap-4 justify-between">
+    <%= link_to course_session_lesson_quiz_questions_path(@course, @session, @lesson), class: "inline-flex items-center text-gray-600 hover:text-primary transition-colors" do %>
+      <%= heroicon(:arrow_left, css_class: "w-5 h-5 mr-2") %>
+      Voltar às questões da prova
+    <% end %>
+    <p class="text-sm text-gray-500">
+      Prova: <span class="font-medium text-gray-700"><%= @quiz.title %></span>
+    </p>
+  </nav>
+
+  <div class="card mb-6">
+    <h1 class="text-xl font-bold text-gray-800 mb-2">Importar da Biblioteca ENEM</h1>
+    <p class="text-gray-600 text-sm mb-6">
+      Filtre por tipo de prova (ano, dia, caderno), área ou trecho do enunciado. Marque as questões e clique em <strong>Adicionar à prova</strong>.
+      Questões já nesta prova aparecem desabilitadas.
+    </p>
+
+    <%= form_with url: new_course_session_lesson_quiz_enem_import_path(@course, @session, @lesson), method: :get, local: true, class: "space-y-4" do %>
+      <%= hidden_field_tag :page, 1 %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1" for="q_enem_exam_year_eq">Ano</label>
+          <%= select_tag "q[enem_exam_year_eq]",
+              options_for_select([["Todos", ""]] + @year_options.map { |y| [y, y] }, @q.enem_exam_year_eq),
+              id: "q_enem_exam_year_eq",
+              class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1" for="q_enem_exam_day_eq">Dia</label>
+          <%= select_tag "q[enem_exam_day_eq]",
+              options_for_select([["Todos", ""]] + EnemExam::DAY_VALUES.map { |d| [d, d] }, @q.enem_exam_day_eq),
+              id: "q_enem_exam_day_eq",
+              class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1" for="q_enem_exam_booklet_color_eq">Caderno</label>
+          <%= select_tag "q[enem_exam_booklet_color_eq]",
+              options_for_select([["Todos", ""]] + @color_options.map { |c| [c, c] }, @q.enem_exam_booklet_color_eq),
+              id: "q_enem_exam_booklet_color_eq",
+              class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1" for="q_area_eq">Área</label>
+          <%= select_tag "q[area_eq]",
+              options_for_select([["Todas", ""]] + EnemQuestion::AREA_VALUES.map { |a| [a, a] }, @q.area_eq),
+              id: "q_area_eq",
+              class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1" for="q_number_in_exam_eq">Nº na prova</label>
+          <%= number_field_tag "q[number_in_exam_eq]", @q.number_in_exam_eq,
+              id: "q_number_in_exam_eq",
+              min: 1,
+              placeholder: "ex: 45",
+              class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1" for="q_skill_cont">Habilidade (contém)</label>
+          <%= text_field_tag "q[skill_cont]", @q.skill_cont,
+              id: "q_skill_cont",
+              placeholder: "ex: H12",
+              class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-600 mb-1" for="q_statement_cont">Trecho do enunciado</label>
+        <%= text_field_tag "q[statement_cont]", @q.statement_cont,
+            id: "q_statement_cont",
+            placeholder: "Busca no texto do enunciado…",
+            class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <%= submit_tag "Aplicar filtros", class: "btn-primary px-4 py-2 rounded-lg text-sm cursor-pointer" %>
+        <%= link_to "Limpar filtros", new_course_session_lesson_quiz_enem_import_path(@course, @session, @lesson), class: "px-4 py-2 rounded-lg text-sm border border-gray-300 text-gray-700 hover:bg-gray-50" %>
+      </div>
+    <% end %>
+  </div>
+
+  <% total_pages = @total_count.positive? ? (@total_count.to_f / @per_page).ceil : 1 %>
+  <p class="text-sm text-gray-600 mb-4">
+    <%= @total_count %> questão(ões) encontrada(s).
+    <% if total_pages > 1 %>
+      Página <%= @page %> de <%= total_pages %>.
+    <% end %>
+  </p>
+
+  <% if @enem_questions.any? %>
+    <%= form_with url: course_session_lesson_quiz_enem_import_path(@course, @session, @lesson), method: :post, local: true do %>
+      <div class="overflow-x-auto border border-gray-200 rounded-lg bg-white mb-4">
+        <table class="min-w-full text-sm">
+          <thead class="bg-gray-50 text-left">
+            <tr>
+              <th class="px-3 py-2 w-10"></th>
+              <th class="px-3 py-2">Prova</th>
+              <th class="px-3 py-2">Q</th>
+              <th class="px-3 py-2">Área</th>
+              <th class="px-3 py-2">Enunciado (trecho)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @enem_questions.each do |eq| %>
+              <% exam = eq.enem_exam %>
+              <% already = @existing_enem_ids.include?(eq.id) %>
+              <tr class="border-t border-gray-100 <%= "bg-gray-50/80" if already %>">
+                <td class="px-3 py-2 align-top">
+                  <%= check_box_tag "enem_question_ids[]", eq.id, false,
+                      disabled: already,
+                      id: "enem_q_#{eq.id}",
+                      class: "rounded border-gray-300" %>
+                </td>
+                <td class="px-3 py-2 align-top whitespace-nowrap text-gray-700">
+                  <%= exam.year %> · <%= exam.day %> · <%= exam.booklet_color %>
+                </td>
+                <td class="px-3 py-2 align-top font-medium"><%= eq.number_in_exam %></td>
+                <td class="px-3 py-2 align-top"><%= eq.area %></td>
+                <td class="px-3 py-2 align-top text-gray-700">
+                  <label for="enem_q_<%= eq.id %>" class="cursor-pointer">
+                    <%= truncate(eq.statement, length: 160) %>
+                  </label>
+                  <% if already %>
+                    <span class="ml-2 text-xs text-amber-700 font-medium">já na prova</span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <%= submit_tag "Adicionar à prova", class: "btn-primary px-4 py-2 rounded-lg text-sm cursor-pointer" %>
+        <span class="text-xs text-gray-500">Dica: importe em lotes usando os filtros para achar o bloco desejado.</span>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="card text-center py-12 text-gray-600">
+      <p class="mb-2">Nenhuma questão encontrada com estes filtros.</p>
+      <p class="text-sm text-gray-500">Importe PDFs em <%= link_to "Meus imports", enem_import_jobs_path, class: "text-primary hover:underline" %> ou ajuste os filtros.</p>
+    </div>
+  <% end %>
+
+  <% if total_pages > 1 %>
+    <div class="mt-6 flex flex-wrap items-center gap-2 justify-center">
+      <% if @page > 1 %>
+        <%= link_to "« Anterior",
+            new_course_session_lesson_quiz_enem_import_path(@course, @session, @lesson, q: @ransack_params, page: @page - 1),
+            class: "px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50" %>
+      <% end %>
+      <% if @page < total_pages %>
+        <%= link_to "Próxima »",
+            new_course_session_lesson_quiz_enem_import_path(@course, @session, @lesson, q: @ransack_params, page: @page + 1),
+            class: "px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<%= render "shared/footer" %>

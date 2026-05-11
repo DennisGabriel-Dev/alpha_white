@@ -3,6 +3,10 @@ class EnemExam < ApplicationRecord
 
   has_many :enem_questions, dependent: :destroy
 
+  def self.ransackable_attributes(_auth_object = nil)
+    %w[year day booklet_color]
+  end
+
   validates :year, presence: true,
                    numericality: { only_integer: true, greater_than: 1990, less_than: 2100 }
   validates :day, presence: true, inclusion: { in: DAY_VALUES }
