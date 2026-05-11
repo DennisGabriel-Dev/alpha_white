@@ -23,10 +23,46 @@ RSpec.describe "EnemExams", type: :request do
     context "como admin" do
       before { sign_in admin }
 
+      let!(:exam_other) { create(:enem_exam, year: 2022, day: "D2", booklet_color: "CD7") }
+
       it "renderiza biblioteca" do
         get enem_exams_path, headers: headers
         expect(response).to have_http_status(:ok)
         expect(response.body).to include("Biblioteca ENEM")
+      end
+
+      it "filtra por ano" do
+        get enem_exams_path, params: { year: 2023 }, headers: headers
+        expect(response.body).to include(enem_exam_path(exam))
+        expect(response.body).not_to include(enem_exam_path(exam_other))
+      end
+
+      it "filtra por dia e caderno" do
+        get enem_exams_path, params: { day: "D2", booklet_color: "CD7" }, headers: headers
+        expect(response.body).to include(enem_exam_path(exam_other))
+        expect(response.body).not_to include(enem_exam_path(exam))
+      end
+    end
+  end
+
+  describe "GET /enem_exams/:id" do
+    context "como admin" do
+      before { sign_in admin }
+
+      it "lista todas as questões sem filtro" do
+        get enem_exam_path(exam), headers: headers
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Q#{question.number_in_exam}")
+      end
+
+      it "filtra por número da questão" do
+        get enem_exam_path(exam), params: { number: question.number_in_exam }, headers: headers
+        expect(response.body).to include("Q#{question.number_in_exam}")
+      end
+
+      it "mostra aviso quando número não existe" do
+        get enem_exam_path(exam), params: { number: 99999 }, headers: headers
+        expect(response.body).to include("Nenhuma questão encontrada")
       end
     end
   end

@@ -33,6 +33,12 @@ class Quiz < ApplicationRecord
 
   validates :title, presence: true
 
+  def user_has_student_answers?(user)
+    return false if questions.empty?
+
+    StudentAnswer.exists?(user: user, question_id: questions.ids)
+  end
+
   private
 
   def set_tenant_from_lesson

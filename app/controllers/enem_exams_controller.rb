@@ -4,11 +4,29 @@ class EnemExamsController < ApplicationController
   before_action :set_enem_exam, only: [:show, :edit, :update]
 
   def index
-    @enem_exams = EnemExam.includes(:enem_questions).order(year: :desc, day: :asc, booklet_color: :asc)
+    scope = EnemExam.includes(:enem_questions)
+    if params[:year].present?
+      y = params[:year].to_i
+      scope = scope.where(year: y) if y.between?(1991, 2099)
+    end
+    if params[:day].present? && EnemExam::DAY_VALUES.include?(params[:day])
+      scope = scope.where(day: params[:day])
+    end
+    if params[:booklet_color].present?
+      scope = scope.where("LOWER(booklet_color) = ?", params[:booklet_color].to_s.strip.downcase)
+    end
+
+    @enem_exams = scope.order(year: :desc, day: :asc, booklet_color: :asc)
+    @filter_years = EnemExam.distinct.order(year: :desc).pluck(:year)
+    @filter_colors = EnemExam.distinct.pluck(:booklet_color).sort_by { |c| c.to_s.downcase }
   end
 
   def show
     @enem_questions = @enem_exam.enem_questions.order(:number_in_exam)
+    if params[:number].present?
+      num = params[:number].to_s.strip.to_i
+      @enem_questions = @enem_questions.where(number_in_exam: num) if num.positive?
+    end
   end
 
   def edit

@@ -42,6 +42,12 @@ class Lesson < ApplicationRecord
 
   default_scope { order(position: :asc, id: :asc) }
 
+  def video_prerequisite_met_for?(user)
+    return true unless video.attached? || video_url.present?
+
+    lesson_completions.find_by(user: user)&.video_watched?
+  end
+
   private
 
   def set_tenant_from_session
