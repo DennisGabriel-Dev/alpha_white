@@ -113,17 +113,38 @@
 
           <% unless quiz_comp&.quiz_completed? %>
             <% if @lesson.quiz.questions.any? %>
-              <%= link_to take_course_session_lesson_quiz_path(@course, @session, @lesson),
-                    class: "merma-btn-primary inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold" do %>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                </svg>
-                Iniciar prova
+              <% quiz_unlocked = admin_or_instructor? || @lesson.video_prerequisite_met_for?(current_user) %>
+              <% if quiz_unlocked %>
+                <%= link_to take_course_session_lesson_quiz_path(@course, @session, @lesson),
+                      class: "merma-btn-primary inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold" do %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                  </svg>
+                  Iniciar prova
+                <% end %>
+              <% else %>
+                <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+                  Assista à aula antes de iniciar a prova.
+                </div>
               <% end %>
             <% else %>
               <p class="text-sm text-gray-400">A prova ainda não possui questões.</p>
             <% end %>
+          <% end %>
+
+          <% if @lesson.quiz.user_has_student_answers?(current_user) %>
+            <div class="mt-4">
+              <%= link_to review_course_session_lesson_quiz_path(@course, @session, @lesson),
+                    class: "inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold border-2 transition-colors",
+                    style: "border-color: var(--color-primary); color: var(--color-primary);" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                Conferir respostas
+              <% end %>
+            </div>
           <% end %>
 
           <% if admin_or_instructor? %>

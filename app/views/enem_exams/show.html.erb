@@ -1,6 +1,14 @@
 <div class="container mx-auto px-4 py-8 max-w-6xl">
-  <div class="mb-6">
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
     <%= link_to "← Voltar para Biblioteca ENEM", enem_exams_path, class: "text-sm text-gray-600 hover:text-gray-800" %>
+    <%= form_with url: enem_exam_path(@enem_exam), method: :get, local: true, class: "flex flex-wrap items-center gap-2" do %>
+      <label for="q_number" class="text-sm text-gray-600">Nº da questão</label>
+      <%= text_field_tag :number, params[:number], id: "q_number", placeholder: "ex: 45", class: "border border-gray-300 rounded-md p-2 text-sm w-24" %>
+      <%= submit_tag "Buscar", class: "px-3 py-2 rounded bg-gray-100 border border-gray-300 text-sm hover:bg-gray-200" %>
+      <% if params[:number].present? %>
+        <%= link_to "Mostrar todas", enem_exam_path(@enem_exam), class: "text-sm text-primary hover:underline" %>
+      <% end %>
+    <% end %>
   </div>
 
   <div class="bg-white border border-gray-200 rounded-lg p-4 mb-6">
@@ -9,7 +17,17 @@
         <h1 class="text-2xl font-bold text-gray-800">
           ENEM <%= @enem_exam.year %> - <%= @enem_exam.day %> - <%= @enem_exam.booklet_color %>
         </h1>
-        <p class="text-sm text-gray-500 mt-1"><%= @enem_questions.count %> questões extraídas</p>
+        <p class="text-sm text-gray-500 mt-1">
+          <% if params[:number].present? %>
+            <%= @enem_questions.count %> questão(ões) com filtro nº <%= params[:number] %>
+            <% total = @enem_exam.enem_questions.count %>
+            <% if total != @enem_questions.count %>
+              <span class="text-gray-400">(de <%= total %> na prova)</span>
+            <% end %>
+          <% else %>
+            <%= @enem_questions.count %> questões extraídas
+          <% end %>
+        </p>
       </div>
       <%= link_to "Editar prova", edit_enem_exam_path(@enem_exam), class: "px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50" %>
     </div>
@@ -21,6 +39,12 @@
 
   <% if alert.present? %>
     <div class="mb-4 p-3 rounded border border-red-200 bg-red-50 text-red-800"><%= alert %></div>
+  <% end %>
+
+  <% if params[:number].present? && @enem_questions.empty? %>
+    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-900 text-sm">
+      Nenhuma questão encontrada com o número informado.
+    </div>
   <% end %>
 
   <div class="space-y-4">
