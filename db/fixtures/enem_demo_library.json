@@ -1,0 +1,41 @@
+{
+  "exam": {
+    "year": 2024,
+    "day": "D1",
+    "booklet_color": "CD1",
+    "metadata": {
+      "source": "seed_demo_json",
+      "description": "Biblioteca mínima para demo local (sem PDF / microserviço)"
+    }
+  },
+  "questions": [
+    {
+      "number_in_exam": 1,
+      "area": "MT",
+      "skill": "H1",
+      "statement": "[Demo] Em um plano cartesiano, o ponto (2, 3) pertence ao gráfico de qual função afim y = ax + b com a = 1?",
+      "correct_letter": "B",
+      "alternatives": [
+        { "letter": "A", "text": "y = x + 4" },
+        { "letter": "B", "text": "y = x + 1" },
+        { "letter": "C", "text": "y = x - 1" },
+        { "letter": "D", "text": "y = 2x + 3" },
+        { "letter": "E", "text": "y = 3x - 2" }
+      ]
+    },
+    {
+      "number_in_exam": 2,
+      "area": "MT",
+      "skill": "H2",
+      "statement": "[Demo] Qual é o valor de 15% de 200?",
+      "correct_letter": "C",
+      "alternatives": [
+        { "letter": "A", "text": "20" },
+        { "letter": "B", "text": "25" },
+        { "letter": "C", "text": "30" },
+        { "letter": "D", "text": "35" },
+        { "letter": "E", "text": "40" }
+      ]
+    }
+  ]
+}

@@ -95,6 +95,38 @@ module AlphaWhiteSeed
     ].sample
   end
 
+  def ensure_demo_enem_library
+    path = Rails.root.join("db/fixtures/enem_demo_library.json")
+    unless File.file?(path)
+      Rails.logger.error "Fixture ENEM demo não encontrada: #{path}"
+      return
+    end
+
+    payload = JSON.parse(File.read(path))
+    exam_data = payload.fetch("exam")
+    exam = EnemExam.find_or_initialize_by(
+      year: exam_data.fetch("year"),
+      day: exam_data.fetch("day"),
+      booklet_color: exam_data.fetch("booklet_color").to_s.upcase
+    )
+    exam.metadata = exam.metadata.merge(exam_data["metadata"] || {}).merge("seed" => "enem_demo_library.json")
+    exam.save!
+
+    Array(payload["questions"]).each do |q|
+      eq = EnemQuestion.find_or_initialize_by(enem_exam: exam, number_in_exam: q.fetch("number_in_exam"))
+      eq.assign_attributes(
+        area: q.fetch("area"),
+        statement: q.fetch("statement"),
+        skill: q["skill"],
+        correct_letter: q.fetch("correct_letter").to_s.upcase,
+        alternatives: q["alternatives"] || []
+      )
+      eq.save!
+    end
+
+    Rails.logger.info "Biblioteca ENEM demo: prova #{exam.year} #{exam.day} #{exam.booklet_color} (#{exam.enem_questions.count} questões)"
+  end
+
   def ensure_tenant_branding(tenant, attrs)
     updates = {}
     updates[:primary_color] = attrs[:primary_color] if tenant.primary_color != attrs[:primary_color]
@@ -214,6 +246,8 @@ module AlphaWhiteSeed
   end
 end
 
+AlphaWhiteSeed.ensure_demo_enem_library
+
 # --- Tenants ---
 tenants = []
 TENANTS_DATA.each do |data|
@@ -282,6 +316,7 @@ puts "  - #{Course.count} cursos no total"
 puts "  - #{Session.count} sessões"
 puts "  - #{Lesson.count} aulas"
 puts "  - #{Quiz.count} quizzes / #{Question.count} questões"
+puts "  - #{EnemExam.count} edições ENEM (biblioteca global) / #{EnemQuestion.count} questões ENEM"
 puts "  - #{User.count} usuários"
 puts "  - #{LessonCompletion.count} registros de progresso"
 puts "  - #{Feedback.count} feedbacks"
