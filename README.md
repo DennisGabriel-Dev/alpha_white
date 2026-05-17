@@ -81,18 +81,21 @@ A aplicação usa a gem [acts_as_tenant](https://github.com/ErwinM/acts_as_tenan
 # Usuários por tenant: admin, instrutor e estudantes (email único por tenant no formato tenant_email)
 {
   "objetivo" => [
+    { email: "super@objetivo.demo", role: :super_admin },
     { email: "admin@objetivo.demo", role: :tenant_admin },
     { email: "instrutor@objetivo.demo", role: :instructor },
     { email: "aluno1@objetivo.demo", role: :student },
     { email: "aluno2@objetivo.demo", role: :student }
   ],
   "poliedro" => [
+    { email: "super@poliedro.demo", role: :super_admin }
     { email: "admin@poliedro.demo", role: :tenant_admin },
     { email: "instrutor@poliedro.demo", role: :instructor },
     { email: "aluno1@poliedro.demo", role: :student },
     { email: "aluno2@poliedro.demo", role: :student }
   ],
   "anglo" => [
+    { email: "super@anglo.demo", role: :super_admin }
     { email: "admin@anglo.demo", role: :tenant_admin },
     { email: "instrutor@anglo.demo", role: :instructor },
     { email: "aluno1@anglo.demo", role: :student },

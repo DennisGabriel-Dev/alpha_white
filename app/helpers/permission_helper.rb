@@ -32,4 +32,16 @@ module PermissionHelper
 
     current_user.instructor?
   end
+
+  def reports_aluno_path_allowed?
+    user_signed_in? && current_user.student?
+  end
+
+  def reports_turma_path_allowed?
+    user_signed_in? && (current_user.instructor? || current_user.tenant_admin? || current_user.super_admin?)
+  end
+
+  def reports_escola_path_allowed?
+    user_signed_in? && (current_user.tenant_admin? || current_user.super_admin?)
+  end
 end

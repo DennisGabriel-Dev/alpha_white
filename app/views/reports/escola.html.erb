@@ -1,0 +1,45 @@
+<% content_for :title, "Relatórios — Escola" %>
+<% if themed_layout? %>
+  <% content_for :header_title, "Escola" %>
+<% end %>
+
+<%= render "shared/header" unless themed_layout? %>
+
+<div class="<%= themed_layout? ? 'max-w-3xl mx-auto px-5 py-6' : 'container mx-auto px-4 py-8 max-w-4xl' %>">
+  <nav class="mb-6"><%= render "reports/nav" %></nav>
+
+  <section class="mb-8 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Alunos ativos (últimos 7 dias)</h2>
+    <p class="text-3xl font-bold text-gray-900 mt-1 tabular-nums"><%= @data.active_student_count %></p>
+    <p class="text-xs text-gray-500 mt-2">Alunos distintos com atualização em conclusão de aula ou resposta de prova nos últimos <%= Reports::TenantOverview::WINDOW_DAYS %> dias.</p>
+  </section>
+
+  <section>
+    <h2 class="text-lg font-semibold text-gray-900 mb-1">Engajamento por curso</h2>
+    <p class="text-sm text-gray-500 mb-3">Alunos distintos com conclusão de aula ou resposta de prova nos últimos <%= Reports::TenantOverview::WINDOW_DAYS %> dias, por curso.</p>
+    <% if @data.engagement_rows.empty? %>
+      <p class="text-sm text-gray-500">Nenhum curso ativo.</p>
+    <% else %>
+      <div class="overflow-x-auto rounded-xl border border-gray-200">
+        <table class="min-w-full text-sm">
+          <thead class="bg-gray-50 text-left text-gray-600">
+            <tr>
+              <th class="px-4 py-2">Curso</th>
+              <th class="px-4 py-2 text-right">Alunos ativos (7d)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <% @data.engagement_rows.each do |row| %>
+              <tr>
+                <td class="px-4 py-2">
+                  <%= link_to row.course.name, course_path(row.course), class: "font-medium text-gray-900 hover:text-primary" %>
+                </td>
+                <td class="px-4 py-2 text-right tabular-nums font-medium"><%= row.active_students_7d %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </section>
+</div>
