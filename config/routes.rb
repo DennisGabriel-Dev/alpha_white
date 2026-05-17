@@ -29,6 +29,12 @@ Rails.application.routes.draw do
     resources :enem_questions, only: [:edit, :update], controller: "enem_exam_questions"
   end
 
+  scope path: "relatorios", as: :relatorios do
+    get "aluno", to: "reports#aluno"
+    get "turma", to: "reports#turma"
+    get "escola", to: "reports#escola"
+  end
+
   # Rotas Web (HTML)
   resources :courses do
     resources :sessions, only: [:show, :new, :create, :edit, :update, :destroy] do

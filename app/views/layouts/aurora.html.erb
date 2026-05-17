@@ -94,6 +94,31 @@
             Cursos
           <% end %>
 
+          <% if reports_aluno_path_allowed? || reports_turma_path_allowed? || reports_escola_path_allowed? %>
+            <p class="px-2 text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 mt-4">Relatórios</p>
+            <% if reports_aluno_path_allowed? %>
+              <%= link_to relatorios_aluno_path,
+                    class: "aurora-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-white/80 transition-colors #{controller_name == 'reports' && action_name == 'aluno' ? 'active' : ''}" do %>
+                <span class="text-xs w-4 text-center">📊</span>
+                Meu desempenho
+              <% end %>
+            <% end %>
+            <% if reports_turma_path_allowed? %>
+              <%= link_to relatorios_turma_path,
+                    class: "aurora-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-white/80 transition-colors #{controller_name == 'reports' && action_name == 'turma' ? 'active' : ''}" do %>
+                <span class="text-xs w-4 text-center">👥</span>
+                Turma
+              <% end %>
+            <% end %>
+            <% if reports_escola_path_allowed? %>
+              <%= link_to relatorios_escola_path,
+                    class: "aurora-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-white/80 transition-colors #{controller_name == 'reports' && action_name == 'escola' ? 'active' : ''}" do %>
+                <span class="text-xs w-4 text-center">🏫</span>
+                Escola
+              <% end %>
+            <% end %>
+          <% end %>
+
           <p class="px-2 text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 mt-4">Biblioteca</p>
 
           <% if tenant_admin? %>
