@@ -42,6 +42,30 @@
   <% if merma_nav_courses.empty? %>
     <p class="text-[11px] text-gray-400 text-center py-6">Nenhum curso disponível</p>
   <% end %>
+
+  <% if reports_aluno_path_allowed? || reports_turma_path_allowed? || reports_escola_path_allowed? %>
+    <div class="px-2 pt-3 mt-2 border-t border-gray-100 space-y-0.5">
+      <p class="px-2 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Relatórios</p>
+      <% if reports_aluno_path_allowed? %>
+        <%= link_to relatorios_aluno_path, class: "merma-nav-item #{controller_name == 'reports' && action_name == 'aluno' ? 'active' : ''}" do %>
+          <%= heroicon(:chart_bar, css_class: "w-4 h-4 flex-shrink-0 text-gray-500") %>
+          <span class="truncate">Meu desempenho</span>
+        <% end %>
+      <% end %>
+      <% if reports_turma_path_allowed? %>
+        <%= link_to relatorios_turma_path, class: "merma-nav-item #{controller_name == 'reports' && action_name == 'turma' ? 'active' : ''}" do %>
+          <%= heroicon(:user_circle, css_class: "w-4 h-4 flex-shrink-0 text-gray-500") %>
+          <span class="truncate">Turma</span>
+        <% end %>
+      <% end %>
+      <% if reports_escola_path_allowed? %>
+        <%= link_to relatorios_escola_path, class: "merma-nav-item #{controller_name == 'reports' && action_name == 'escola' ? 'active' : ''}" do %>
+          <%= heroicon(:academic_cap, css_class: "w-4 h-4 flex-shrink-0 text-gray-500") %>
+          <span class="truncate">Escola</span>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
 </div>
 
 <script>
