@@ -43,6 +43,16 @@
     <p class="text-[11px] text-gray-400 text-center py-6">Nenhum curso disponível</p>
   <% end %>
 
+  <% if me_achievements_path_allowed? %>
+    <div class="px-2 pt-3 mt-2 border-t border-gray-100 space-y-0.5">
+      <p class="px-2 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Você</p>
+      <%= link_to me_achievements_path, class: "merma-nav-item #{controller_path == 'me/achievements' ? 'active' : ''}" do %>
+        <%= heroicon(:trophy, css_class: "w-4 h-4 flex-shrink-0 text-gray-500") %>
+        <span class="truncate flex-1">Conquistas</span>
+      <% end %>
+    </div>
+  <% end %>
+
   <% if reports_aluno_path_allowed? || reports_turma_path_allowed? || reports_escola_path_allowed? %>
     <div class="px-2 pt-3 mt-2 border-t border-gray-100 space-y-0.5">
       <p class="px-2 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Relatórios</p>

@@ -127,6 +127,58 @@ module AlphaWhiteSeed
     Rails.logger.info "Biblioteca ENEM demo: prova #{exam.year} #{exam.day} #{exam.booklet_color} (#{exam.enem_questions.count} questões)"
   end
 
+  ACHIEVEMENTS_CATALOG = [
+    {
+      slug: "first_answer",
+      name: "Primeira resposta",
+      description: "Respondeu sua primeira questão em uma prova.",
+      kind: :event,
+      threshold: 1
+    },
+    {
+      slug: "first_lesson_done",
+      name: "Primeira aula concluída",
+      description: "Concluiu sua primeira aula (vídeo e prova, quando houver).",
+      kind: :event,
+      threshold: 1
+    },
+    {
+      slug: "streak_3",
+      name: "Fogo no estudo (3 dias)",
+      description: "Estudou por 3 dias seguidos.",
+      kind: :streak,
+      threshold: 3
+    },
+    {
+      slug: "streak_7",
+      name: "Semana de foco (7 dias)",
+      description: "Manteve a sequência de estudo por 7 dias.",
+      kind: :streak,
+      threshold: 7
+    },
+    {
+      slug: "quiz_perfect",
+      name: "Prova perfeita",
+      description: "Acertou todas as questões de uma prova.",
+      kind: :quiz_perfect,
+      threshold: 1
+    }
+  ].freeze
+
+  def ensure_achievements_catalog
+    ACHIEVEMENTS_CATALOG.each do |row|
+      achievement = Achievement.find_or_initialize_by(slug: row[:slug])
+      achievement.assign_attributes(
+        name: row[:name],
+        description: row[:description],
+        kind: row[:kind],
+        threshold: row[:threshold]
+      )
+      achievement.save!
+    end
+    Rails.logger.info "Catálogo de conquistas: #{Achievement.count} badges"
+  end
+
   def ensure_tenant_branding(tenant, attrs)
     updates = {}
     updates[:primary_color] = attrs[:primary_color] if tenant.primary_color != attrs[:primary_color]
@@ -247,6 +299,7 @@ module AlphaWhiteSeed
 end
 
 AlphaWhiteSeed.ensure_demo_enem_library
+AlphaWhiteSeed.ensure_achievements_catalog
 
 # --- Tenants ---
 tenants = []

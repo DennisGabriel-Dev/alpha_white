@@ -29,6 +29,10 @@ Rails.application.routes.draw do
     resources :enem_questions, only: [:edit, :update], controller: "enem_exam_questions"
   end
 
+  namespace :me, path: "me" do
+    get "conquistas", to: "achievements#index", as: :achievements
+  end
+
   scope path: "relatorios", as: :relatorios do
     get "aluno", to: "reports#aluno"
     get "turma", to: "reports#turma"

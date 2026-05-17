@@ -38,6 +38,15 @@ class User < ApplicationRecord
 
   belongs_to :tenant
   has_many :enem_import_jobs, dependent: :destroy
+  has_many :user_achievements, dependent: :destroy
+  has_many :achievements, through: :user_achievements
+  has_many :study_streaks, dependent: :destroy
 
   acts_as_tenant :tenant
+
+  def study_streak_for(tenant = ActsAsTenant.current_tenant)
+    return nil unless tenant
+
+    study_streaks.find_by(tenant_id: tenant.id)
+  end
 end

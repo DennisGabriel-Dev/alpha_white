@@ -1,0 +1,7 @@
+<% streak = student_streak_display %>
+<% if streak.to_i.positive? %>
+  <span class="inline-flex items-center gap-1 text-xs font-semibold text-orange-600" title="Ofensiva — dias seguidos estudando">
+    <span aria-hidden="true" style="width: 25px;"><%= image_tag "streaks/fire.png"%></span>
+    <span style="font-size: 15px;"><%= streak %></span>
+  </span>
+<% end %>

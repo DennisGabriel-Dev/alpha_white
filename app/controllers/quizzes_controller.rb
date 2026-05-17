@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class QuizzesController < ApplicationController
+  include GamificationFlash
+
   before_action :authenticate_user!
   before_action :require_admin_or_instructor!, only: [:new, :create, :edit, :update, :destroy]
   before_action :set_course
@@ -55,13 +57,17 @@ class QuizzesController < ApplicationController
     end
     completion.save!
 
+    gamification = nil
+    gamification = run_gamification!(quiz: @quiz, lesson_just_completed: completion.completed?) if current_user.student?
+
     lesson_path = course_session_lesson_path(@course, @session, @lesson, tab: "quiz")
 
-    notice = if completion.quiz_completed?
-              "Prova concluída! Confira o desempenho abaixo."
-            else
-              "Respostas enviadas (#{answered} nesta submissão). Responda todas as questões para concluir a prova."
-            end
+    base_notice = if completion.quiz_completed?
+                    "Prova concluída! Confira o desempenho abaixo."
+                  else
+                    "Respostas enviadas (#{answered} nesta submissão). Responda todas as questões para concluir a prova."
+                  end
+    notice = notice_with_gamification(base_notice, gamification)
 
     if completion.quiz_completed?
       redirect_to review_course_session_lesson_quiz_path(@course, @session, @lesson), notice: notice
