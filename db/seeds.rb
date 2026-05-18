@@ -166,16 +166,7 @@ module AlphaWhiteSeed
   ].freeze
 
   def ensure_achievements_catalog
-    ACHIEVEMENTS_CATALOG.each do |row|
-      achievement = Achievement.find_or_initialize_by(slug: row[:slug])
-      achievement.assign_attributes(
-        name: row[:name],
-        description: row[:description],
-        kind: row[:kind],
-        threshold: row[:threshold]
-      )
-      achievement.save!
-    end
+    Gamification::AchievementsCatalog.ensure!
     Rails.logger.info "Catálogo de conquistas: #{Achievement.count} badges"
   end
 

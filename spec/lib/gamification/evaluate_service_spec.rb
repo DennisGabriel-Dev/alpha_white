@@ -33,4 +33,25 @@ RSpec.describe Gamification::EvaluateService do
       expect(result.call.newly_awarded.map(&:slug)).not_to include("first_answer")
     end
   end
+
+  it "concede first_answer mesmo com várias respostas já salvas" do
+    course = create(:course, tenant: tenant)
+    session = create(:session, course:, tenant: tenant)
+    lesson = create(:lesson, session:, tenant: tenant)
+    quiz = create(:quiz, lesson:, tenant: tenant)
+
+    2.times do
+      q = build(:question, quiz:, tenant: tenant)
+      q.question_options.build(text: "A", correct: true, position: 0)
+      q.question_options.build(text: "B", correct: false, position: 1)
+      q.save!
+      opt = q.question_options.find_by!(correct: true)
+      StudentAnswer.create!(user: student, question: q, question_option: opt)
+    end
+
+    ActsAsTenant.with_tenant(tenant) do
+      result = described_class.new(user: student, tenant: tenant, quiz: quiz).call
+      expect(result.newly_awarded.map(&:slug)).to include("first_answer")
+    end
+  end
 end

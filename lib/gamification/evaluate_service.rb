@@ -11,6 +11,8 @@ module Gamification
     def call
       return Gamification::Result.new(newly_awarded: [], study_streak: nil) unless @user.student?
 
+      AchievementsCatalog.ensure! if Achievement.none?
+
       newly_awarded = []
       streak = nil
 
@@ -65,13 +67,27 @@ module Gamification
     end
 
     def first_answer_just_earned?
-      count = StudentAnswer.joins(:question).where(user: @user, questions: { tenant_id: @tenant.id }).count
-      count == 1
+      return false if already_has_slug?("first_answer")
+
+      student_answers_in_tenant.exists?
     end
 
     def first_lesson_just_earned?
-      completions = LessonCompletion.joins(:lesson).where(user: @user, lessons: { tenant_id: @tenant.id }).includes(:lesson)
-      completions.count(&:completed?) == 1
+      return false if already_has_slug?("first_lesson_done")
+
+      LessonCompletion.joins(:lesson)
+                      .where(user: @user, lessons: { tenant_id: @tenant.id })
+                      .includes(:lesson)
+                      .any?(&:completed?)
+    end
+
+    def student_answers_in_tenant
+      StudentAnswer.joins(:question).where(user: @user, questions: { tenant_id: @tenant.id })
+    end
+
+    def already_has_slug?(slug)
+      achievement = Achievement.find_by(slug: slug)
+      achievement && already_has?(achievement)
     end
 
     def grant_by_slug(slug)
