@@ -68,7 +68,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_locale
-    I18n.locale = "pt-br"
+    I18n.locale = I18n.default_locale
   end
 
   def set_active_storage_url_options
