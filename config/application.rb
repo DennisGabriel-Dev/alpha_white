@@ -38,5 +38,9 @@ module AlphaWhite
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    config.i18n.default_locale = :"pt-br"
+    config.i18n.available_locales = [ :"pt-br", :en ]
+    config.i18n.fallbacks = [ :en ]
   end
 end

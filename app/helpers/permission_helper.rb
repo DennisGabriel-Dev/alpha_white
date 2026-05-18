@@ -44,4 +44,8 @@ module PermissionHelper
   def reports_escola_path_allowed?
     user_signed_in? && (current_user.tenant_admin? || current_user.super_admin?)
   end
+
+  def me_achievements_path_allowed?
+    user_signed_in? && current_user.student?
+  end
 end

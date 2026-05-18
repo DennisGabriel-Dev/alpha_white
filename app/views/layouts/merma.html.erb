@@ -172,6 +172,7 @@
               <%= yield :header_actions %>
             <% end %>
             <% if user_signed_in? %>
+              <%= render "shared/student_streak_badge" %>
               <span class="text-xs text-gray-400 hidden sm:block truncate max-w-[10rem]"><%= current_user.email %></span>
             <% end %>
           </div>

@@ -94,6 +94,15 @@
             Cursos
           <% end %>
 
+          <% if me_achievements_path_allowed? %>
+            <p class="px-2 text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 mt-4">Você</p>
+            <%= link_to me_achievements_path,
+                  class: "aurora-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-white/80 transition-colors #{controller_path == 'me/achievements' ? 'active' : ''}" do %>
+              <span class="text-xs w-4 text-center"><%= image_tag "achievements/default.png" %></span>
+              <span class="flex-1">Conquistas</span>
+            <% end %>
+          <% end %>
+
           <% if reports_aluno_path_allowed? || reports_turma_path_allowed? || reports_escola_path_allowed? %>
             <p class="px-2 text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 mt-4">Relatórios</p>
             <% if reports_aluno_path_allowed? %>
@@ -183,6 +192,10 @@
               <input type="text" placeholder="Buscar cursos..."
                      class="pl-9 pr-4 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg w-48 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent">
             </div>
+
+            <% if user_signed_in? %>
+              <%= render "shared/student_streak_badge" %>
+            <% end %>
 
             <%# Notification bell %>
             <button class="relative p-1.5 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100">

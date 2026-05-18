@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class LessonCompletionsController < ApplicationController
+  include GamificationFlash
+
   before_action :authenticate_user!
   before_action :set_course
   before_action :set_session
@@ -9,7 +11,10 @@ class LessonCompletionsController < ApplicationController
   def create
     @completion = @lesson.lesson_completions.find_or_initialize_by(user: current_user)
     if @completion.update(lesson_completion_params)
-      redirect_to course_session_lesson_path(@course, @session, @lesson), notice: "Progresso registrado."
+      gamification = nil
+      gamification = run_gamification!(lesson_just_completed: @completion.completed?) if current_user.student?
+      notice = notice_with_gamification("Progresso registrado.", gamification)
+      redirect_to course_session_lesson_path(@course, @session, @lesson), notice: notice
     else
       redirect_to course_session_lesson_path(@course, @session, @lesson), alert: "Erro ao registrar progresso."
     end
