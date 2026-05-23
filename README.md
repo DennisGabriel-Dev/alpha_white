@@ -17,11 +17,18 @@ Aplicação Rails 8 com arquitetura **multi-tenant** usando row-level tenancy. C
 ### Primeira vez
 Obs: pode ser necessário instalar o make: ```sudo apt install make```, caso você opte por usar os atalhos introduzidos no makefile
 ```bash
+# 1
 git clone git@github.com:DennisGabriel-Dev/alpha_white.git
+# 2
 cd alpha_white
+# 3
 touch .env
-# Sobe containers, prepara o banco e popula com dados iniciais
+# 4
 make setup
+# 5
+make start 
+# ou
+make start_background # para rodar em segundo plano
 ```
 
 O primeiro `make setup` pode demorar alguns minutos (build da imagem). Quando terminar, acesse:
