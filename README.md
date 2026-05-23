@@ -2,8 +2,9 @@
 
 Aplicação Rails 8 com arquitetura **multi-tenant** usando row-level tenancy. Cada cursinho preparatório é um tenant isolado, com seus próprios dados e acesso via subdomínio.
 
-**O projeto roda apenas com Docker.** Não é necessário instalar Ruby nem PostgreSQL na máquina.
+*Essa aplicação também possui um módulo próprio para API, caso deseje criar a sua própria UI.*
 
+**O projeto roda apenas com Docker.** Não é necessário instalar Ruby nem PostgreSQL na máquina.
 ---
 
 ## 🚀 Como rodar (para o professor / qualquer máquina)
