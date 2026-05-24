@@ -79,4 +79,5 @@ Rails.application.configure do
   config.hosts << "objetivo.lvh.me"
   config.hosts << "poliedro.lvh.me"
   config.hosts << "anglo.lvh.me"
+  config.hosts << "alphawhite.ddns.net"
 end
