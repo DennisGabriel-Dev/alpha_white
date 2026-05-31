@@ -1,12 +1,13 @@
 <%# Barra de tempo restante — pai deve ter data-controller="quiz-timer" %>
 <% if @quiz_attempt.present? && @expires_at.present? %>
-  <div class="flex flex-wrap items-center gap-3 mb-4 p-3 rounded-lg border border-amber-200 bg-amber-50">
+  <div class="flex flex-wrap items-center gap-3 mb-4 p-3 rounded-xl border border-amber-200 bg-amber-50
+              <%= 'rounded-2xl' if themed_layout? %>">
     <span class="text-sm text-amber-900">
       Tempo restante:
       <strong data-quiz-timer-target="display" class="tabular-nums">--:--</strong>
     </span>
     <% if @quiz_attempt.attempt_number > 1 %>
-      <span class="text-xs text-amber-800 bg-amber-100 px-2 py-0.5 rounded">
+      <span class="text-xs text-amber-800 bg-amber-100 px-2 py-0.5 rounded-lg">
         Tentativa <%= @quiz_attempt.attempt_number %>
       </span>
     <% end %>

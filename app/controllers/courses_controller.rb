@@ -1,7 +1,7 @@
 class CoursesController < ApplicationController
-  before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy]
-  before_action :require_admin_or_instructor!, only: [:new, :create, :edit, :update, :destroy]
-  before_action :set_course, only: [:show, :edit, :update, :destroy]
+  before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy, :relatorio]
+  before_action :require_admin_or_instructor!, only: [:new, :create, :edit, :update, :destroy, :relatorio]
+  before_action :set_course, only: [:show, :edit, :update, :destroy, :relatorio]
 
   def index
     # Apenas cursos do tenant atual serão retornados automaticamente
@@ -51,6 +51,19 @@ class CoursesController < ApplicationController
   def destroy
     @course.destroy
     redirect_to courses_path, notice: "Curso removido com sucesso."
+  end
+
+  def relatorio
+    period = Reports::PeriodFilter.parse(params[:from], params[:to])
+    csv = Reports::CourseCsvExport.new(
+      course: @course,
+      tenant: ActsAsTenant.current_tenant,
+      from: period.from,
+      to: period.to
+    ).call
+
+    filename = "curso-#{@course.id}-#{Date.current.iso8601}.csv"
+    send_data csv, filename: filename, type: "text/csv; charset=utf-8", disposition: "attachment"
   end
 
   private

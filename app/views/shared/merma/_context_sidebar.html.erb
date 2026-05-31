@@ -76,6 +76,16 @@
       <% end %>
     </div>
   <% end %>
+
+  <% if staff_users_path_allowed? %>
+    <div class="px-2 pt-3 mt-2 border-t border-gray-100 space-y-0.5">
+      <p class="px-2 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Administração</p>
+      <%= link_to staff_users_path, class: "merma-nav-item #{controller_name == 'staff_users' ? 'active' : ''}" do %>
+        <%= heroicon(:user_circle, css_class: "w-4 h-4 flex-shrink-0 text-gray-500") %>
+        <span class="truncate">Equipe</span>
+      <% end %>
+    </div>
+  <% end %>
 </div>
 
 <script>

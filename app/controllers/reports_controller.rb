@@ -8,6 +8,7 @@ class ReportsController < ApplicationController
 
   def turma
     require_staff_for_turma!
+    @courses = Course.order(:name)
     @data = Reports::ClassPerformance.new(tenant: ActsAsTenant.current_tenant).call
   end
 

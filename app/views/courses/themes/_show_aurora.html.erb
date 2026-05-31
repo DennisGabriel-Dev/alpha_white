@@ -81,6 +81,10 @@
       <% end %>
     </div>
 
+    <% if admin_or_instructor? %>
+      <%= render "reports/csv_export_course", course: @course %>
+    <% end %>
+
     <% if notice %>
       <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm"><%= notice %></div>
     <% end %>

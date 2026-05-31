@@ -128,6 +128,15 @@
             <% end %>
           <% end %>
 
+          <% if staff_users_path_allowed? %>
+            <p class="px-2 text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 mt-4">Administração</p>
+            <%= link_to staff_users_path,
+                  class: "aurora-sidebar-link flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-white/80 transition-colors #{controller_name == 'staff_users' ? 'active' : ''}" do %>
+              <span class="text-xs w-4 text-center">👥</span>
+              Equipe
+            <% end %>
+          <% end %>
+
           <p class="px-2 text-xs font-semibold text-white/40 uppercase tracking-widest mb-2 mt-4">Biblioteca</p>
 
           <% if tenant_admin? %>
