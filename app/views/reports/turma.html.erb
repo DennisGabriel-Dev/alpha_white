@@ -1,12 +1,19 @@
 <% content_for :title, "Relatórios — Turma" %>
 <% if themed_layout? %>
   <% content_for :header_title, "Turma" %>
+  <% content_for :breadcrumb do %>
+    <%= render "shared/reports_breadcrumb", title: "Turma" %>
+  <% end %>
 <% end %>
 
 <%= render "shared/header" unless themed_layout? %>
 
-<div class="<%= themed_layout? ? 'max-w-4xl mx-auto px-5 py-6' : 'container mx-auto px-4 py-8 max-w-5xl' %>">
-  <nav class="mb-6"><%= render "reports/nav" %></nav>
+<div class="<%= theme_page_container_class(max_width: '5xl') %>">
+  <%= render "reports/nav" %>
+
+  <% if reports_turma_path_allowed? %>
+    <%= render "reports/csv_export", courses: @courses %>
+  <% end %>
 
   <section class="mb-10">
     <h2 class="text-lg font-semibold text-gray-900 mb-1">Top 10 questões com mais erros</h2>
@@ -14,7 +21,7 @@
     <% if @data.top_wrong.empty? %>
       <p class="text-sm text-gray-500">Ainda não há respostas incorretas suficientes para ranquear.</p>
     <% else %>
-      <div class="overflow-x-auto rounded-xl border border-gray-200">
+      <div class="<%= theme_table_wrap_class %>">
         <table class="min-w-full text-sm">
           <thead class="bg-gray-50 text-left text-gray-600">
             <tr>
@@ -43,13 +50,15 @@
     <% if @data.student_rows.empty? %>
       <p class="text-sm text-gray-500">Nenhum aluno cadastrado ou não há aulas no cursinho.</p>
     <% else %>
-      <div class="overflow-x-auto rounded-xl border border-gray-200">
+      <div class="<%= theme_table_wrap_class %>">
         <table class="min-w-full text-sm">
           <thead class="bg-gray-50 text-left text-gray-600">
             <tr>
               <th class="px-4 py-2">Aluno</th>
               <th class="px-4 py-2 text-right">Aulas ok</th>
               <th class="px-4 py-2 text-right">Total</th>
+              <th class="px-4 py-2 text-right">Tentativas</th>
+              <th class="px-4 py-2 text-right">Tempo em provas</th>
               <th class="px-4 py-2 w-40">Progresso</th>
             </tr>
           </thead>
@@ -59,6 +68,8 @@
                 <td class="px-4 py-2 text-gray-900 truncate max-w-xs"><%= row.user.email %></td>
                 <td class="px-4 py-2 text-right tabular-nums"><%= row.completed %></td>
                 <td class="px-4 py-2 text-right tabular-nums"><%= row.total %></td>
+                <td class="px-4 py-2 text-right tabular-nums"><%= row.quiz_attempts_count %></td>
+                <td class="px-4 py-2 text-right tabular-nums text-gray-600"><%= reports_format_duration(row.quiz_time_seconds) %></td>
                 <td class="px-4 py-2">
                   <%= render "reports/progress_bar", percent: row.percent %>
                 </td>

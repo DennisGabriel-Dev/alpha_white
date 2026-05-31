@@ -43,6 +43,9 @@ Rails.application.routes.draw do
 
   # Rotas Web (HTML)
   resources :courses do
+    member do
+      get :relatorio
+    end
     resources :sessions, only: [:show, :new, :create, :edit, :update, :destroy] do
       resources :lessons, only: [:show, :new, :create, :edit, :update, :destroy] do
         resources :feedbacks, only: [:create]

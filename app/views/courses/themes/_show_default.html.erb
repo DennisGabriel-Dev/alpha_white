@@ -30,6 +30,10 @@
     </div>
   </div>
 
+  <% if admin_or_instructor? %>
+    <%= render "reports/csv_export_course", course: @course %>
+  <% end %>
+
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
     <h2 class="text-xl font-bold text-gray-800">
       Sessões
