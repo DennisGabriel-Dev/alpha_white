@@ -50,11 +50,10 @@ class QuizzesController < ApplicationController
       return
     end
 
-    if @quiz_attempt.expired?
-      answered = persist_answers_for_attempt!(@quiz_attempt)
-      @quiz_attempt.submit!(at: @quiz_attempt.expires_at)
+    if current_user.student? && @quiz_attempt.expired?
+      Quizzes::FinalizeExpiredAttempts.new(quiz: @quiz, user: current_user).call
       redirect_to take_course_session_lesson_quiz_path(@course, @session, @lesson),
-                  alert: "Tempo esgotado. Suas respostas parciais foram registradas. Você pode iniciar uma nova tentativa."
+                  alert: "Tempo esgotado. O envio após o limite não é permitido."
       return
     end
 
