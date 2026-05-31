@@ -29,7 +29,9 @@
           <% end %>
         </p>
       </div>
-      <%= link_to "Editar prova", edit_enem_exam_path(@enem_exam), class: "px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50" %>
+      <% if super_admin? %>
+        <%= link_to "Editar prova", edit_enem_exam_path(@enem_exam), class: "px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50" %>
+      <% end %>
     </div>
   </div>
 
@@ -57,7 +59,9 @@
             </h2>
             <p class="text-xs text-gray-500">Gabarito: <%= question.correct_letter %> | Habilidade: <%= question.skill.presence || "-" %></p>
           </div>
-          <%= link_to "Editar questão", edit_enem_exam_enem_question_path(@enem_exam, question), class: "text-primary hover:underline text-sm" %>
+          <% if super_admin? %>
+            <%= link_to "Editar questão", edit_enem_exam_enem_question_path(@enem_exam, question), class: "text-primary hover:underline text-sm" %>
+          <% end %>
         </div>
 
         <div class="mb-3">

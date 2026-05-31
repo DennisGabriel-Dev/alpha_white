@@ -4,6 +4,7 @@ class EnemExamsController < ApplicationController
   before_action :authenticate_user!
   before_action :require_admin_or_instructor!
   before_action -> { require_tenant_feature!(:enem_library) }
+  before_action :require_super_admin!, only: [:edit, :update]
   before_action :set_enem_exam, only: [:show, :edit, :update]
 
   def index

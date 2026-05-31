@@ -1,6 +1,7 @@
 # API V1 - Courses Controller (apenas JSON)
 class Api::V1::CoursesController < Api::V1::BaseController
   before_action :set_course, only: [ :show, :update, :destroy ]
+  before_action :authorize_admin_or_instructor!, only: [ :create, :update, :destroy ]
 
   # GET /api/v1/courses
   def index

@@ -2,7 +2,7 @@ class EnemExamQuestionsController < ApplicationController
   include RequiresTenantFeature
 
   before_action :authenticate_user!
-  before_action :require_admin_or_instructor!
+  before_action :require_super_admin!
   before_action -> { require_tenant_feature!(:enem_library) }
   before_action :set_enem_exam
   before_action :set_enem_question

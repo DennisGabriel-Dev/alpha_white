@@ -17,6 +17,7 @@ class ApplicationController < ActionController::Base
   before_action :set_tenant
   before_action :set_locale
   before_action :set_active_storage_url_options
+  before_action :ensure_user_belongs_to_current_tenant!, if: :user_signed_in?
 
   private
 
@@ -44,6 +45,12 @@ class ApplicationController < ActionController::Base
     return if admin_or_instructor?
 
     redirect_to root_path, alert: "Acesso negado. Apenas administradores ou instrutores podem realizar esta ação."
+  end
+
+  def require_super_admin!
+    return if super_admin?
+
+    redirect_to root_path, alert: "Acesso restrito à biblioteca global ENEM."
   end
 
   def resolve_layout
@@ -77,5 +84,13 @@ class ApplicationController < ActionController::Base
       host: request.host,
       port: request.optional_port
     }
+  end
+
+  def ensure_user_belongs_to_current_tenant!
+    return unless current_tenant
+    return if current_user.tenant_id == current_tenant.id
+
+    sign_out(current_user)
+    redirect_to new_user_session_path, alert: "Esta conta não pertence a este cursinho."
   end
 end
