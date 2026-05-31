@@ -1,0 +1,12 @@
+<%# Logo do tenant — fallback com inicial do nome %>
+<% size_class = local_assigns.fetch(:size_class, "w-10 h-10") %>
+<% text_class = local_assigns.fetch(:text_class, "text-xl") %>
+<% rounded_class = local_assigns.fetch(:rounded_class, "rounded-lg") %>
+
+<% if tenant_logo_attached? %>
+  <%= image_tag tenant_logo_url, alt: tenant_name, class: "#{size_class} #{rounded_class} object-cover" %>
+<% else %>
+  <div class="<%= size_class %> bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+    <span class="text-white font-bold <%= text_class %>"><%= tenant_name.first.upcase %></span>
+  </div>
+<% end %>

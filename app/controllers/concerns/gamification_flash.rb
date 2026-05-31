@@ -4,6 +4,8 @@ module GamificationFlash
   private
 
   def run_gamification!(quiz: nil, lesson_just_completed: false)
+    return unless ActsAsTenant.current_tenant&.feature_enabled?(:gamification)
+
     Gamification::EvaluateService.new(
       user: current_user,
       tenant: ActsAsTenant.current_tenant,

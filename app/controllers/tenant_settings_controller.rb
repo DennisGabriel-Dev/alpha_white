@@ -5,23 +5,28 @@ class TenantSettingsController < ApplicationController
   def edit
     @tenant = current_tenant
     @themes = Tenant::THEMES
+    @feature_flags = Tenant::FEATURE_FLAGS
   end
 
   def update
     @tenant = current_tenant
+    @themes = Tenant::THEMES
+    @feature_flags = Tenant::FEATURE_FLAGS
 
-    if @tenant.update(theme_params)
-      redirect_to edit_tenant_setting_path, notice: "Tema atualizado com sucesso!"
+    @tenant.assign_attributes(brand_params.except(:feature_flags))
+    @tenant.assign_feature_flags_from_params(params.dig(:tenant, :feature_flags), form: true)
+
+    if @tenant.save
+      redirect_to edit_tenant_setting_path, notice: "Configurações atualizadas com sucesso!"
     else
-      @themes = Tenant::THEMES
       render :edit, status: :unprocessable_entity
     end
   end
 
   private
 
-  def theme_params
-    params.require(:tenant).permit(:theme, :primary_color)
+  def brand_params
+    params.require(:tenant).permit(:theme, :primary_color, :tagline, :meta_description, :logo, :favicon)
   end
 
   def require_super_admin!

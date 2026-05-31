@@ -15,9 +15,35 @@ module ApplicationHelper
     current_tenant&.name || "Alpha White"
   end
 
-  # Retorna a URL do logo do tenant ou logo padrão
+  # Retorna a URL do logo do tenant (upload via Active Storage)
   def tenant_logo_url
-    current_tenant&.logo_url || nil
+    return unless current_tenant&.logo&.attached?
+
+    url_for(current_tenant.logo)
+  end
+
+  def tenant_logo_attached?
+    current_tenant&.logo&.attached?
+  end
+
+  def tenant_favicon_url
+    if current_tenant&.favicon&.attached?
+      url_for(current_tenant.favicon)
+    else
+      "/icon.png"
+    end
+  end
+
+  def tenant_tagline
+    current_tenant&.tagline.presence || Tenant::DEFAULT_TAGLINE
+  end
+
+  def tenant_meta_description
+    current_tenant&.meta_description.presence || Tenant::DEFAULT_META_DESCRIPTION
+  end
+
+  def tenant_feature?(key)
+    current_tenant&.feature_enabled?(key) == true || current_user&.super_admin?
   end
 
   # Verdadeiro quando o tenant usa um layout próprio (não o application padrão)

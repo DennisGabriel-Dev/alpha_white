@@ -1,0 +1,9 @@
+<%# Meta description, favicon e application-name por tenant (title fica no layout) %>
+<meta name="description" content="<%= tenant_meta_description %>">
+<meta name="application-name" content="<%= tenant_name %>">
+
+<link rel="icon" href="<%= tenant_favicon_url %>" type="image/png">
+<% unless current_tenant&.favicon&.attached? %>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+<% end %>
+<link rel="apple-touch-icon" href="<%= tenant_favicon_url %>">

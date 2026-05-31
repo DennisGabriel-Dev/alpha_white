@@ -1,9 +1,53 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe Tenant, type: :model do
   describe "constantes" do
     it "define os temas disponíveis" do
       expect(Tenant::THEMES).to include("default", "aurora", "merma")
+    end
+
+    it "define feature flags padrão" do
+      expect(Tenant::FEATURE_FLAGS.keys).to contain_exactly("gamification", "reports", "enem_library", "csv_export")
+    end
+  end
+
+  describe "#feature_enabled?" do
+    let(:tenant) { create(:tenant) }
+
+    it "retorna true quando flag ausente no jsonb (default ligado)" do
+      expect(tenant.feature_enabled?(:gamification)).to be true
+    end
+
+    it "retorna false quando flag explicitamente desligada" do
+      tenant.update!(feature_flags: { "gamification" => false })
+      expect(tenant.feature_enabled?(:gamification)).to be false
+    end
+
+    it "retorna false para chave desconhecida" do
+      expect(tenant.feature_enabled?(:inexistente)).to be false
+    end
+  end
+
+  describe "#assign_feature_flags_from_params" do
+    let(:tenant) { create(:tenant) }
+
+    it "normaliza checkboxes ausentes como false no formulário" do
+      tenant.assign_feature_flags_from_params({ "reports" => "1" }, form: true)
+      tenant.save!
+
+      expect(tenant.feature_enabled?(:reports)).to be true
+      expect(tenant.feature_enabled?(:gamification)).to be false
+    end
+
+    it "preserva flags ausentes em merge parcial (seed)" do
+      tenant.update!(feature_flags: { "gamification" => true, "reports" => true })
+      tenant.assign_feature_flags_from_params({ "gamification" => false })
+      tenant.save!
+
+      expect(tenant.feature_enabled?(:gamification)).to be false
+      expect(tenant.feature_enabled?(:reports)).to be true
     end
   end
 

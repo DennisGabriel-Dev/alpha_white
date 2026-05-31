@@ -1,19 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
-    <title><%= content_for(:title) || "#{tenant_name} - Sua aprovação começa aqui" %></title>
+    <title><%= content_for(:title) || "#{tenant_name} - #{tenant_tagline}" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="description" content="Prepare-se com cursos completos e trilhas de estudo.">
+    <%= render "shared/tenant_head" %>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="<%= tenant_name %>">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -202,7 +200,7 @@
                      class="pl-9 pr-4 py-1.5 text-sm bg-gray-50 border border-gray-200 rounded-lg w-48 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent">
             </div>
 
-            <% if user_signed_in? %>
+            <% if user_signed_in? && tenant_feature?(:gamification) %>
               <%= render "shared/student_streak_badge" %>
             <% end %>
 

@@ -20,9 +20,12 @@ DEMO_VIDEO_URLS = [
 ].freeze
 
 TENANTS_DATA = [
-  { name: "Cursinho Objetivo", subdomain: "objetivo", theme: "default", primary_color: "#3C0094" },
-  { name: "Cursinho Poliedro", subdomain: "poliedro", theme: "aurora", primary_color: "#4F46E5" },
-  { name: "Cursinho Anglo", subdomain: "anglo", theme: "merma", primary_color: "#0D9488" }
+  { name: "Cursinho Objetivo", subdomain: "objetivo", theme: "default", primary_color: "#3C0094",
+    tagline: "Sua aprovação no ENEM começa aqui", feature_flags: {} },
+  { name: "Cursinho Poliedro", subdomain: "poliedro", theme: "aurora", primary_color: "#4F46E5",
+    tagline: "Excelência em vestibulares", feature_flags: { "gamification" => false } },
+  { name: "Cursinho Anglo", subdomain: "anglo", theme: "merma", primary_color: "#0D9488",
+    tagline: "Estude no seu ritmo", feature_flags: { "csv_export" => false } }
 ].freeze
 
 COURSES_BY_TENANT = {
@@ -175,6 +178,11 @@ module AlphaWhiteSeed
     updates[:primary_color] = attrs[:primary_color] if tenant.primary_color != attrs[:primary_color]
     if Tenant.column_names.include?("theme") && tenant.respond_to?(:theme=)
       updates[:theme] = attrs[:theme] if tenant.theme != attrs[:theme]
+    end
+    updates[:tagline] = attrs[:tagline] if attrs[:tagline].present? && tenant.tagline != attrs[:tagline]
+    if attrs[:feature_flags].present? && tenant.respond_to?(:feature_flags=)
+      tenant.assign_feature_flags_from_params(attrs[:feature_flags])
+      updates[:feature_flags] = tenant.feature_flags
     end
     tenant.update!(updates) if updates.any?
   end
