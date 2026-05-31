@@ -84,6 +84,11 @@ module AlphaWhiteSeed
     if Tenant.column_names.include?("theme") && tenant.respond_to?(:theme=)
       updates[:theme] = attrs[:theme] if tenant.theme != attrs[:theme]
     end
+    updates[:tagline] = attrs[:tagline] if attrs[:tagline].present? && tenant.tagline != attrs[:tagline]
+    if attrs[:feature_flags].present? && tenant.respond_to?(:feature_flags=)
+      tenant.assign_feature_flags_from_params(attrs[:feature_flags])
+      updates[:feature_flags] = tenant.feature_flags
+    end
     tenant.update!(updates) if updates.any?
   end
 

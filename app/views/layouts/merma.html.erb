@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
-    <title><%= content_for(:title) || "#{tenant_name} – Sua aprovação começa aqui" %></title>
+    <title><%= content_for(:title) || "#{tenant_name} – #{tenant_tagline}" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= render "shared/tenant_head" %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= yield :head %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -171,7 +170,7 @@
             <% if content_for?(:header_actions) %>
               <%= yield :header_actions %>
             <% end %>
-            <% if user_signed_in? %>
+            <% if user_signed_in? && tenant_feature?(:gamification) %>
               <%= render "shared/student_streak_badge" %>
               <span class="text-xs text-gray-400 hidden sm:block truncate max-w-[10rem]"><%= current_user.email %></span>
             <% end %>

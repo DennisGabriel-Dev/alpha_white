@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
-    <title><%= content_for(:title) || "#{ActsAsTenant.current_tenant&.name || 'Alpha White'} - Sua aprovação no ENEM começa aqui" %></title>
+    <title><%= content_for(:title) || "#{tenant_name} - #{tenant_tagline}" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="description" content="Prepare-se para o ENEM com cursos completos, trilhas de estudo e simulados realistas. Estude no seu ritmo e alcance sua aprovação!">
+    <%= render "shared/tenant_head" %>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="<%= ActsAsTenant.current_tenant&.name || 'Alpha White' %>">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -14,10 +13,6 @@
 
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
 
     <%# Google Fonts - Inter e Poppins %>
     <link rel="preconnect" href="https://fonts.googleapis.com">

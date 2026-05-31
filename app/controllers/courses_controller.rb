@@ -1,6 +1,9 @@
 class CoursesController < ApplicationController
+  include RequiresTenantFeature
+
   before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy, :relatorio]
   before_action :require_admin_or_instructor!, only: [:new, :create, :edit, :update, :destroy, :relatorio]
+  before_action -> { require_tenant_feature!(:csv_export) }, only: [:relatorio]
   before_action :set_course, only: [:show, :edit, :update, :destroy, :relatorio]
 
   def index

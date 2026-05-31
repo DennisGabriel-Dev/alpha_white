@@ -2,8 +2,8 @@
   <div class="max-w-3xl mx-auto">
 
     <div class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-900">Escolha o tema</h1>
-      <p class="text-gray-500 mt-1">Personalize o visual de <strong><%= tenant_name %></strong>.</p>
+      <h1 class="text-2xl font-bold text-gray-900">Aparência e módulos</h1>
+      <p class="text-gray-500 mt-1">Identidade visual e funcionalidades de <strong><%= tenant_name %></strong>.</p>
     </div>
 
     <% if notice.present? %>
@@ -18,7 +18,56 @@
       </div>
     <% end %>
 
-    <%= form_with model: @tenant, url: tenant_setting_path, method: :patch do |f| %>
+    <%= form_with model: @tenant, url: tenant_setting_path, method: :patch, html: { multipart: true } do |f| %>
+
+      <%# Identidade visual %>
+      <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <h2 class="text-sm font-semibold text-gray-900 mb-1">Identidade visual</h2>
+        <p class="text-xs text-gray-400 mb-5">Logo, favicon e textos exibidos no site e nos resultados de busca.</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-2">Logo</label>
+            <% if @tenant.logo.attached? %>
+              <div class="mb-2">
+                <%= image_tag url_for(@tenant.logo), alt: tenant_name, class: "h-12 w-12 rounded-lg object-cover border border-gray-200" %>
+              </div>
+            <% end %>
+            <%= f.file_field :logo, accept: "image/png,image/jpeg,image/webp,image/svg+xml",
+                  class: "block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" %>
+            <p class="text-xs text-gray-400 mt-1">PNG, JPG ou SVG. Recomendado: quadrado, mín. 128×128.</p>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-2">Favicon</label>
+            <% if @tenant.favicon.attached? %>
+              <div class="mb-2">
+                <%= image_tag url_for(@tenant.favicon), alt: "Favicon", class: "h-8 w-8 rounded object-cover border border-gray-200" %>
+              </div>
+            <% end %>
+            <%= f.file_field :favicon, accept: "image/png,image/jpeg,image/x-icon,image/svg+xml",
+                  class: "block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" %>
+            <p class="text-xs text-gray-400 mt-1">Ícone da aba do navegador. Recomendado: 32×32 ou 64×64.</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <%= f.label :tagline, "Slogan (tagline)", class: "block text-xs font-semibold text-gray-600 mb-1" %>
+            <%= f.text_field :tagline,
+                  placeholder: Tenant::DEFAULT_TAGLINE,
+                  class: "w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" %>
+            <p class="text-xs text-gray-400 mt-1">Aparece no título da página e no rodapé.</p>
+          </div>
+          <div>
+            <%= f.label :meta_description, "Descrição (SEO)", class: "block text-xs font-semibold text-gray-600 mb-1" %>
+            <%= f.text_area :meta_description, rows: 2,
+                  placeholder: Tenant::DEFAULT_META_DESCRIPTION,
+                  class: "w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300" %>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="text-sm font-semibold text-gray-900 mb-3">Tema do layout</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
 
         <%# Tema: Default %>
@@ -190,6 +239,38 @@
           </div>
         </div>
       </div>
+
+      <%# Módulos (feature flags) %>
+      <% if super_admin? %>
+        <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h2 class="text-sm font-semibold text-gray-900 mb-1">Módulos habilitados</h2>
+          <p class="text-xs text-gray-400 mb-5">Desligue um módulo para esconder menus e bloquear o acesso às rotas.</p>
+
+          <% feature_labels = {
+            "gamification" => ["Gamificação", "Conquistas, badges e ofensiva de estudo."],
+            "reports" => ["Relatórios", "Painéis de desempenho (aluno, turma e escola)."],
+            "enem_library" => ["Biblioteca ENEM", "Provas oficiais, imports de PDF e questões para quizzes."],
+            "csv_export" => ["Exportação CSV", "Download de relatório por curso (instrutor/admin)."]
+          } %>
+
+          <div class="space-y-3">
+            <% @feature_flags.each_key do |flag_key| %>
+              <% label, desc = feature_labels.fetch(flag_key) %>
+              <label class="flex items-start gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-50 cursor-pointer">
+                <%= check_box_tag "tenant[feature_flags][#{flag_key}]",
+                      "1",
+                      @tenant.feature_enabled?(flag_key),
+                      id: "feature_#{flag_key}",
+                      class: "mt-0.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" %>
+                <span>
+                  <span class="block text-sm font-medium text-gray-800"><%= label %></span>
+                  <span class="block text-xs text-gray-400"><%= desc %></span>
+                </span>
+              </label>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
 
       <div class="flex justify-end">
         <%= f.submit "Salvar alterações",

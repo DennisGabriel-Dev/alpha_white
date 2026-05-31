@@ -1,4 +1,4 @@
-<%# Export CSV do curso (staff) — datas opcionais %>
+<% return unless csv_export_allowed? %>
 <section class="<%= theme_panel_class %> mb-6">
   <h2 class="text-lg font-semibold text-gray-900 mb-1">Exportar CSV</h2>
   <p class="text-sm text-gray-500 mb-4">
