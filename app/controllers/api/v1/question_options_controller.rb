@@ -7,11 +7,11 @@ class Api::V1::QuestionOptionsController < Api::V1::BaseController
 
   def index
     @options = @question.question_options
-    render json: { question_options: @options, total: @options.count }
+    render json: { question_options: serialize_question_options(@options), total: @options.count }
   end
 
   def show
-    render json: { question_option: @question_option }
+    render json: { question_option: serialize_question_option(@question_option) }
   end
 
   def create

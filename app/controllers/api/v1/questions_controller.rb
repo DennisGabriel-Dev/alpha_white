@@ -7,11 +7,17 @@ class Api::V1::QuestionsController < Api::V1::BaseController
 
   def index
     @questions = @quiz.questions.includes(:question_options)
-    render json: { questions: @questions.as_json(include: :question_options), total: @questions.count }
+    render json: {
+      questions: @questions.map { |question| serialize_question(question) },
+      total: @questions.count
+    }
   end
 
   def show
-    render json: { question: @question, question_options: @question.question_options }
+    render json: {
+      question: serialize_question(@question),
+      question_options: serialize_question_options(@question.question_options)
+    }
   end
 
   def create

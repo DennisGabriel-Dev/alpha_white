@@ -45,9 +45,25 @@ class User < ApplicationRecord
 
   acts_as_tenant :tenant
 
+  before_validation :assign_current_tenant, on: :create
+
+  # Devise: autenticação escopada ao subdomínio (tenant) atual.
+  def self.find_for_database_authentication(warden_conditions)
+    tenant = ActsAsTenant.current_tenant
+    return nil unless tenant
+
+    where(tenant_id: tenant.id).find_by(email: warden_conditions[:email])
+  end
+
   def study_streak_for(tenant = ActsAsTenant.current_tenant)
     return nil unless tenant
 
     study_streaks.find_by(tenant_id: tenant.id)
+  end
+
+  private
+
+  def assign_current_tenant
+    self.tenant_id ||= ActsAsTenant.current_tenant&.id
   end
 end

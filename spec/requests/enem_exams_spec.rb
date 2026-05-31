@@ -70,21 +70,34 @@ RSpec.describe "EnemExams", type: :request do
   describe "PATCH /enem_exams/:id" do
     before { sign_in admin }
 
-    it "permite editar prova" do
+    it "bloqueia tenant_admin" do
       patch enem_exam_path(exam),
             params: { enem_exam: { year: 2022, day: "D1", booklet_color: "CD1", metadata_json: "{\"source\":\"manual\"}" } },
             headers: headers
 
-      expect(response).to redirect_to(enem_exam_path(exam))
-      expect(exam.reload.year).to eq(2022)
-      expect(exam.metadata["source"]).to eq("manual")
+      expect(response).to redirect_to(root_path)
+      expect(exam.reload.year).to eq(2023)
+    end
+
+    context "como super_admin" do
+      let(:admin) { create(:user, :super_admin, tenant:) }
+
+      it "permite editar prova" do
+        patch enem_exam_path(exam),
+              params: { enem_exam: { year: 2022, day: "D1", booklet_color: "CD1", metadata_json: "{\"source\":\"manual\"}" } },
+              headers: headers
+
+        expect(response).to redirect_to(enem_exam_path(exam))
+        expect(exam.reload.year).to eq(2022)
+        expect(exam.metadata["source"]).to eq("manual")
+      end
     end
   end
 
   describe "PATCH /enem_exams/:enem_exam_id/enem_questions/:id" do
     before { sign_in instructor }
 
-    it "permite editar questão" do
+    it "bloqueia instrutor" do
       patch enem_exam_enem_question_path(exam, question),
             params: {
               enem_question: {
@@ -98,12 +111,34 @@ RSpec.describe "EnemExams", type: :request do
             },
             headers: headers
 
-      expect(response).to redirect_to(enem_exam_path(exam))
-      question.reload
-      expect(question.number_in_exam).to eq(2)
-      expect(question.area).to eq("CH")
-      expect(question.correct_letter).to eq("B")
-      expect(question.alternatives).to eq(["A) Alt 1", "B) Alt 2"])
+      expect(response).to redirect_to(root_path)
+      expect(question.reload.number_in_exam).to eq(1)
+    end
+
+    context "como super_admin" do
+      let(:instructor) { create(:user, :super_admin, tenant:) }
+
+      it "permite editar questão" do
+        patch enem_exam_enem_question_path(exam, question),
+              params: {
+                enem_question: {
+                  number_in_exam: 2,
+                  area: "CH",
+                  correct_letter: "B",
+                  skill: "H15",
+                  statement: "Enunciado ajustado",
+                  alternatives_json: "[\"A) Alt 1\", \"B) Alt 2\"]"
+                }
+              },
+              headers: headers
+
+        expect(response).to redirect_to(enem_exam_path(exam))
+        question.reload
+        expect(question.number_in_exam).to eq(2)
+        expect(question.area).to eq("CH")
+        expect(question.correct_letter).to eq("B")
+        expect(question.alternatives).to eq(["A) Alt 1", "B) Alt 2"])
+      end
     end
   end
 end

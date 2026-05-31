@@ -2,7 +2,7 @@
 
 class QuestionsController < ApplicationController
   before_action :authenticate_user!
-  before_action :require_admin_or_instructor!, only: [ :new, :create, :edit, :update, :destroy ]
+  before_action :require_admin_or_instructor!, only: [ :new, :create, :edit, :update, :destroy, :index ]
   before_action :set_course
   before_action :set_session
   before_action :set_lesson
