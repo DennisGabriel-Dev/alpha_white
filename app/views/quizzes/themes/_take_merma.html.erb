@@ -68,7 +68,7 @@
     <% if review_mode %>
       <div class="space-y-5">
         <% questions.each_with_index do |question, index| %>
-          <% my_answer = question.student_answers.find { |a| a.user_id == uid } %>
+          <% my_answer = @review_attempt&.student_answers&.find { |a| a.question_id == question.id } %>
           <% picked = my_answer&.question_option %>
           <% status =
                if picked.nil?
@@ -133,14 +133,19 @@
         <% end %>
       </div>
     <% else %>
+      <% timed_quiz = @quiz_attempt.present? && @expires_at.present? %>
+      <div <%= timed_quiz ? "data-controller=\"quiz-timer\" data-quiz-timer-expires-at-value=\"#{@expires_at.iso8601}\"".html_safe : "" %>>
+        <%= render "quizzes/timer" if timed_quiz %>
       <%= form_with url: submit_course_session_lesson_quiz_path(@course, @session, @lesson),
-            method: :post, local: true, id: "merma-quiz-form" do %>
+            method: :post, local: true, id: "merma-quiz-form",
+            data: (timed_quiz ? { quiz_timer_target: "form" } : {}) do %>
 
         <div class="space-y-5">
           <% questions.each_with_index do |question, index| %>
-            <% my_answer = question.student_answers.find { |a| a.user_id == uid } %>
+            <% my_answer = @quiz_attempt&.student_answers&.find { |a| a.question_id == question.id } %>
             <div class="bg-white rounded-2xl border border-gray-100 p-5 merma-question"
-                 id="q-<%= question.id %>">
+                 id="q-<%= question.id %>"
+                 data-question-id="<%= question.id %>">
               <div class="flex gap-3 mb-4">
                 <span class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5"
                       style="background: var(--color-primary-10); color: var(--color-primary);">
@@ -193,6 +198,7 @@
           </button>
         </div>
       <% end %>
+      </div>
     <% end %>
   </div>
 </div>

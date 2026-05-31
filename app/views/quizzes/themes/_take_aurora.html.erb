@@ -54,7 +54,7 @@
   <% if review_mode %>
     <div class="space-y-4">
       <% questions.each_with_index do |question, index| %>
-        <% my_answer = question.student_answers.find { |a| a.user_id == uid } %>
+        <% my_answer = @review_attempt&.student_answers&.find { |a| a.question_id == question.id } %>
         <% picked = my_answer&.question_option %>
         <% status =
              if picked.nil?
@@ -121,14 +121,19 @@
       <% end %>
     </div>
   <% else %>
+    <% timed_quiz = @quiz_attempt.present? && @expires_at.present? %>
+    <div <%= timed_quiz ? "data-controller=\"quiz-timer\" data-quiz-timer-expires-at-value=\"#{@expires_at.iso8601}\"".html_safe : "" %>>
+      <%= render "quizzes/timer" if timed_quiz %>
     <%= form_with url: submit_course_session_lesson_quiz_path(@course, @session, @lesson),
-          method: :post, local: true, id: "quiz-form" do %>
+          method: :post, local: true, id: "quiz-form",
+          data: (timed_quiz ? { quiz_timer_target: "form" } : {}) do %>
 
       <div class="space-y-4">
         <% questions.each_with_index do |question, index| %>
-          <% my_answer = question.student_answers.find { |a| a.user_id == uid } %>
+          <% my_answer = @quiz_attempt&.student_answers&.find { |a| a.question_id == question.id } %>
           <div class="bg-white rounded-2xl border border-gray-100 p-5 quiz-question"
-               id="question-<%= question.id %>">
+               id="question-<%= question.id %>"
+               data-question-id="<%= question.id %>">
             <div class="flex items-start gap-3 mb-4">
               <span class="flex-shrink-0 w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center
                            text-[var(--color-primary)] bg-[var(--color-primary)]/10">
@@ -177,6 +182,7 @@
         </button>
       </div>
     <% end %>
+    </div>
   <% end %>
 
 </div>

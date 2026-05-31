@@ -48,4 +48,8 @@ module PermissionHelper
   def me_achievements_path_allowed?
     user_signed_in? && current_user.student?
   end
+
+  def staff_users_path_allowed?
+    tenant_admin?
+  end
 end

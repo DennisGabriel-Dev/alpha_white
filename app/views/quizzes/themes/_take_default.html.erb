@@ -20,6 +20,10 @@
       <p class="text-sm text-gray-700 mt-3">
         Resultado: <strong><%= @review_correct %>/<%= @review_total %></strong>
         (<%= number_to_percentage((@review_correct.to_f / @review_total) * 100, precision: 0) %>).
+        <% if @review_attempt_count.to_i > 1 %>
+          Tentativas enviadas: <strong><%= @review_attempt_count %></strong>
+          (conferindo a <%= @review_attempt_number %>ª).
+        <% end %>
         Gabarito em verde; sua resposta errada em vermelho.
       </p>
     <% else %>
@@ -30,7 +34,7 @@
   <% if review_mode %>
     <div class="space-y-8">
       <% questions.each_with_index do |question, index| %>
-        <% my_answer = question.student_answers.find { |a| a.user_id == uid } %>
+        <% my_answer = @review_attempt&.student_answers&.find { |a| a.question_id == question.id } %>
         <% picked = my_answer&.question_option %>
         <% status =
              if picked.nil?
@@ -77,11 +81,15 @@
       <% end %>
     </div>
   <% else %>
-    <%= form_with url: submit_course_session_lesson_quiz_path(@course, @session, @lesson),
-          method: :post, local: true, class: "space-y-8" do %>
+    <% timed_quiz = @quiz_attempt.present? && @expires_at.present? %>
+    <div <%= timed_quiz ? "data-controller=\"quiz-timer\" data-quiz-timer-expires-at-value=\"#{@expires_at.iso8601}\"".html_safe : "" %>>
+      <%= render "quizzes/timer" if timed_quiz %>
+      <%= form_with url: submit_course_session_lesson_quiz_path(@course, @session, @lesson),
+            method: :post, local: true, class: "space-y-8",
+            data: (timed_quiz ? { quiz_timer_target: "form" } : {}) do %>
       <% questions.each_with_index do |question, index| %>
-        <% my_answer = question.student_answers.find { |a| a.user_id == uid } %>
-        <div class="card">
+        <% my_answer = @quiz_attempt&.student_answers&.find { |a| a.question_id == question.id } %>
+        <div class="card" data-question-id="<%= question.id %>">
           <h3 class="font-semibold text-gray-800 mb-4"><%= index + 1 %>. <%= question.enunciation %></h3>
           <div class="space-y-3">
             <% question.question_options.each do |option| %>
@@ -102,6 +110,7 @@
         <%= link_to "Cancelar", course_session_lesson_path(@course, @session, @lesson), class: "text-gray-600 hover:text-gray-800 font-medium" %>
       </div>
     <% end %>
+    </div>
   <% end %>
 </div>
 

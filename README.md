@@ -2,8 +2,9 @@
 
 Aplicação Rails 8 com arquitetura **multi-tenant** usando row-level tenancy. Cada cursinho preparatório é um tenant isolado, com seus próprios dados e acesso via subdomínio.
 
-**O projeto roda apenas com Docker.** Não é necessário instalar Ruby nem PostgreSQL na máquina.
+*Essa aplicação também possui um módulo próprio para API, caso deseje criar a sua própria UI.*
 
+**O projeto roda apenas com Docker.** Não é necessário instalar Ruby nem PostgreSQL na máquina.
 ---
 
 ## 🚀 Como rodar (para o professor / qualquer máquina)
@@ -14,13 +15,20 @@ Aplicação Rails 8 com arquitetura **multi-tenant** usando row-level tenancy. C
   - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/Mac) ou Docker Engine + Compose (Linux)
 
 ### Primeira vez
-
+Obs: pode ser necessário instalar o make: ```sudo apt install make```, caso você opte por usar os atalhos introduzidos no makefile
 ```bash
+# 1
 git clone git@github.com:DennisGabriel-Dev/alpha_white.git
+# 2
 cd alpha_white
-
-# Sobe containers, prepara o banco e popula com dados iniciais
+# 3
+touch .env
+# 4
 make setup
+# 5
+make start 
+# ou
+make start_background # para rodar em segundo plano
 ```
 
 O primeiro `make setup` pode demorar alguns minutos (build da imagem). Quando terminar, acesse:

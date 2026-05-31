@@ -30,7 +30,7 @@ RSpec.describe Reports::StudentPerformance, type: :model do
     q.save!
 
     opt_ok = q.question_options.find_by!(correct: true)
-    StudentAnswer.create!(user: student, question: q, question_option: opt_ok)
+    create_submitted_answer(user: student, question: q, question_option: opt_ok)
 
     result = ActsAsTenant.with_tenant(tenant) do
       Reports::StudentPerformance.new(user: student, tenant: tenant).call

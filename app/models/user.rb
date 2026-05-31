@@ -41,6 +41,7 @@ class User < ApplicationRecord
   has_many :user_achievements, dependent: :destroy
   has_many :achievements, through: :user_achievements
   has_many :study_streaks, dependent: :destroy
+  has_many :quiz_attempts, dependent: :destroy
 
   acts_as_tenant :tenant
 

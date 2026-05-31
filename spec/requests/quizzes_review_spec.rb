@@ -29,7 +29,7 @@ RSpec.describe "Quiz review", type: :request do
     end
 
     it "mostra a conferência quando há respostas" do
-      StudentAnswer.create!(user: student, question:, question_option: wrong_option)
+      create_submitted_answer(user: student, question:, question_option: wrong_option)
 
       get review_course_session_lesson_quiz_path(course, session, lesson), headers: headers
 
@@ -39,7 +39,7 @@ RSpec.describe "Quiz review", type: :request do
     end
 
     it "não exige vídeo assistido (diferente de take/submit)" do
-      StudentAnswer.create!(user: student, question:, question_option: wrong_option)
+      create_submitted_answer(user: student, question:, question_option: wrong_option)
 
       get review_course_session_lesson_quiz_path(course, session, lesson), headers: headers
 

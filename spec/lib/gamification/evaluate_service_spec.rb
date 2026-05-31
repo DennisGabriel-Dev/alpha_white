@@ -20,7 +20,7 @@ RSpec.describe Gamification::EvaluateService do
     opt = q.question_options.find_by!(correct: true)
 
     ActsAsTenant.with_tenant(tenant) do
-      StudentAnswer.create!(user: student, question: q, question_option: opt)
+      create_submitted_answer(user: student, question: q, question_option: opt)
       result = described_class.new(user: student, tenant: tenant).call
       expect(result.newly_awarded.map(&:slug)).to include("first_answer")
     end
@@ -46,7 +46,7 @@ RSpec.describe Gamification::EvaluateService do
       q.question_options.build(text: "B", correct: false, position: 1)
       q.save!
       opt = q.question_options.find_by!(correct: true)
-      StudentAnswer.create!(user: student, question: q, question_option: opt)
+      create_submitted_answer(user: student, question: q, question_option: opt)
     end
 
     ActsAsTenant.with_tenant(tenant) do

@@ -17,7 +17,7 @@ RSpec.describe Reports::ClassPerformance, type: :model do
 
     3.times do
       u = create(:user, :student, tenant:)
-      StudentAnswer.create!(user: u, question: q, question_option: wrong)
+      create_submitted_answer(user: u, question: q, question_option: wrong)
     end
 
     result = ActsAsTenant.with_tenant(tenant) do
