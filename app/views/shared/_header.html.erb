@@ -20,8 +20,8 @@
 
       <%# Menu Desktop %>
       <div class="hidden md:flex items-center space-x-8">
-        <%= link_to "Cursos", courses_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
-        <% if user_signed_in? && (me_achievements_path_allowed? || reports_aluno_path_allowed? || reports_turma_path_allowed? || reports_escola_path_allowed?) %>
+        <%= link_to "Cursos", root_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
+        <% if user_signed_in? && (me_achievements_path_allowed? || reports_aluno_path_allowed? || reports_turma_path_allowed? || reports_escola_path_allowed? || staff_users_path_allowed?) %>
           <% if me_achievements_path_allowed? %>
             <%= link_to "Conquistas", me_achievements_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
           <% end %>
@@ -33,6 +33,9 @@
           <% end %>
           <% if reports_escola_path_allowed? %>
             <%= link_to "Escola", relatorios_escola_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
+          <% end %>
+          <% if staff_users_path_allowed? %>
+            <%= link_to "Equipe", staff_users_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
           <% end %>
         <% end %>
         <%= link_to "Trilhas", "#trilhas", class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
@@ -70,8 +73,8 @@
     <%# Menu Mobile Dropdown %>
     <div class="hidden md:hidden mt-4 pb-4 border-t border-gray-200" id="mobile-menu">
       <div class="flex flex-col space-y-4 mt-4">
-        <%= link_to "Cursos", courses_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
-        <% if user_signed_in? && (me_achievements_path_allowed? || reports_aluno_path_allowed? || reports_turma_path_allowed? || reports_escola_path_allowed?) %>
+        <%= link_to "Cursos", root_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
+        <% if user_signed_in? && (me_achievements_path_allowed? || reports_aluno_path_allowed? || reports_turma_path_allowed? || reports_escola_path_allowed? || staff_users_path_allowed?) %>
           <% if me_achievements_path_allowed? %>
             <%= link_to "Conquistas", me_achievements_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
           <% end %>
@@ -83,6 +86,9 @@
           <% end %>
           <% if reports_escola_path_allowed? %>
             <%= link_to "Escola", relatorios_escola_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
+          <% end %>
+          <% if staff_users_path_allowed? %>
+            <%= link_to "Equipe", staff_users_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
           <% end %>
         <% end %>
         <%= link_to "Trilhas", "#trilhas", class: "text-gray-700 hover:text-primary font-medium transition-colors" %>

@@ -28,15 +28,22 @@ class Quiz < ApplicationRecord
   belongs_to :lesson, inverse_of: :quiz
   belongs_to :tenant
   has_many :questions, dependent: :destroy
+  has_many :quiz_attempts, dependent: :destroy
 
   before_validation :set_tenant_from_lesson, on: :create
 
   validates :title, presence: true
 
   def user_has_student_answers?(user)
-    return false if questions.empty?
+    quiz_attempts.submitted.where(user: user).joins(:student_answers).exists?
+  end
 
-    StudentAnswer.exists?(user: user, question_id: questions.ids)
+  def latest_submitted_attempt_for(user)
+    quiz_attempts.submitted.where(user: user).order(submitted_at: :desc, attempt_number: :desc).first
+  end
+
+  def submitted_attempt_count_for(user)
+    quiz_attempts.submitted.where(user: user).count
   end
 
   private

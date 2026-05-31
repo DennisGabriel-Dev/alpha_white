@@ -39,6 +39,8 @@ Rails.application.routes.draw do
     get "escola", to: "reports#escola"
   end
 
+  resources :staff_users, only: [:index, :new, :create], path: "equipe"
+
   # Rotas Web (HTML)
   resources :courses do
     resources :sessions, only: [:show, :new, :create, :edit, :update, :destroy] do
