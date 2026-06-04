@@ -1,5 +1,8 @@
 class ReportsController < ApplicationController
+  include RequiresTenantFeature
+
   before_action :authenticate_user!
+  before_action -> { require_tenant_feature!(:reports) }
 
   def aluno
     require_student_for_aluno!
@@ -8,6 +11,7 @@ class ReportsController < ApplicationController
 
   def turma
     require_staff_for_turma!
+    @courses = Course.order(:name)
     @data = Reports::ClassPerformance.new(tenant: ActsAsTenant.current_tenant).call
   end
 

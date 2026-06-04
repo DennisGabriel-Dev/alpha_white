@@ -13,7 +13,14 @@ class QuizzesController < ApplicationController
 
   def take
     @quiz = @lesson.quiz
-    redirect_to course_session_lesson_path(@course, @session, @lesson), alert: "Prova não encontrada" unless @quiz
+    unless @quiz
+      redirect_to course_session_lesson_path(@course, @session, @lesson), alert: "Prova não encontrada"
+      return
+    end
+
+    return unless prepare_student_quiz_attempt!
+
+    @expires_at = @quiz_attempt.expires_at
   end
 
   def review
@@ -24,7 +31,8 @@ class QuizzesController < ApplicationController
       return
     end
 
-    assign_quiz_review_summary
+    @review_attempt = @quiz.latest_submitted_attempt_for(current_user)
+    assign_quiz_review_summary(@review_attempt)
     render :take
   end
 
@@ -35,33 +43,30 @@ class QuizzesController < ApplicationController
       return
     end
 
-    answered = 0
-    params[:answers]&.each do |question_id, question_option_id|
-      next if question_option_id.blank?
-
-      question = @quiz.questions.find_by(id: question_id)
-      option = question&.question_options&.find_by(id: question_option_id)
-      next unless question && option
-
-      answer = question.student_answers.find_or_initialize_by(user: current_user)
-      if answer.update(question_option_id: option.id)
-        answered += 1
-      end
+    @quiz_attempt = QuizAttempt.in_progress.find_by(quiz: @quiz, user: current_user)
+    unless @quiz_attempt
+      redirect_to take_course_session_lesson_quiz_path(@course, @session, @lesson),
+                  alert: "Nenhuma tentativa em andamento. Inicie a prova novamente."
+      return
     end
 
-    completion = @lesson.lesson_completions.find_or_initialize_by(user: current_user)
-    question_ids = @quiz.questions.ids
-    if question_ids.any?
-      answered_for_quiz = StudentAnswer.where(user: current_user, question_id: question_ids).distinct.count(:question_id)
-      completion.quiz_completed = true if answered_for_quiz >= question_ids.size
+    if @quiz_attempt.expired?
+      answered = persist_answers_for_attempt!(@quiz_attempt)
+      @quiz_attempt.submit!(at: @quiz_attempt.expires_at)
+      redirect_to take_course_session_lesson_quiz_path(@course, @session, @lesson),
+                  alert: "Tempo esgotado. Suas respostas parciais foram registradas. Você pode iniciar uma nova tentativa."
+      return
     end
-    completion.save!
+
+    answered = persist_answers_for_attempt!(@quiz_attempt)
+
+    @quiz_attempt.submit!
+    completion = update_lesson_completion_after_submit!
 
     gamification = nil
     gamification = run_gamification!(quiz: @quiz, lesson_just_completed: completion.completed?) if current_user.student?
 
     lesson_path = course_session_lesson_path(@course, @session, @lesson, tab: "quiz")
-
     base_notice = if completion.quiz_completed?
                     "Prova concluída! Confira o desempenho abaixo."
                   else
@@ -134,19 +139,63 @@ class QuizzesController < ApplicationController
 
   def ensure_video_prerequisite_for_students!
     return unless student?
+
     return if @lesson.video_prerequisite_met_for?(current_user)
 
     redirect_to course_session_lesson_path(@course, @session, @lesson, tab: "quiz"),
                 alert: "Assista à aula ou marque como assistido antes de iniciar a prova."
   end
 
-  def assign_quiz_review_summary
+  def prepare_student_quiz_attempt!
+    return true unless current_user.student?
+
+    Quizzes::FinalizeExpiredAttempts.new(quiz: @quiz, user: current_user).call
+    @quiz_attempt = Quizzes::EnsureAttempt.new(quiz: @quiz, user: current_user).call
+    true
+  end
+
+  def persist_answers_for_attempt!(attempt)
+    answered = 0
+    params[:answers]&.each do |question_id, question_option_id|
+      next if question_option_id.blank?
+
+      question = @quiz.questions.find_by(id: question_id)
+      option = question&.question_options&.find_by(id: question_option_id)
+      next unless question && option
+
+      time_spent = params.dig(:time_spent, question_id).to_i
+      answer = attempt.student_answers.find_or_initialize_by(question: question)
+      answer.user = current_user
+      if answer.update(
+        question_option_id: option.id,
+        time_spent_seconds: time_spent.positive? ? time_spent : nil
+      )
+        answered += 1
+      end
+    end
+    answered
+  end
+
+  def update_lesson_completion_after_submit!
+    completion = @lesson.lesson_completions.find_or_initialize_by(user: current_user)
+    question_ids = @quiz.questions.ids
+    if question_ids.any?
+      answered_for_quiz = @quiz_attempt.student_answers.where(question_id: question_ids).distinct.count(:question_id)
+      completion.quiz_completed = true if answered_for_quiz >= question_ids.size
+    end
+    completion.save!
+    completion
+  end
+
+  def assign_quiz_review_summary(attempt)
     questions = @quiz.questions.includes(:question_options, student_answers: :question_option)
-    uid = current_user.id
+    attempt_answers = attempt.student_answers.index_by(&:question_id)
     @review_correct = questions.count do |q|
-      ans = q.student_answers.find { |a| a.user_id == uid }
+      ans = attempt_answers[q.id]
       ans&.question_option&.correct?
     end
     @review_total = questions.size
+    @review_attempt_number = attempt.attempt_number
+    @review_attempt_count = @quiz.submitted_attempt_count_for(current_user)
   end
 end

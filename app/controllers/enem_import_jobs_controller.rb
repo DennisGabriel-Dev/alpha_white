@@ -1,6 +1,9 @@
 class EnemImportJobsController < ApplicationController
+  include RequiresTenantFeature
+
   before_action :authenticate_user!
   before_action :require_admin_or_instructor!
+  before_action -> { require_tenant_feature!(:enem_library) }
 
   INEP_FILENAME_PATTERN = /\A\d{4}_(PV|GB)_[^_]+_D[12]_CD\d+\.pdf\z/i
 

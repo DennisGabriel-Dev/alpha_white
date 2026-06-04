@@ -1,12 +1,15 @@
 <% content_for :title, "Relatórios — Meu desempenho" %>
 <% if themed_layout? %>
   <% content_for :header_title, "Meu desempenho" %>
+  <% content_for :breadcrumb do %>
+    <%= render "shared/reports_breadcrumb", title: "Meu desempenho" %>
+  <% end %>
 <% end %>
 
 <%= render "shared/header" unless themed_layout? %>
 
-<div class="<%= themed_layout? ? 'max-w-3xl mx-auto px-5 py-6' : 'container mx-auto px-4 py-8 max-w-4xl' %>">
-  <nav class="mb-6"><%= render "reports/nav" %></nav>
+<div class="<%= theme_page_container_class(max_width: themed_layout? ? '3xl' : '4xl') %>">
+  <%= render "reports/nav" %>
 
   <section class="mb-10">
     <h2 class="text-lg font-semibold text-gray-900 mb-3">Progresso por curso</h2>
@@ -15,13 +18,13 @@
     <% else %>
       <div class="space-y-4">
         <% @data.course_rows.each do |row| %>
-          <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div class="<%= theme_panel_class %>">
             <div class="flex justify-between gap-3 mb-2">
-              <%= link_to row.course.name, course_path(row.course), class: "font-medium text-gray-900 hover:text-primary truncate" %>
+              <%= link_to row.course.name, course_path(row.course), class: "font-medium text-gray-900 hover:text-[var(--color-primary)] truncate" %>
               <span class="text-sm text-gray-600 flex-shrink-0"><%= row.completed %> / <%= row.total %> aulas</span>
             </div>
             <%= render "reports/progress_bar", percent: row.percent %>
-            <p class="text-xs text-gray-500 mt-1"><%= number_to_percentage(row.percent, precision: 1, strip_insignificant_zeros: true) %> concluído</p>
+            <p class="text-xs text-gray-500 mt-1"><%= number_to_percentage(row.percent, precision: 1, strip_insignificant_zeros: true) %> concluído · Tempo em provas: <%= reports_format_duration(row.quiz_time_seconds) %></p>
           </div>
         <% end %>
       </div>
@@ -34,13 +37,14 @@
     <% if @data.enem_rows.empty? %>
       <p class="text-sm text-gray-500">Você ainda não respondeu questões vinculadas ao ENEM.</p>
     <% else %>
-      <div class="overflow-x-auto rounded-xl border border-gray-200">
+      <div class="<%= theme_table_wrap_class %>">
         <table class="min-w-full text-sm">
           <thead class="bg-gray-50 text-left text-gray-600">
             <tr>
               <th class="px-4 py-2">Área</th>
               <th class="px-4 py-2 text-right">Acertos</th>
               <th class="px-4 py-2 text-right">Total</th>
+              <th class="px-4 py-2 text-right">Tempo médio/questão</th>
               <th class="px-4 py-2 w-40">Taxa</th>
             </tr>
           </thead>
@@ -50,6 +54,9 @@
                 <td class="px-4 py-2 font-medium text-gray-900"><%= reports_area_label(row.area) %></td>
                 <td class="px-4 py-2 text-right tabular-nums"><%= row.correct %></td>
                 <td class="px-4 py-2 text-right tabular-nums"><%= row.total %></td>
+                <td class="px-4 py-2 text-right tabular-nums text-gray-600">
+                  <%= row.avg_time_seconds ? "#{row.avg_time_seconds}s" : "—" %>
+                </td>
                 <td class="px-4 py-2">
                   <%= render "reports/progress_bar", percent: row.percent %>
                 </td>

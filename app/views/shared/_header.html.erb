@@ -8,20 +8,17 @@
       <%# Logo (whitelabel - dinâmico por tenant) %>
       <div class="flex items-center">
         <%= link_to root_path, class: "flex items-center space-x-2" do %>
-          <%# TODO: Adicionar logo do tenant quando implementado %>
-          <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-            <span class="text-white font-bold text-xl">📚</span>
-          </div>
+          <%= render "shared/tenant_logo", size_class: "w-10 h-10", text_class: "text-lg" %>
           <span class="text-xl font-bold text-primary">
-            <%= ActsAsTenant.current_tenant&.name || "Alpha White" %>
+            <%= tenant_name %>
           </span>
         <% end %>
       </div>
 
       <%# Menu Desktop %>
       <div class="hidden md:flex items-center space-x-8">
-        <%= link_to "Cursos", courses_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
-        <% if user_signed_in? && (me_achievements_path_allowed? || reports_aluno_path_allowed? || reports_turma_path_allowed? || reports_escola_path_allowed?) %>
+        <%= link_to "Cursos", root_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
+        <% if user_signed_in? && (me_achievements_path_allowed? || reports_aluno_path_allowed? || reports_turma_path_allowed? || reports_escola_path_allowed? || staff_users_path_allowed?) %>
           <% if me_achievements_path_allowed? %>
             <%= link_to "Conquistas", me_achievements_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
           <% end %>
@@ -34,6 +31,12 @@
           <% if reports_escola_path_allowed? %>
             <%= link_to "Escola", relatorios_escola_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
           <% end %>
+          <% if staff_users_path_allowed? %>
+            <%= link_to "Equipe", staff_users_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
+          <% end %>
+          <% if tenant_admin? %>
+            <%= link_to "Aparência", edit_tenant_setting_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
+          <% end %>
         <% end %>
         <%= link_to "Trilhas", "#trilhas", class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
         <%= link_to "Simulados", "#simulados", class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
@@ -43,7 +46,9 @@
       <%# CTAs Desktop %>
       <div class="hidden md:flex items-center space-x-4">
         <% if user_signed_in? %>
-          <%= render "shared/student_streak_badge" %>
+          <% if tenant_feature?(:gamification) %>
+            <%= render "shared/student_streak_badge" %>
+          <% end %>
           <%= render "shared/icons/settings_icon" %>
           <%= link_to "Sair", destroy_user_session_path,
             data: {
@@ -70,8 +75,8 @@
     <%# Menu Mobile Dropdown %>
     <div class="hidden md:hidden mt-4 pb-4 border-t border-gray-200" id="mobile-menu">
       <div class="flex flex-col space-y-4 mt-4">
-        <%= link_to "Cursos", courses_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
-        <% if user_signed_in? && (me_achievements_path_allowed? || reports_aluno_path_allowed? || reports_turma_path_allowed? || reports_escola_path_allowed?) %>
+        <%= link_to "Cursos", root_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
+        <% if user_signed_in? && (me_achievements_path_allowed? || reports_aluno_path_allowed? || reports_turma_path_allowed? || reports_escola_path_allowed? || staff_users_path_allowed?) %>
           <% if me_achievements_path_allowed? %>
             <%= link_to "Conquistas", me_achievements_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
           <% end %>
@@ -83,6 +88,9 @@
           <% end %>
           <% if reports_escola_path_allowed? %>
             <%= link_to "Escola", relatorios_escola_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
+          <% end %>
+          <% if staff_users_path_allowed? %>
+            <%= link_to "Equipe", staff_users_path, class: "text-gray-700 hover:text-primary font-medium transition-colors" %>
           <% end %>
         <% end %>
         <%= link_to "Trilhas", "#trilhas", class: "text-gray-700 hover:text-primary font-medium transition-colors" %>

@@ -34,18 +34,35 @@ module PermissionHelper
   end
 
   def reports_aluno_path_allowed?
-    user_signed_in? && current_user.student?
+    user_signed_in? && current_user.student? && tenant_feature?(:reports)
   end
 
   def reports_turma_path_allowed?
-    user_signed_in? && (current_user.instructor? || current_user.tenant_admin? || current_user.super_admin?)
+    user_signed_in? && ((
+      current_user.instructor? || current_user.tenant_admin?) &&
+      tenant_feature?(:reports)) || current_user&.super_admin?
   end
 
   def reports_escola_path_allowed?
-    user_signed_in? && (current_user.tenant_admin? || current_user.super_admin?)
+    user_signed_in? && (
+      (current_user.tenant_admin?) &&
+      tenant_feature?(:reports)) ||
+      current_user&.super_admin?
   end
 
   def me_achievements_path_allowed?
-    user_signed_in? && current_user.student?
+    user_signed_in? && current_user&.student? && tenant_feature?(:gamification)
+  end
+
+  def staff_users_path_allowed?
+    tenant_admin?
+  end
+
+  def csv_export_allowed?
+    admin_or_instructor? && tenant_feature?(:csv_export)
+  end
+
+  def enem_library_allowed?
+    admin_or_instructor? && tenant_feature?(:enem_library)
   end
 end

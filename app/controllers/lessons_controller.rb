@@ -37,7 +37,10 @@ class LessonsController < ApplicationController
 
   def update
     if @lesson.update(lesson_params)
-      redirect_to course_session_path(@course, @session), notice: "Aula atualizada com sucesso."
+      redirect_after_lesson_update("Aula atualizada com sucesso.")
+    elsif params[:return_to] == "quiz_questions" && @lesson.quiz.present?
+      redirect_to course_session_lesson_quiz_questions_path(@course, @session, @lesson),
+                  alert: @lesson.errors.full_messages.to_sentence
     else
       render :edit, status: :unprocessable_entity
     end
@@ -68,6 +71,15 @@ class LessonsController < ApplicationController
   end
 
   def lesson_params
-    params.require(:lesson).permit(:name, :description, :video_url, :position, :video)
+    params.require(:lesson).permit(:name, :description, :video_url, :position, :video, :quiz_time_limit_minutes)
+  end
+
+  def redirect_after_lesson_update(default_notice)
+    if params[:return_to] == "quiz_questions" && @lesson.quiz.present?
+      redirect_to course_session_lesson_quiz_questions_path(@course, @session, @lesson),
+                  notice: "Tempo da prova atualizado."
+    else
+      redirect_to course_session_path(@course, @session), notice: default_notice
+    end
   end
 end

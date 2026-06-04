@@ -21,6 +21,29 @@ RSpec.describe Reports::StudentPerformance, type: :model do
     expect(row.percent).to eq(100.0)
   end
 
+  it "soma tempo total em provas por curso" do
+    quiz = create(:quiz, lesson:, tenant:)
+    q = build(:question, quiz:, tenant:)
+    q.question_options.build(text: "A", correct: true, position: 0)
+    q.question_options.build(text: "B", correct: false, position: 1)
+    q.save!
+    opt = q.question_options.find_by!(correct: true)
+    create_submitted_answer(
+      user: student,
+      question: q,
+      question_option: opt,
+      started_at: 10.minutes.ago,
+      submitted_at: 5.minutes.ago
+    )
+
+    result = ActsAsTenant.with_tenant(tenant) do
+      Reports::StudentPerformance.new(user: student, tenant: tenant).call
+    end
+
+    row = result.course_rows.find { |r| r.course.id == course.id }
+    expect(row.quiz_time_seconds).to eq(300)
+  end
+
   it "agrega acertos por área ENEM" do
     quiz = create(:quiz, lesson:, tenant:)
     eq = create(:enem_question, area: "MT")
@@ -30,7 +53,7 @@ RSpec.describe Reports::StudentPerformance, type: :model do
     q.save!
 
     opt_ok = q.question_options.find_by!(correct: true)
-    StudentAnswer.create!(user: student, question: q, question_option: opt_ok)
+    create_submitted_answer(user: student, question: q, question_option: opt_ok)
 
     result = ActsAsTenant.with_tenant(tenant) do
       Reports::StudentPerformance.new(user: student, tenant: tenant).call

@@ -27,6 +27,8 @@
 #  fk_rails_...  (tenant_id => tenants.id)
 #
 class Lesson < ApplicationRecord
+  DEFAULT_QUIZ_TIME_LIMIT_SECONDS = 600
+
   acts_as_tenant :tenant
 
   belongs_to :session
@@ -39,8 +41,18 @@ class Lesson < ApplicationRecord
   before_validation :set_tenant_from_session, on: :create
 
   validates :name, presence: true
+  validates :quiz_time_limit_seconds,
+            numericality: { only_integer: true, greater_than: 0 }
 
   default_scope { order(position: :asc, id: :asc) }
+
+  def quiz_time_limit_minutes
+    (quiz_time_limit_seconds / 60.0).round
+  end
+
+  def quiz_time_limit_minutes=(minutes)
+    self.quiz_time_limit_seconds = minutes.to_i * 60
+  end
 
   def video_prerequisite_met_for?(user)
     return true unless video.attached? || video_url.present?

@@ -1,15 +1,15 @@
 <%# Navegação entre relatórios (links conforme papel) %>
-<div class="flex flex-wrap gap-2 text-sm">
+<div class="flex flex-wrap gap-2 text-sm mb-6">
   <% if reports_aluno_path_allowed? %>
     <%= link_to "Meu desempenho", relatorios_aluno_path,
-          class: "px-3 py-1.5 rounded-lg border #{current_page?(relatorios_aluno_path) ? 'border-primary bg-primary/10 text-primary font-medium' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}" %>
+          class: theme_nav_pill_class(active: current_page?(relatorios_aluno_path)) %>
   <% end %>
   <% if reports_turma_path_allowed? %>
     <%= link_to "Turma", relatorios_turma_path,
-          class: "px-3 py-1.5 rounded-lg border #{current_page?(relatorios_turma_path) ? 'border-primary bg-primary/10 text-primary font-medium' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}" %>
+          class: theme_nav_pill_class(active: current_page?(relatorios_turma_path)) %>
   <% end %>
   <% if reports_escola_path_allowed? %>
     <%= link_to "Escola", relatorios_escola_path,
-          class: "px-3 py-1.5 rounded-lg border #{current_page?(relatorios_escola_path) ? 'border-primary bg-primary/10 text-primary font-medium' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}" %>
+          class: theme_nav_pill_class(active: current_page?(relatorios_escola_path)) %>
   <% end %>
 </div>

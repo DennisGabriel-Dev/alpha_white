@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_10_133000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_30_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "achievements", comment: "Global achievement catalog (badges).", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description", null: false
+    t.integer "kind", default: 0, null: false
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.integer "threshold", default: 1, null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_achievements_on_slug", unique: true
+  end
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
@@ -123,6 +134,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_133000) do
     t.text "description"
     t.string "name", null: false
     t.integer "position", default: 0, null: false
+    t.integer "quiz_time_limit_seconds", default: 600, null: false, comment: "Limit of time for the quiz of this lesson (seconds). Default: 10 min."
     t.bigint "session_id", null: false
     t.bigint "tenant_id", null: false
     t.datetime "updated_at", null: false
@@ -161,6 +173,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_133000) do
     t.index ["tenant_id"], name: "index_questions_on_tenant_id"
   end
 
+  create_table "quiz_attempts", comment: "Quiz attempt by student (can have multiple after resubmission).", force: :cascade do |t|
+    t.integer "attempt_number", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.integer "duration_seconds"
+    t.bigint "quiz_id", null: false
+    t.datetime "started_at", null: false
+    t.datetime "submitted_at"
+    t.bigint "tenant_id", null: false
+    t.integer "time_limit_seconds", null: false, comment: "Snapshot do limite da aula no início"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["quiz_id", "user_id", "submitted_at"], name: "index_quiz_attempts_on_quiz_user_submitted"
+    t.index ["quiz_id"], name: "index_quiz_attempts_on_quiz_id"
+    t.index ["tenant_id", "user_id", "quiz_id", "attempt_number"], name: "index_quiz_attempts_on_tenant_user_quiz_attempt", unique: true
+    t.index ["tenant_id"], name: "index_quiz_attempts_on_tenant_id"
+    t.index ["user_id"], name: "index_quiz_attempts_on_user_id"
+  end
+
   create_table "quizzes", comment: "Quizzes associated with a lesson.", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "lesson_id", null: false
@@ -190,26 +220,58 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_133000) do
     t.datetime "created_at", null: false
     t.bigint "question_id", null: false
     t.bigint "question_option_id"
+    t.bigint "quiz_attempt_id", null: false
     t.string "selected_option"
+    t.integer "time_spent_seconds"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
-    t.index ["question_id", "user_id"], name: "index_student_answers_on_question_id_and_user_id", unique: true
     t.index ["question_id"], name: "index_student_answers_on_question_id"
     t.index ["question_option_id"], name: "index_student_answers_on_question_option_id"
+    t.index ["quiz_attempt_id", "question_id"], name: "index_student_answers_on_attempt_and_question", unique: true
+    t.index ["quiz_attempt_id"], name: "index_student_answers_on_quiz_attempt_id"
     t.index ["user_id"], name: "index_student_answers_on_user_id"
+  end
+
+  create_table "study_streaks", comment: "Daily study streak per student and tenant.", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "current_streak", default: 0, null: false
+    t.date "last_activity_on"
+    t.integer "longest_streak", default: 0, null: false
+    t.bigint "tenant_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["tenant_id", "user_id"], name: "index_study_streaks_on_tenant_id_and_user_id", unique: true
+    t.index ["tenant_id"], name: "index_study_streaks_on_tenant_id"
+    t.index ["user_id"], name: "index_study_streaks_on_user_id"
   end
 
   create_table "tenants", comment: "Table tenants (schools). Each tenant represents a whitelabel school.", force: :cascade do |t|
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
+    t.jsonb "feature_flags", default: {}, null: false
     t.string "logo_url"
+    t.string "meta_description"
     t.string "name", null: false
     t.string "primary_color", default: "#3C0094"
     t.string "subdomain", null: false, comment: "Unique subdomain for the tenant (ex: 'objetivo' for objetivo.seudominio.com)"
+    t.string "tagline"
     t.string "theme", default: "default", null: false
     t.datetime "updated_at", null: false
     t.index ["subdomain"], name: "index_tenants_on_subdomain", unique: true
     t.check_constraint "subdomain::text = lower(subdomain::text)", name: "subdomain_lowercase"
+  end
+
+  create_table "user_achievements", comment: "Badge awarded to a user within a tenant.", force: :cascade do |t|
+    t.bigint "achievement_id", null: false
+    t.datetime "awarded_at", null: false
+    t.datetime "created_at", null: false
+    t.bigint "tenant_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["achievement_id"], name: "index_user_achievements_on_achievement_id"
+    t.index ["tenant_id", "user_id", "achievement_id"], name: "index_user_achievements_on_tenant_user_achievement", unique: true
+    t.index ["tenant_id"], name: "index_user_achievements_on_tenant_id"
+    t.index ["user_id"], name: "index_user_achievements_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -244,12 +306,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_133000) do
   add_foreign_key "questions", "enem_questions"
   add_foreign_key "questions", "quizzes"
   add_foreign_key "questions", "tenants"
+  add_foreign_key "quiz_attempts", "quizzes"
+  add_foreign_key "quiz_attempts", "tenants"
+  add_foreign_key "quiz_attempts", "users"
   add_foreign_key "quizzes", "lessons"
   add_foreign_key "quizzes", "tenants"
   add_foreign_key "sessions", "courses"
   add_foreign_key "sessions", "tenants"
   add_foreign_key "student_answers", "question_options"
   add_foreign_key "student_answers", "questions"
+  add_foreign_key "student_answers", "quiz_attempts"
   add_foreign_key "student_answers", "users"
+  add_foreign_key "study_streaks", "tenants"
+  add_foreign_key "study_streaks", "users"
+  add_foreign_key "user_achievements", "achievements"
+  add_foreign_key "user_achievements", "tenants"
+  add_foreign_key "user_achievements", "users"
   add_foreign_key "users", "tenants"
 end

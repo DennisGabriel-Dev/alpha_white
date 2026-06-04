@@ -10,15 +10,13 @@
       <%# Coluna 1: Logo e descrição %>
       <div class="md:col-span-1">
         <div class="flex items-center space-x-2 mb-4">
-          <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-            <span class="text-white font-bold text-xl">📚</span>
-          </div>
+          <%= render "shared/tenant_logo", size_class: "w-10 h-10", text_class: "text-lg" %>
           <span class="text-xl font-bold">
-            <%= ActsAsTenant.current_tenant&.name || "Alpha White" %>
+            <%= tenant_name %>
           </span>
         </div>
         <p class="text-gray-400 text-sm leading-relaxed">
-          Sua plataforma completa de preparação para o ENEM e vestibulares.
+          <%= tenant_tagline %>
         </p>
       </div>
 
@@ -103,7 +101,7 @@
     <div class="border-t border-gray-800 pt-8">
       <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
         <p>
-          © <%= Time.current.year %> <%= ActsAsTenant.current_tenant&.name || "Alpha White" %>. Todos os direitos reservados.
+          © <%= Time.current.year %> <%= tenant_name %>. Todos os direitos reservados.
         </p>
         <p class="mt-4 md:mt-0">
           Feito com ❤️ para estudantes do Brasil

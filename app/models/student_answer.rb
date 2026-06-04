@@ -30,6 +30,19 @@ class StudentAnswer < ApplicationRecord
   belongs_to :question
   belongs_to :user
   belongs_to :question_option, optional: true
+  belongs_to :quiz_attempt
 
-  validates :question_id, uniqueness: { scope: :user_id }
+  validates :question_id, uniqueness: { scope: :quiz_attempt_id }
+
+  def self.latest_for(user:, question:)
+    where(user: user, question: question).order(created_at: :desc).first
+  end
+
+  def self.attempt_count_for(user:, question:)
+    joins(:quiz_attempt)
+      .where(user: user, question: question)
+      .merge(QuizAttempt.submitted)
+      .distinct
+      .count("quiz_attempts.id")
+  end
 end

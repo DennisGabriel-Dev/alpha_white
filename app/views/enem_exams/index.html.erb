@@ -63,7 +63,9 @@
               <td class="px-4 py-2">
                 <div class="flex gap-2">
                   <%= link_to "Ver", enem_exam_path(exam), class: "text-primary hover:underline" %>
-                  <%= link_to "Editar", edit_enem_exam_path(exam), class: "text-gray-700 hover:underline" %>
+                  <% if super_admin? %>
+                    <%= link_to "Editar", edit_enem_exam_path(exam), class: "text-gray-700 hover:underline" %>
+                  <% end %>
                 </div>
               </td>
             </tr>

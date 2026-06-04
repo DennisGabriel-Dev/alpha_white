@@ -3,8 +3,8 @@
 module Reports
   # Desempenho do aluno: progresso por curso + acertos por área ENEM (questões com enem_question).
   class StudentPerformance
-    CourseRow = Struct.new(:course, :completed, :total, :percent, keyword_init: true)
-    EnemRow = Struct.new(:area, :correct, :total, :percent, keyword_init: true)
+    CourseRow = Struct.new(:course, :completed, :total, :percent, :quiz_time_seconds, keyword_init: true)
+    EnemRow = Struct.new(:area, :correct, :total, :percent, :avg_time_seconds, keyword_init: true)
     Result = Struct.new(:course_rows, :enem_rows, keyword_init: true)
 
     def initialize(user:, tenant:)
@@ -29,24 +29,41 @@ module Reports
           completions = LessonCompletion.where(user: @user, lesson_id: lesson_ids).includes(:lesson)
           done = completions.count(&:completed?)
           percent = total.positive? ? (100.0 * done / total).round(1) : 0.0
+          quiz_time_seconds = quiz_time_for_lessons(lesson_ids)
 
-          CourseRow.new(course: course, completed: done, total: total, percent: percent)
+          CourseRow.new(
+            course: course,
+            completed: done,
+            total: total,
+            percent: percent,
+            quiz_time_seconds: quiz_time_seconds
+          )
         end
       end
     end
 
+    def quiz_time_for_lessons(lesson_ids)
+      quiz_ids = Quiz.where(lesson_id: lesson_ids).pluck(:id)
+      return 0 if quiz_ids.empty?
+
+      QuizAttempt.submitted.where(user: @user, quiz_id: quiz_ids).sum(:duration_seconds).to_i
+    end
+
     def build_enem_rows
-      answers = StudentAnswer.joins(question: :enem_question).where(user: @user).includes(
-        :question_option,
-        question: { enem_question: :enem_exam }
-      )
+      answers = StudentAnswer.joins(:quiz_attempt, question: :enem_question)
+        .merge(QuizAttempt.submitted)
+        .where(user: @user)
+        .includes(:question_option, question: { enem_question: :enem_exam })
 
       by_area = answers.group_by { |a| a.question.enem_question.area }
       by_area.map do |area, arr|
         correct = arr.count { |a| a.question_option&.correct? }
         total = arr.size
         percent = total.positive? ? (100.0 * correct / total).round(1) : 0.0
-        EnemRow.new(area: area, correct: correct, total: total, percent: percent)
+        timed = arr.filter_map(&:time_spent_seconds)
+        avg_time = timed.any? ? (timed.sum.to_f / timed.size).round : nil
+
+        EnemRow.new(area: area, correct: correct, total: total, percent: percent, avg_time_seconds: avg_time)
       end.sort_by(&:area)
     end
   end

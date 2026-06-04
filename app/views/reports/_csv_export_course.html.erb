@@ -1,0 +1,23 @@
+<% return unless csv_export_allowed? %>
+<section class="<%= theme_panel_class %> mb-6">
+  <h2 class="text-lg font-semibold text-gray-900 mb-1">Exportar CSV</h2>
+  <p class="text-sm text-gray-500 mb-4">
+    Uma linha por aluno × questão. Deixe as datas em branco para todo o histórico.
+  </p>
+
+  <%= form_with url: relatorio_course_path(course), method: :get, local: true,
+        data: { turbo: false },
+        class: "flex flex-wrap items-end gap-3" do %>
+    <div>
+      <label for="export_from_<%= course.id %>" class="block text-xs font-semibold text-gray-600 mb-1">De</label>
+      <input type="date" name="from" id="export_from_<%= course.id %>"
+             class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white">
+    </div>
+    <div>
+      <label for="export_to_<%= course.id %>" class="block text-xs font-semibold text-gray-600 mb-1">Até</label>
+      <input type="date" name="to" id="export_to_<%= course.id %>"
+             class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white">
+    </div>
+    <button type="submit" class="<%= theme_btn_primary_class(extra: 'px-4 py-2') %>">Baixar CSV</button>
+  <% end %>
+</section>
