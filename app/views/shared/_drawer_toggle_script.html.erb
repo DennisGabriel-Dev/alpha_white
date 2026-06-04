@@ -9,16 +9,16 @@
       var backdrop = document.getElementById(btn.getAttribute('data-drawer-backdrop'));
       if (!panel) return;
 
-      var closedClass = panel.getAttribute('data-drawer-closed-class') || '-translate-x-full';
-      var openClass = panel.getAttribute('data-drawer-open-class') || 'translate-x-0';
+      var closedClasses = (panel.getAttribute('data-drawer-closed-class') || '-translate-x-full').split(/\s+/);
+      var openClasses = (panel.getAttribute('data-drawer-open-class') || 'translate-x-0').split(/\s+/);
 
       function isOpen() {
-        return panel.classList.contains(openClass);
+        return openClasses.every(function (c) { return panel.classList.contains(c); });
       }
 
       function setOpen(open) {
-        panel.classList.toggle(closedClass, !open);
-        panel.classList.toggle(openClass, open);
+        closedClasses.forEach(function (c) { panel.classList.toggle(c, !open); });
+        openClasses.forEach(function (c) { panel.classList.toggle(c, open); });
         if (backdrop) backdrop.classList.toggle('hidden', !open);
         btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       }

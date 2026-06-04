@@ -144,13 +144,14 @@
          class="fixed inset-0 bg-black/40 z-30 lg:hidden hidden"
          aria-hidden="true"></div>
 
-    <%# ══ Sidebar contextual (drawer &lt; lg) ══ %>
+    <%# ══ Sidebar contextual: drawer no mobile (left-0 + -translate-x-full = 100% fora da tela) ══ %>
     <aside id="merma-context-sidebar"
-           class="fixed inset-y-0 left-14 z-40 w-56 max-w-[85vw] bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden flex-shrink-0
-                  -translate-x-full lg:static lg:left-auto lg:z-auto lg:max-w-none lg:translate-x-0
+           class="fixed inset-y-0 left-0 z-50 w-64 max-w-[min(85vw,16rem)] bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden
+                  -translate-x-full pointer-events-none
+                  lg:pointer-events-auto lg:static lg:z-auto lg:w-56 lg:max-w-none lg:translate-x-0 lg:flex-shrink-0
                   transition-transform duration-200 ease-out"
-           data-drawer-closed-class="-translate-x-full"
-           data-drawer-open-class="translate-x-0">
+           data-drawer-closed-class="-translate-x-full pointer-events-none"
+           data-drawer-open-class="translate-x-0 pointer-events-auto">
       <% if content_for?(:sidebar_content) %>
         <%= yield :sidebar_content %>
       <% else %>
@@ -226,11 +227,12 @@
              class="fixed inset-0 bg-black/40 z-30 xl:hidden hidden"
              aria-hidden="true"></div>
         <aside id="merma-right-panel"
-               class="fixed inset-y-0 right-0 z-40 w-72 max-w-[90vw] border-l border-gray-200 flex flex-col overflow-y-auto flex-shrink-0 bg-white
-                      translate-x-full xl:static xl:z-auto xl:max-w-none xl:translate-x-0
+               class="fixed inset-y-0 right-0 z-50 w-72 max-w-[90vw] border-l border-gray-200 flex flex-col overflow-y-auto flex-shrink-0 bg-white
+                      translate-x-full pointer-events-none
+                      xl:pointer-events-auto xl:static xl:z-auto xl:max-w-none xl:translate-x-0
                       transition-transform duration-200 ease-out"
-               data-drawer-closed-class="translate-x-full"
-               data-drawer-open-class="translate-x-0">
+               data-drawer-closed-class="translate-x-full pointer-events-none"
+               data-drawer-open-class="translate-x-0 pointer-events-auto">
           <%= yield :right_panel %>
         </aside>
       <% end %>
