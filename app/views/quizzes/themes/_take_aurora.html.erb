@@ -131,9 +131,10 @@
       <div class="space-y-4">
         <% questions.each_with_index do |question, index| %>
           <% my_answer = @quiz_attempt&.student_answers&.find { |a| a.question_id == question.id } %>
+          <% question_id = question.id %>
           <div class="bg-white rounded-2xl border border-gray-100 p-5 quiz-question"
-               id="question-<%= question.id %>"
-               data-question-id="<%= question.id %>">
+               id="question-<%= question_id %>"
+               data-question-id="<%= question_id %>">
             <div class="flex items-start gap-3 mb-4">
               <span class="flex-shrink-0 w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center
                            text-[var(--color-primary)] bg-[var(--color-primary)]/10">
