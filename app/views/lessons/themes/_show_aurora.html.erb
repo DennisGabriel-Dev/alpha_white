@@ -3,7 +3,18 @@
 <% content_for :header_subtitle, "#{@course.name} · #{@session.name}" %>
 <% content_for :main_class, "overflow-hidden flex flex-col" %>
 
-<div class="flex flex-1 overflow-hidden">
+<% content_for :header_actions do %>
+  <button type="button"
+          class="xl:hidden px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+          data-drawer-toggle="aurora-lesson-playlist"
+          data-drawer-backdrop="aurora-playlist-backdrop"
+          aria-expanded="false"
+          aria-label="Lista de aulas">
+    Aulas
+  </button>
+<% end %>
+
+<div class="flex flex-1 overflow-hidden min-w-0">
 
   <%# ── Coluna principal ── %>
   <div class="flex-1 overflow-y-auto min-w-0">
@@ -16,7 +27,11 @@
 
   </div>
 
-  <%# ── Playlist lateral ── %>
+  <div id="aurora-playlist-backdrop"
+       class="fixed inset-0 bg-black/40 z-30 xl:hidden hidden"
+       aria-hidden="true"></div>
+
+  <%# ── Playlist lateral (drawer &lt; xl) ── %>
   <%= render "shared/aurora/lesson_playlist",
         course: @course,
         sessions: @sessions,

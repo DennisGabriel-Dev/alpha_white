@@ -140,8 +140,18 @@
       </div>
     </nav>
 
-    <%# ══ Sidebar contextual ══ %>
-    <aside class="w-56 bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden flex-shrink-0">
+    <div id="merma-sidebar-backdrop"
+         class="fixed inset-0 bg-black/40 z-30 lg:hidden hidden"
+         aria-hidden="true"></div>
+
+    <%# ══ Sidebar contextual: drawer no mobile (left-0 + -translate-x-full = 100% fora da tela) ══ %>
+    <aside id="merma-context-sidebar"
+           class="fixed inset-y-0 left-0 z-50 w-64 max-w-[min(85vw,16rem)] bg-gray-50 border-r border-gray-200 flex flex-col overflow-hidden
+                  -translate-x-full pointer-events-none
+                  lg:pointer-events-auto lg:static lg:z-auto lg:w-56 lg:max-w-none lg:translate-x-0 lg:flex-shrink-0
+                  transition-transform duration-200 ease-out"
+           data-drawer-closed-class="-translate-x-full pointer-events-none"
+           data-drawer-open-class="translate-x-0 pointer-events-auto">
       <% if content_for?(:sidebar_content) %>
         <%= yield :sidebar_content %>
       <% else %>
@@ -151,15 +161,19 @@
     <% end %>
 
     <%# ══ Área de conteúdo ══ %>
-    <div class="flex-1 flex overflow-hidden">
+    <div class="flex-1 flex overflow-hidden min-w-0">
 
       <%# Coluna principal %>
-      <div class="flex-1 flex flex-col overflow-hidden bg-white">
+      <div class="flex-1 flex flex-col overflow-hidden bg-white min-w-0">
 
         <% unless auth_minimal_chrome? %>
         <%# Header %>
-        <header class="border-b border-gray-100 px-6 py-3 flex items-center justify-between flex-shrink-0 min-h-[3.25rem]">
-          <div class="flex items-center gap-3 min-w-0">
+        <header class="border-b border-gray-100 px-4 sm:px-6 py-3 flex items-center justify-between flex-shrink-0 min-h-[3.25rem] gap-2">
+          <div class="flex items-center gap-2 min-w-0 flex-1">
+            <%= render "shared/drawer_menu_button",
+                  toggle_id: "merma-context-sidebar",
+                  backdrop_id: "merma-sidebar-backdrop",
+                  label: "Navegação" %>
             <% if content_for?(:breadcrumb) %>
               <%= yield :breadcrumb %>
             <% elsif content_for?(:header_title) %>
@@ -167,6 +181,16 @@
             <% end %>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
+            <% if content_for?(:right_panel) %>
+              <button type="button"
+                      class="xl:hidden px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                      data-drawer-toggle="merma-right-panel"
+                      data-drawer-backdrop="merma-panel-backdrop"
+                      aria-expanded="false"
+                      aria-label="Painel lateral">
+                Progresso
+              </button>
+            <% end %>
             <% if content_for?(:header_actions) %>
               <%= yield :header_actions %>
             <% end %>
@@ -197,14 +221,24 @@
 
       </div>
 
-      <%# Painel direito (opcional) %>
+      <%# Painel direito (opcional, drawer &lt; xl) %>
       <% if content_for?(:right_panel) %>
-        <aside class="w-72 border-l border-gray-200 flex flex-col overflow-y-auto flex-shrink-0 bg-white">
+        <div id="merma-panel-backdrop"
+             class="fixed inset-0 bg-black/40 z-30 xl:hidden hidden"
+             aria-hidden="true"></div>
+        <aside id="merma-right-panel"
+               class="fixed inset-y-0 right-0 z-50 w-72 max-w-[90vw] border-l border-gray-200 flex flex-col overflow-y-auto flex-shrink-0 bg-white
+                      translate-x-full pointer-events-none
+                      xl:pointer-events-auto xl:static xl:z-auto xl:max-w-none xl:translate-x-0
+                      transition-transform duration-200 ease-out"
+               data-drawer-closed-class="translate-x-full pointer-events-none"
+               data-drawer-open-class="translate-x-0 pointer-events-auto">
           <%= yield :right_panel %>
         </aside>
       <% end %>
 
     </div>
 
+    <%= render "shared/drawer_toggle_script" unless auth_minimal_chrome? %>
   </body>
 </html>

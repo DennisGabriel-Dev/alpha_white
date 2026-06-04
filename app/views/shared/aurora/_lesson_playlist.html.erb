@@ -6,7 +6,12 @@
       completions    – { lesson_id => LessonCompletion }
       current_lesson – Lesson atual (opcional, para highlight) %>
 
-<aside class="w-80 flex-shrink-0 border-l border-gray-100 bg-white flex flex-col overflow-hidden">
+<aside id="aurora-lesson-playlist"
+       class="fixed inset-y-0 right-0 z-40 w-80 max-w-[90vw] flex-shrink-0 border-l border-gray-100 bg-white flex flex-col overflow-hidden
+              translate-x-full xl:static xl:z-auto xl:max-w-none xl:translate-x-0
+              transition-transform duration-200 ease-out"
+       data-drawer-closed-class="translate-x-full"
+       data-drawer-open-class="translate-x-0">
 
   <%# Cabeçalho %>
   <div class="px-5 pt-5 pb-3 border-b border-gray-100 flex items-center justify-between">

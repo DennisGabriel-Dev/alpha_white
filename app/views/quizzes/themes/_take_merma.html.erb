@@ -47,7 +47,7 @@
          style="width: <%= review_mode && @review_total.to_i.positive? ? ((@review_correct.to_f / @review_total) * 100).round(1) : 0 %>%; background: var(--color-primary);"></div>
   </div>
 
-  <div class="max-w-2xl mx-auto px-5 py-6">
+  <div class="max-w-2xl mx-auto px-4 sm:px-5 py-6">
 
     <%# Cabeçalho %>
     <div class="mb-6">
@@ -109,8 +109,8 @@
                      else
                        "border-gray-100 bg-gray-50/80"
                      end %>
-                <div class="flex items-center gap-3 p-3 rounded-xl border <%= row_class %>">
-                  <span class="text-sm text-gray-800 flex-1"><%= option.text %></span>
+                <div class="flex flex-wrap items-start gap-2 sm:gap-3 p-3 rounded-xl border <%= row_class %>">
+                  <span class="text-sm text-gray-800 flex-1 min-w-0"><%= option.text %></span>
                   <% if correct %>
                     <span class="text-[10px] font-semibold uppercase text-green-700 flex-shrink-0">Gabarito</span>
                   <% elsif chosen %>
@@ -123,7 +123,7 @@
         <% end %>
       </div>
 
-      <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+      <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 mt-6 pt-4 border-t border-gray-100">
         <%= link_to course_session_lesson_path(@course, @session, @lesson, tab: "quiz"),
               class: "merma-btn-primary inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold" do %>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,7 +156,7 @@
                 </p>
               </div>
 
-              <div class="space-y-2 pl-9">
+              <div class="space-y-2 pl-0 sm:pl-9">
                 <% question.question_options.each do |option| %>
                   <% checked = my_answer&.question_option_id == option.id %>
                   <label class="merma-option flex items-center gap-3 p-3 rounded-xl border cursor-pointer
@@ -180,7 +180,7 @@
           <% end %>
         </div>
 
-        <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+        <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 mt-6 pt-4 border-t border-gray-100">
           <%= link_to course_session_lesson_path(@course, @session, @lesson),
                 class: "inline-flex items-center gap-1.5 text-sm font-medium text-gray-400 hover:text-gray-700 transition-colors" do %>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
