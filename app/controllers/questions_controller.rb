@@ -25,7 +25,7 @@ class QuestionsController < ApplicationController
                   notice: "Questão criada com sucesso."
     else
       2.times { @question.question_options.build } if @question.question_options.reject(&:marked_for_destruction?).empty?
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -39,7 +39,7 @@ class QuestionsController < ApplicationController
                   notice: "Questão atualizada com sucesso."
     else
       2.times { @question.question_options.build } if @question.question_options.reject(&:marked_for_destruction?).empty?
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

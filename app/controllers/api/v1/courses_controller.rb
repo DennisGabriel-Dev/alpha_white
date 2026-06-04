@@ -31,7 +31,7 @@ class Api::V1::CoursesController < Api::V1::BaseController
     else
       render json: {
         errors: @course.errors.full_messages
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_content
     end
   end
 
@@ -45,7 +45,7 @@ class Api::V1::CoursesController < Api::V1::BaseController
     else
       render json: {
         errors: @course.errors.full_messages
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_content
     end
   end
 
@@ -58,7 +58,7 @@ class Api::V1::CoursesController < Api::V1::BaseController
     else
       render json: {
         errors: [ "Erro ao deletar curso" ]
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_content
     end
   end
 

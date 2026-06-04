@@ -19,7 +19,7 @@ class TenantSettingsController < ApplicationController
     if @tenant.save
       redirect_to edit_tenant_setting_path, notice: "Configurações atualizadas com sucesso!"
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

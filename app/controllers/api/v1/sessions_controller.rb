@@ -37,7 +37,7 @@ class Api::V1::SessionsController < Api::V1::BaseController
     else
       render json: {
         errors: @session.errors.full_messages
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_content
     end
   end
 
@@ -51,7 +51,7 @@ class Api::V1::SessionsController < Api::V1::BaseController
     else
       render json: {
         errors: @session.errors.full_messages
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_content
     end
   end
 
@@ -60,7 +60,7 @@ class Api::V1::SessionsController < Api::V1::BaseController
     if @session.destroy
       render json: { message: "Sessão removida com sucesso." }
     else
-      render json: { errors: [ "Erro ao remover sessão" ] }, status: :unprocessable_entity
+      render json: { errors: [ "Erro ao remover sessão" ] }, status: :unprocessable_content
     end
   end
 

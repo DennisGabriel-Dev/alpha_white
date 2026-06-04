@@ -25,7 +25,7 @@ class Api::V1::QuestionsController < Api::V1::BaseController
     if @question.save
       render json: { question: @question, message: "Questão criada com sucesso." }, status: :created
     else
-      render json: { errors: @question.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @question.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -33,7 +33,7 @@ class Api::V1::QuestionsController < Api::V1::BaseController
     if @question.update(question_params)
       render json: { question: @question, message: "Questão atualizada com sucesso." }
     else
-      render json: { errors: @question.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @question.errors.full_messages }, status: :unprocessable_content
     end
   end
 

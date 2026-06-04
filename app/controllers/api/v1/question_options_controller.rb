@@ -19,7 +19,7 @@ class Api::V1::QuestionOptionsController < Api::V1::BaseController
     if @option.save
       render json: { question_option: @option, message: "Alternative created successfully." }, status: :created
     else
-      render json: { errors: @option.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @option.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -27,7 +27,7 @@ class Api::V1::QuestionOptionsController < Api::V1::BaseController
     if @question_option.update(question_option_params)
       render json: { question_option: @question_option, message: "Alternative updated successfully." }
     else
-      render json: { errors: @question_option.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @question_option.errors.full_messages }, status: :unprocessable_content
     end
   end
 

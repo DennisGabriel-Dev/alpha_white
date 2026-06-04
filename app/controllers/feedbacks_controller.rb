@@ -11,7 +11,7 @@ class FeedbacksController < ApplicationController
     if @feedback.save
       redirect_to course_session_lesson_path(@course, @session, @lesson), notice: "Feedback enviado com sucesso."
     else
-      render "lessons/show", status: :unprocessable_entity
+      render "lessons/show", status: :unprocessable_content
     end
   end
 

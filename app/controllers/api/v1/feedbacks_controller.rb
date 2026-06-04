@@ -13,7 +13,7 @@ class Api::V1::FeedbacksController < Api::V1::BaseController
     if @feedback.save
       render json: { feedback: @feedback, message: "Feedback enviado com sucesso." }, status: :created
     else
-      render json: { errors: @feedback.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @feedback.errors.full_messages }, status: :unprocessable_content
     end
   end
 

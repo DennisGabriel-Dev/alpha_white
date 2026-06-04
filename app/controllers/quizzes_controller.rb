@@ -92,7 +92,7 @@ class QuizzesController < ApplicationController
       redirect_to course_session_lesson_quiz_questions_path(@course, @session, @lesson),
                   notice: "Prova criada com sucesso."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -104,7 +104,7 @@ class QuizzesController < ApplicationController
       redirect_to course_session_lesson_quiz_questions_path(@course, @session, @lesson),
                   notice: "Prova atualizada com sucesso."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

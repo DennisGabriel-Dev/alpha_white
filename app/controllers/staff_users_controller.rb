@@ -20,7 +20,7 @@ class StaffUsersController < ApplicationController
     if @instructor.save
       redirect_to staff_users_path, notice: "Instrutor #{@instructor.email} criado com sucesso."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 

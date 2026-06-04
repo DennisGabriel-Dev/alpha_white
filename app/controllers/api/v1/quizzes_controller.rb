@@ -19,7 +19,7 @@ class Api::V1::QuizzesController < Api::V1::BaseController
     if @quiz.save
       render json: { quiz: @quiz, message: "Prova criada com sucesso." }, status: :created
     else
-      render json: { errors: @quiz.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @quiz.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -27,7 +27,7 @@ class Api::V1::QuizzesController < Api::V1::BaseController
     if @quiz.update(quiz_params)
       render json: { quiz: @quiz, message: "Prova atualizada com sucesso." }
     else
-      render json: { errors: @quiz.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @quiz.errors.full_messages }, status: :unprocessable_content
     end
   end
 

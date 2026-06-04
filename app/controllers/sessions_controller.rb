@@ -21,7 +21,7 @@ class SessionsController < ApplicationController
     if @session.save
       redirect_to @course, notice: "Sessão criada com sucesso."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -32,7 +32,7 @@ class SessionsController < ApplicationController
     if @session.update(session_params)
       redirect_to @course, notice: "Sessão atualizada com sucesso."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

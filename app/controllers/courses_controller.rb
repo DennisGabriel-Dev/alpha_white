@@ -36,7 +36,7 @@ class CoursesController < ApplicationController
     if @course.save
       redirect_to @course, notice: "Curso criado com sucesso."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -47,7 +47,7 @@ class CoursesController < ApplicationController
     if @course.update(course_params)
       redirect_to @course, notice: "Curso atualizado com sucesso."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

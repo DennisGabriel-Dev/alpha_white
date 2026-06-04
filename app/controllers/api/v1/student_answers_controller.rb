@@ -14,7 +14,7 @@ class Api::V1::StudentAnswersController < Api::V1::BaseController
     if @answer.update(student_answer_params)
       render json: { student_answer: @answer, message: "Resposta enviada com sucesso." }, status: @answer.previously_new_record? ? :created : :ok
     else
-      render json: { errors: @answer.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @answer.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -23,7 +23,7 @@ class Api::V1::StudentAnswersController < Api::V1::BaseController
     if @answer.update(student_answer_params)
       render json: { student_answer: @answer, message: "Resposta atualizada com sucesso." }
     else
-      render json: { errors: @answer.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @answer.errors.full_messages }, status: :unprocessable_content
     end
   end
 

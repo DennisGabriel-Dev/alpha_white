@@ -28,7 +28,7 @@ class LessonsController < ApplicationController
     if @lesson.save
       redirect_to course_session_path(@course, @session), notice: "Aula criada com sucesso."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -42,7 +42,7 @@ class LessonsController < ApplicationController
       redirect_to course_session_lesson_quiz_questions_path(@course, @session, @lesson),
                   alert: @lesson.errors.full_messages.to_sentence
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

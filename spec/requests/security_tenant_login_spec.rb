@@ -12,7 +12,7 @@ RSpec.describe "Segurança — login cross-tenant", type: :request do
          params: { user: { email: user.email, password: "password123" } },
          headers: { "HOST" => "#{tenant_b.subdomain}.lvh.me" }
 
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
   end
 
   it "permite login no subdomínio correto" do

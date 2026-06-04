@@ -20,7 +20,7 @@ class Api::V1::LessonCompletionsController < Api::V1::BaseController
         message: "Progresso registrado."
       }, status: @completion.previously_new_record? ? :created : :ok
     else
-      render json: { errors: @completion.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @completion.errors.full_messages }, status: :unprocessable_content
     end
   end
 
@@ -33,7 +33,7 @@ class Api::V1::LessonCompletionsController < Api::V1::BaseController
         message: "Progresso atualizado."
       }
     else
-      render json: { errors: @completion.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: @completion.errors.full_messages }, status: :unprocessable_content
     end
   end
 
