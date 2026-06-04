@@ -27,13 +27,14 @@
 <% end %>
 
 <%# ── Ações ── %>
+<% quiz_label = "quiz-progress-label" %>
 <% content_for :header_actions do %>
   <% if review_mode %>
-    <span class="text-xs font-medium text-gray-700" id="quiz-progress-label">
+    <span class="text-xs font-medium text-gray-700" id="<%= quiz_label %>">
       <%= @review_correct %>/<%= @review_total %> acertos
     </span>
   <% else %>
-    <span class="text-xs text-gray-400" id="quiz-progress-label">
+    <span class="text-xs text-gray-400" id="<%= quiz_label %>">
       0 de <%= questions.count %> respondidas
     </span>
   <% end %>
@@ -143,9 +144,10 @@
         <div class="space-y-5">
           <% questions.each_with_index do |question, index| %>
             <% my_answer = @quiz_attempt&.student_answers&.find { |a| a.question_id == question.id } %>
+            <% question_id = question.id %>
             <div class="bg-white rounded-2xl border border-gray-100 p-5 merma-question"
-                 id="q-<%= question.id %>"
-                 data-question-id="<%= question.id %>">
+                 id="q-<%= question_id %>"
+                 data-question-id="<%= question_id %>">
               <div class="flex gap-3 mb-4">
                 <span class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5"
                       style="background: var(--color-primary-10); color: var(--color-primary);">
