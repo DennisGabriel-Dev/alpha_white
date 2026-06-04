@@ -49,7 +49,7 @@ gem "acts_as_tenant"
 gem "ransack", "~> 4.2"
 
 # Dados realistas em db/seeds.rb (require manual no seed)
-gem "faker", "~> 3.0", require: false
+gem "faker", "~> 3.8", require: false
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
