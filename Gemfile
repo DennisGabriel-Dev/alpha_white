@@ -71,6 +71,8 @@ end
 
 group :test do
   gem 'shoulda-matchers', '~> 7.0', '>= 7.0.1'
+  gem "simplecov", require: false
+  gem "simplecov-cobertura", require: false
 end
 
 group :development do

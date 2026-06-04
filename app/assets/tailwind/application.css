@@ -12,12 +12,14 @@
   --color-primary-deeper: #170721;
   --color-accent-orange: #FE7610;
   --color-accent-turquoise: #00A3A8;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 /* Custom base styles */
 body {
   background-color: white;
   color: rgb(17 24 39);
+  font-family: var(--font-sans);
 }
 
 h1 {

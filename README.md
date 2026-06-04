@@ -69,6 +69,25 @@ make stop            # Para os containers
 | `make console` | Abre Rails console no container |
 | `make logs` | Logs do app em tempo real |
 
+### SonarQube (análise de código)
+
+O SonarQube **não usa** o PostgreSQL nem o Redis do `docker-compose.yml` da aplicação. Ele sobe com **banco próprio** (`sonar` / usuário `sonar`) em `docker-compose.sonar.yml`, conforme a [documentação oficial Docker](https://docs.sonarsource.com/sonarqube-server/latest/setup-and-upgrade/install-the-server/installing-sonarqube-from-docker).
+
+```bash
+sudo sysctl -w vm.max_map_count=262144
+
+make sonar-up          # http://localhost:9000 — login inicial admin/admin (troque a senha)
+# No painel: My Account → Security → Generate Tokens
+export SONAR_TOKEN=seu_token_aqui
+make test-coverage     # RSpec + SimpleCov → coverage/sonar-coverage.xml
+make sonar-scan        # envia código + cobertura para o Sonar
+# ou em um passo:
+make sonar-report      # test-coverage + sonar-scan
+make sonar-down        # para a stack quando não precisar
+```
+
+A app Rails segue em `make start` (porta 3000); o SonarQube usa a porta **9000** em paralelo.
+
 ---
 
 ## 🏗️ Arquitetura Multi-Tenant

@@ -7,10 +7,6 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= yield :head %>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
 
@@ -22,7 +18,7 @@
         --color-primary-20:    color-mix(in srgb, <%= tenant_primary_color %> 20%, white);
       }
 
-      body { font-family: 'Inter', sans-serif; }
+      body { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
 
       /* ── Rail ── */
       .merma-rail-btn {
@@ -55,7 +51,7 @@
       .merma-btn-primary:hover { background: var(--color-primary-dark); }
 
       /* ── Progress ring text ── */
-      .merma-ring-text { font-family: 'Inter', sans-serif; font-weight: 700; }
+      .merma-ring-text { font-weight: 700; }
     </style>
   </head>
 
