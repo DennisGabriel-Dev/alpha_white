@@ -5,10 +5,10 @@
 <% content_for :header_title, @quiz.title + (review_mode ? " · Conferência" : "") %>
 <% content_for :header_subtitle, "#{@lesson.name} · #{pluralize(questions.count, 'questão', 'questões')}" %>
 
-<div class="flex-1 overflow-y-auto p-6">
+<div class="flex-1 overflow-y-auto p-4 sm:p-6">
 
   <%# Breadcrumb %>
-  <nav class="flex items-center gap-2 text-xs text-gray-400 mb-6">
+  <nav class="flex flex-wrap items-center gap-2 text-xs text-gray-400 mb-6">
     <%= link_to course_path(@course), class: "hover:text-[var(--color-primary)] transition-colors" do %>
       <%= @course.name %>
     <% end %>
@@ -85,7 +85,7 @@
             </div>
           </div>
 
-          <div class="space-y-2 ml-10">
+          <div class="space-y-2 ml-0 sm:ml-10">
             <% question.question_options.each do |option| %>
               <% correct = option.correct? %>
               <% chosen = picked&.id == option.id %>
@@ -97,8 +97,8 @@
                    else
                      "border-gray-100 bg-gray-50/80"
                    end %>
-              <div class="flex items-center gap-3 p-3.5 rounded-xl border <%= row_class %>">
-                <span class="text-sm text-gray-700 flex-1"><%= option.text %></span>
+              <div class="flex flex-wrap items-start gap-2 sm:gap-3 p-3.5 rounded-xl border <%= row_class %>">
+                <span class="text-sm text-gray-700 flex-1 min-w-0"><%= option.text %></span>
                 <% if correct %>
                   <span class="text-[10px] font-semibold uppercase text-green-700">Gabarito</span>
                 <% elsif chosen %>
@@ -111,7 +111,7 @@
       <% end %>
     </div>
 
-    <div class="flex items-center justify-between mt-6 pt-6 border-t border-gray-100">
+    <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 mt-6 pt-6 border-t border-gray-100">
       <%= link_to course_session_lesson_path(@course, @session, @lesson, tab: "quiz"),
             class: "aurora-btn-primary inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold" do %>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,7 +142,7 @@
               <p class="text-sm font-medium text-gray-800 leading-relaxed pt-0.5"><%= question.enunciation %></p>
             </div>
 
-            <div class="space-y-2 ml-10">
+            <div class="space-y-2 ml-0 sm:ml-10">
               <% question.question_options.each do |option| %>
                 <% checked = my_answer&.question_option_id == option.id %>
                 <label class="quiz-option flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all
@@ -164,7 +164,7 @@
         <% end %>
       </div>
 
-      <div class="flex items-center justify-between mt-6 pt-6 border-t border-gray-100">
+      <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 mt-6 pt-6 border-t border-gray-100">
         <%= link_to course_session_lesson_path(@course, @session, @lesson),
               class: "inline-flex items-center gap-1.5 text-sm font-medium text-gray-400 hover:text-gray-600 transition-colors" do %>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
