@@ -20,7 +20,7 @@ class QuizzesController < ApplicationController
 
     return unless prepare_student_quiz_attempt!
 
-    @expires_at = @quiz_attempt.expires_at
+    @expires_at = @quiz_attempt&.expires_at
   end
 
   def review

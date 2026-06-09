@@ -55,10 +55,11 @@
         Jornadas guiadas com tudo que você precisa para dominar cada área do conhecimento
       </p>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       <% @tracks.each do |track| %>
         <%= render "shared/track_card", name: track[:name], description: track[:description],
-              courses_count: track[:courses_count], hours: track[:hours], level: track[:level] %>
+              courses_count: track[:courses_count], hours: track[:hours], level: track[:level],
+              course: track[:course] %>
       <% end %>
     </div>
   </div>

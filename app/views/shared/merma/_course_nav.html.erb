@@ -43,19 +43,29 @@
   <% sessions.each do |session| %>
     <div class="mb-1">
       <%# Cabeçalho da sessão %>
-      <div class="flex items-center justify-between px-2 pt-3 pb-1">
-        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider truncate">
+      <div class="flex items-center justify-between gap-1 px-2 pt-3 pb-1">
+        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-wider truncate flex-1 min-w-0">
           <%= session.name %>
         </p>
         <% if admin_or_instructor? %>
-          <%= link_to new_course_session_lesson_path(course, session),
-                title: "Nova aula",
-                class: "w-4 h-4 flex items-center justify-center rounded text-gray-300
-                        hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition-colors flex-shrink-0" do %>
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-            </svg>
-          <% end %>
+          <div class="flex items-center gap-0.5 flex-shrink-0">
+            <%= link_to edit_course_session_path(course, session),
+                  title: "Editar sessão",
+                  class: "w-4 h-4 flex items-center justify-center rounded text-gray-300
+                          hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition-colors" do %>
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/>
+              </svg>
+            <% end %>
+            <%= link_to new_course_session_lesson_path(course, session),
+                  title: "Nova aula",
+                  class: "w-4 h-4 flex items-center justify-center rounded text-gray-300
+                          hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition-colors" do %>
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+              </svg>
+            <% end %>
+          </div>
         <% end %>
       </div>
 
