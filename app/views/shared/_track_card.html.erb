@@ -48,8 +48,9 @@
   
   <%# CTA %>
   <div class="pt-4">
-    <%= link_to "#", class: "block w-full text-center py-3 px-4 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors" do %>
-      Começar trilha →
+    <% cta_path = local_assigns[:course] ? course_path(course) : courses_path %>
+    <%= link_to cta_path, class: "block w-full text-center py-3 px-4 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-colors" do %>
+      Ver curso →
     <% end %>
   </div>
 </div>

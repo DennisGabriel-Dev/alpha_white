@@ -5,7 +5,7 @@
 
 require "faker"
 
-Faker::Config.locale = "pt-BR"
+Faker::Config.locale = "pt-br"
 Faker::UniqueGenerator.clear
 
 puts "🌱 Iniciando seeds..."
@@ -23,26 +23,108 @@ TENANTS_DATA = [
   { name: "Cursinho Objetivo", subdomain: "objetivo", theme: "default", primary_color: "#3C0094",
     tagline: "Sua aprovação no ENEM começa aqui", feature_flags: {} },
   { name: "Cursinho Poliedro", subdomain: "poliedro", theme: "aurora", primary_color: "#4F46E5",
-    tagline: "Excelência em vestibulares", feature_flags: { "gamification" => false } },
+    tagline: "Excelência em vestibulares", feature_flags: {} },
   { name: "Cursinho Anglo", subdomain: "anglo", theme: "merma", primary_color: "#0D9488",
     tagline: "Estude no seu ritmo", feature_flags: { "csv_export" => false } }
 ].freeze
 
+# Catálogo ENEM por tenant: mesmas áreas (LC, CH, CN, MT), nomes e descrições próprios de cada cursinho.
 COURSES_BY_TENANT = {
   "objetivo" => [
-    { name: "Medicina Intensivo", description: "Preparatório intensivo para Medicina com foco em questões ENEM e vestibulares concorridos." },
-    { name: "Engenharia Premium", description: "Curso completo para aprovação em Engenharia nas melhores universidades." },
-    { name: "Extensivo Anual", description: "Curso completo de 1 ano com todas as matérias do ENEM." }
+    {
+      name: "Linguagens e Códigos — Objetivo",
+      area: "LC",
+      description: "Interpretação de textos, literatura, gramática e língua estrangeira no padrão ENEM."
+    },
+    {
+      name: "Humanas Integradas — Objetivo",
+      area: "CH",
+      description: "História, geografia, filosofia e sociologia com análise de documentos e contextualização."
+    },
+    {
+      name: "Natureza em Foco — Objetivo",
+      area: "CN",
+      description: "Física, química e biologia integradas a saúde, meio ambiente e tecnologia."
+    },
+    {
+      name: "Matemática para o ENEM — Objetivo",
+      area: "MT",
+      description: "Álgebra, geometria, estatística e raciocínio lógico em situações-problema do exame."
+    },
+    {
+      name: "Extensivo Anual ENEM",
+      area: nil,
+      description: "Preparação completa com as quatro áreas, redação e estratégias de prova ao longo do ano."
+    },
+    {
+      name: "Simulados Oficiais INEP",
+      area: nil,
+      description: "Provas integradas no formato ENEM, com correção e desempenho por área de conhecimento."
+    }
   ],
   "poliedro" => [
-    { name: "ITA/IME Elite", description: "Preparação exclusiva para ITA e IME com professores especializados." },
-    { name: "Medicina USP", description: "Foco total na aprovação em Medicina nas universidades paulistas." },
-    { name: "Semi-extensivo", description: "Curso de 6 meses para revisão e aprofundamento." }
+    {
+      name: "Poliedro LC: Comunicação e Textos",
+      area: "LC",
+      description: "Leitura, interpretação e produção textual para a área de Linguagens do ENEM."
+    },
+    {
+      name: "Poliedro CH: Mundo e Sociedade",
+      area: "CH",
+      description: "História, geografia e ciências sociais com leitura crítica de mapas, gráficos e documentos."
+    },
+    {
+      name: "Poliedro CN: Ciências Aplicadas",
+      area: "CN",
+      description: "Física, química e biologia em problemas interdisciplinares típicos da prova."
+    },
+    {
+      name: "Poliedro MT: Raciocínio Matemático",
+      area: "MT",
+      description: "Matemática e suas tecnologias com resolução orientada e simulados por tema."
+    },
+    {
+      name: "Semi-extensivo Poliedro ENEM",
+      area: nil,
+      description: "Revisão intensiva das quatro áreas em seis meses, com foco em desempenho no exame."
+    },
+    {
+      name: "Banco de Simulados Poliedro",
+      area: nil,
+      description: "Simulados cronometrados com relatório de acertos por área LC, CH, CN e MT."
+    }
   ],
   "anglo" => [
-    { name: "ENEM Master", description: "Curso completo focado exclusivamente no ENEM." },
-    { name: "Unicamp/Unesp", description: "Preparação específica para vestibulares Unicamp e Unesp." },
-    { name: "Módulo Online", description: "Todas as aulas disponíveis online com suporte ao vivo." }
+    {
+      name: "Anglo — Linguagens ENEM",
+      area: "LC",
+      description: "Domine interpretação de textos, gêneros discursivos e competências de leitura do ENEM."
+    },
+    {
+      name: "Anglo — Ciências Humanas",
+      area: "CH",
+      description: "História, geografia, filosofia e sociologia com questões comentadas e mapas mentais."
+    },
+    {
+      name: "Anglo — Ciências da Natureza",
+      area: "CN",
+      description: "Conteúdos de física, química e biologia organizados por habilidades do exame."
+    },
+    {
+      name: "Anglo — Matemática",
+      area: "MT",
+      description: "Funções, geometria, estatística e análise de gráficos com prática diária."
+    },
+    {
+      name: "ENEM Master Anglo",
+      area: nil,
+      description: "Trilha completa do ENEM com as quatro áreas, redação e gestão de tempo em prova."
+    },
+    {
+      name: "Simulados Comentados Anglo",
+      area: nil,
+      description: "Simulados no formato oficial com feedback por questão e evolução por área."
+    }
   ]
 }.freeze
 
@@ -79,22 +161,56 @@ module AlphaWhiteSeed
     text
   end
 
-  def session_title
-    topics = [
-      Faker::Science.science,
-      Faker::Educator.subject,
-      Faker::Book.genre,
-      "Revisão #{Faker::Number.between(from: 1, to: 12)}ª semana"
+  ENEM_SESSION_TOPICS = {
+    "LC" => [
+      "Interpretação de textos",
+      "Literatura brasileira",
+      "Gramática e linguagem",
+      "Língua estrangeira",
+      "Artes e cultura digital"
+    ],
+    "CH" => [
+      "História do Brasil",
+      "História geral",
+      "Geografia física",
+      "Geografia humana",
+      "Filosofia e sociologia"
+    ],
+    "CN" => [
+      "Física — mecânica",
+      "Química orgânica",
+      "Biologia celular",
+      "Ecologia e meio ambiente",
+      "Física moderna"
+    ],
+    "MT" => [
+      "Funções e gráficos",
+      "Geometria plana",
+      "Estatística e probabilidade",
+      "Álgebra e equações",
+      "Trigonometria"
+    ],
+    nil => [
+      "Revisão integrada",
+      "Simulado oficial",
+      "Estratégias de prova",
+      "Gestão de tempo",
+      "Redação — estrutura e argumentação"
     ]
+  }.freeze
+
+  def session_title(area: nil)
+    topics = ENEM_SESSION_TOPICS[area] || ENEM_SESSION_TOPICS[nil]
     topics.sample
   end
 
-  def lesson_title
+  def lesson_title(area: nil)
+    topics = ENEM_SESSION_TOPICS[area] || ENEM_SESSION_TOPICS[nil]
     [
-      "Fundamentos: #{Faker::Lorem.sentence(word_count: 4).delete_suffix('.')}",
-      "Prática guiada — #{Faker::Educator.course_name}",
-      "Dúvidas frequentes: #{Faker::Lorem.sentence(word_count: 3).delete_suffix('.')}",
-      "Simulado comentado ##{Faker::Number.between(from: 1, to: 20)}"
+      "#{topics.sample} — teoria",
+      "#{topics.sample} — questões comentadas",
+      "Simulado ENEM ##{Faker::Number.between(from: 1, to: 20)}",
+      "Revisão: #{topics.sample}"
     ].sample
   end
 
@@ -187,19 +303,19 @@ module AlphaWhiteSeed
     tenant.update!(updates) if updates.any?
   end
 
-  def populate_course_structure(course, tenant)
+  def populate_course_structure(course, tenant, area: nil)
     return unless course.sessions.empty?
 
     ActsAsTenant.with_tenant(tenant) do
       rand(2..4).times do |si|
         session = course.sessions.create!(
-          name: session_title,
+          name: session_title(area: area),
           position: si
         )
 
         rand(2..5).times do |li|
           lesson = session.lessons.create!(
-            name: lesson_title,
+            name: lesson_title(area: area),
             description: lorem_description(max_chars: 800),
             position: li,
             video_url: (rand < 0.72 ? DEMO_VIDEO_URLS.sample : nil)
@@ -235,19 +351,27 @@ module AlphaWhiteSeed
     puts "    🧱 Estrutura gerada (sessões/aulas/quizzes): #{course.name}"
   end
 
-  def ensure_extra_courses(tenant)
-    extras = [
-      "Trilha de revisão — #{tenant.subdomain}",
-      "Simulados comentados — #{tenant.subdomain}"
-    ]
+  def sync_tenant_courses(tenant, course_catalog)
+    expected_names = course_catalog.map { |c| c[:name] }
 
     ActsAsTenant.with_tenant(tenant) do
-      extras.each do |name|
-        course = Course.find_or_create_by!(name: name) do |c|
-          c.description = lorem_description
+      course_catalog.each do |course_data|
+        course = Course.find_or_create_by!(name: course_data[:name]) do |c|
+          c.description = course_data[:description]
           c.active = true
         end
-        populate_course_structure(course, tenant)
+        updates = {}
+        updates[:description] = course_data[:description] if course.description != course_data[:description]
+        updates[:active] = true unless course.active?
+        course.update!(updates) if updates.any?
+
+        puts "    📚 Curso: #{course.name}"
+        populate_course_structure(course, tenant, area: course_data[:area])
+      end
+
+      Course.where.not(name: expected_names).where(active: true).find_each do |legacy|
+        legacy.update!(active: false)
+        puts "    ⏸️ Curso legado desativado: #{legacy.name}"
       end
     end
   end
@@ -314,23 +438,9 @@ TENANTS_DATA.each do |data|
   puts "  ✅ Tenant: #{tenant.name} (#{tenant.subdomain})"
 end
 
-# --- Cursos principais + extras + árvore de conteúdo ---
+# --- Cursos ENEM + árvore de conteúdo ---
 tenants.each do |tenant|
-  ActsAsTenant.with_tenant(tenant) do
-    (COURSES_BY_TENANT[tenant.subdomain] || []).each do |course_data|
-      course = Course.find_or_create_by!(name: course_data[:name]) do |c|
-        c.description = course_data[:description]
-        c.active = true
-      end
-      if course.description != course_data[:description]
-        course.update!(description: course_data[:description])
-      end
-      puts "    📚 Curso: #{course.name}"
-      AlphaWhiteSeed.populate_course_structure(course, tenant)
-    end
-  end
-
-  AlphaWhiteSeed.ensure_extra_courses(tenant)
+  AlphaWhiteSeed.sync_tenant_courses(tenant, COURSES_BY_TENANT.fetch(tenant.subdomain))
 end
 
 # --- Usuários (contas de demo + turma numerada) ---

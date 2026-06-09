@@ -6,45 +6,48 @@ class PagesController < ApplicationController
     # Dados para seção de benefícios
     @benefits = [
       {
-        icon: "📚",
+        icon: :book_open,
         title: "Conteúdo completo do ENEM",
         description: "Todo o conteúdo que você precisa para arrasar no ENEM, organizado por disciplinas e temas."
       },
       {
-        icon: "📊",
+        icon: :chart_bar,
         title: "Acompanhe sua evolução",
         description: "Veja seu progresso em tempo real e identifique pontos de melhoria com relatórios detalhados."
       },
       {
-        icon: "🎯",
+        icon: :academic_cap,
         title: "Simulados realistas",
         description: "Pratique com simulados no formato do ENEM e se prepare de verdade para o dia da prova."
       }
     ]
 
-    # Mock de trilhas (será implementado depois)
-    @tracks = [
-      {
-        name: "ENEM Completo",
-        description: "Trilha completa com todas as disciplinas do ENEM",
-        courses_count: 12,
-        hours: 80,
-        level: "Iniciante"
-      },
-      {
-        name: "Matemática Intensiva",
-        description: "Domine matemática e suas tecnologias",
-        courses_count: 8,
-        hours: 40,
-        level: "Intermediário"
-      },
-      {
-        name: "Redação Nota 1000",
-        description: "Aprenda a fazer redações perfeitas",
-        courses_count: 4,
-        hours: 20,
-        level: "Todos os níveis"
-      }
-    ]
+    @tracks = build_enem_tracks
+  end
+
+  private
+
+  def build_enem_tracks
+    Course.where(active: true).order(:id).map do |course|
+      track_presentation_for(course).merge(
+        name: course.name,
+        description: course.description,
+        course: course
+      )
+    end
+  end
+
+  def track_presentation_for(course)
+    label = course.name.downcase
+
+    if label.include?("simulado") || label.include?("banco de simulados")
+      { hours: 24, level: "Avançado", courses_count: 1 }
+    elsif label.match?(/extensivo|semi-extensivo|master|completo|anual/)
+      { hours: 120, level: "Todos os níveis", courses_count: 4 }
+    elsif label.match?(/matemática|matematico|raciocínio matemático|: mt/)
+      { hours: 40, level: "Intermediário", courses_count: 1 }
+    else
+      { hours: 48, level: "Intermediário", courses_count: 1 }
+    end
   end
 end

@@ -15,6 +15,15 @@ class EnemImportJob < ApplicationRecord
 
   before_validation :set_tenant_from_user, on: :create
 
+  def status_in_pt_br
+    case status
+    when "pending"    then "Pendente"
+    when "processing" then "Processando"
+    when "done"       then "Concluído"
+    when "failed"     then "Falhou"
+    end
+  end
+
   def mark_processing!
     update!(status: :processing, error_message: nil)
   end

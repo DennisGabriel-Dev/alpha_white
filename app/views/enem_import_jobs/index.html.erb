@@ -67,7 +67,7 @@
           <% @jobs.each do |job| %>
             <tr class="border-t border-gray-100 align-top">
               <td class="px-4 py-2"><%= job.id %></td>
-              <td class="px-4 py-2"><%= job.status %></td>
+              <td class="px-4 py-2"><%= job.status_in_pt_br %></td>
               <td class="px-4 py-2">
                 <% if job.enem_exam.present? %>
                   <%= link_to "#{job.enem_exam.year} #{job.enem_exam.day} #{job.enem_exam.booklet_color}",
