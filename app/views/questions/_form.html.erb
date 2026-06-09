@@ -70,7 +70,7 @@
   </div>
 
   <div class="flex items-center gap-3 pt-4">
-    <%= f.submit class: "btn-primary cursor-pointer" %>
+    <%= f.submit question.persisted? ? "Salvar questão" : "Criar questão", class: "btn-primary cursor-pointer" %>
     <%= link_to "Cancelar", course_session_lesson_quiz_questions_path(@course, @session, @lesson), class: "text-gray-600 hover:text-gray-800 font-medium" %>
   </div>
 <% end %>
